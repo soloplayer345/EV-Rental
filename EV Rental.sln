@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35514.174 d17.12
+VisualStudioVersion = 17.12.35514.174
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EV Rental", "EV Rental\EV Rental.csproj", "{1045745E-81C8-423A-87D7-85820D133922}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PresentaionLayer", "EV Rental\PresentaionLayer.csproj", "{1045745E-81C8-423A-87D7-85820D133922}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccessLayer", "DataAccessLayer\DataAccessLayer.csproj", "{97FEF20C-B415-423B-9D0D-0E060D78825E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessLayer", "BusinessLayer\BusinessLayer.csproj", "{43E76334-04BE-4195-8EB3-B3E3CA5F9C55}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{1045745E-81C8-423A-87D7-85820D133922}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1045745E-81C8-423A-87D7-85820D133922}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1045745E-81C8-423A-87D7-85820D133922}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97FEF20C-B415-423B-9D0D-0E060D78825E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97FEF20C-B415-423B-9D0D-0E060D78825E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97FEF20C-B415-423B-9D0D-0E060D78825E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97FEF20C-B415-423B-9D0D-0E060D78825E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43E76334-04BE-4195-8EB3-B3E3CA5F9C55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43E76334-04BE-4195-8EB3-B3E3CA5F9C55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43E76334-04BE-4195-8EB3-B3E3CA5F9C55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43E76334-04BE-4195-8EB3-B3E3CA5F9C55}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

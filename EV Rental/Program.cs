@@ -1,3 +1,10 @@
+using BusinessLayer.Interfaces;
+using BusinessLayer.Services;
+using DataAccessLayer;
+using DataAccessLayer.Interfaces;
+using EV_Rental.Middlewares;
+using Microsoft.EntityFrameworkCore;
+
 namespace EV_Rental
 {
     public class Program
@@ -8,6 +15,23 @@ namespace EV_Rental
 
             // Add services to the container.
             builder.Services.AddRazorPages();
+
+            // Add Session
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
+            //add connection String
+            builder.Services.AddDbContext<EVRentalDBContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("LocalSQLServer"))
+            );
+
+            // Register UnitOfWork and Services
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
 
             var app = builder.Build();
 
@@ -24,6 +48,8 @@ namespace EV_Rental
 
             app.UseRouting();
 
+            app.UseSession(); // Add Session middleware
+            app.UseRoleBasedRedirect(); // Add Role-based redirect middleware
             app.UseAuthorization();
 
             app.MapRazorPages();

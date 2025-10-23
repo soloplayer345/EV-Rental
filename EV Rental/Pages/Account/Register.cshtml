@@ -1,0 +1,82 @@
+@page
+@model EV_Rental.Pages.Account.RegisterModel
+@{
+    ViewData["Title"] = "Đăng ký";
+}
+
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">Đăng ký tài khoản</h3>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @Model.ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form method="post">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="RegisterRequest.Email" class="form-label"></label>
+                                <input asp-for="RegisterRequest.Email" class="form-control" placeholder="example@email.com" />
+                                <span asp-validation-for="RegisterRequest.Email" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="RegisterRequest.Phone" class="form-label"></label>
+                                <input asp-for="RegisterRequest.Phone" class="form-control" placeholder="0123456789" />
+                                <span asp-validation-for="RegisterRequest.Phone" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="RegisterRequest.Password" class="form-label"></label>
+                                <input asp-for="RegisterRequest.Password" class="form-control" placeholder="Tối thiểu 6 ký tự" />
+                                <span asp-validation-for="RegisterRequest.Password" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="RegisterRequest.ConfirmPassword" class="form-label"></label>
+                                <input asp-for="RegisterRequest.ConfirmPassword" class="form-control" />
+                                <span asp-validation-for="RegisterRequest.ConfirmPassword" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="RegisterRequest.IdCard" class="form-label"></label>
+                                <input asp-for="RegisterRequest.IdCard" class="form-control" placeholder="Số CCCD" />
+                                <span asp-validation-for="RegisterRequest.IdCard" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="RegisterRequest.DriverLicense" class="form-label"></label>
+                                <input asp-for="RegisterRequest.DriverLicense" class="form-control" placeholder="Số GPLX" />
+                                <span asp-validation-for="RegisterRequest.DriverLicense" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">Đăng ký</button>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <p>Đã có tài khoản? <a asp-page="/Account/Login">Đăng nhập ngay</a></p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

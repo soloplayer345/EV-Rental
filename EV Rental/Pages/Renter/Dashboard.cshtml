@@ -1,0 +1,37 @@
+@page
+@model EV_Rental.Pages.Renter.DashboardModel
+@{
+    ViewData["Title"] = "Renter Dashboard";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1>Renter Dashboard</h1>
+            <p class="lead">Chào mừng: @Model.UserEmail</p>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header">Thuê Xe</div>
+                <div class="card-body">
+                    <h5 class="card-title">Xe có sẵn</h5>
+                    <p class="card-text">Tìm và thuê xe điện</p>
+                    <a href="#" class="btn btn-light">Xem danh sách xe</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Lịch sử thuê</div>
+                <div class="card-body">
+                    <h5 class="card-title">Chuyến đi của bạn</h5>
+                    <p class="card-text">Xem lịch sử thuê xe</p>
+                    <a href="#" class="btn btn-light">Xem lịch sử</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

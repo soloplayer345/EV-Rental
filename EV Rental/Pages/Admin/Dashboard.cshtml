@@ -1,0 +1,47 @@
+@page
+@model EV_Rental.Pages.Admin.DashboardModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1>Admin Dashboard</h1>
+            <p class="lead">Chào mừng Admin: @Model.UserEmail</p>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header">Quản lý Users</div>
+                <div class="card-body">
+                    <h5 class="card-title">Tổng số Users</h5>
+                    <p class="card-text">Quản lý tài khoản người dùng</p>
+                    <a href="#" class="btn btn-light">Xem chi tiết</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Quản lý Xe</div>
+                <div class="card-body">
+                    <h5 class="card-title">Tổng số Xe</h5>
+                    <p class="card-text">Quản lý phương tiện</p>
+                    <a href="#" class="btn btn-light">Xem chi tiết</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">Quản lý Trạm</div>
+                <div class="card-body">
+                    <h5 class="card-title">Tổng số Trạm</h5>
+                    <p class="card-text">Quản lý trạm sạc</p>
+                    <a href="#" class="btn btn-light">Xem chi tiết</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
