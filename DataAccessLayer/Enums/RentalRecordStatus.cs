@@ -10,6 +10,7 @@ namespace DataAccessLayer.Enums
     {
         Pending,
         Active,
-        Completed
+        Completed,
+        Cancelled
     }
 }

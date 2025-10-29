@@ -10,6 +10,7 @@ namespace DataAccessLayer.Enums
     {
         Available,
         Rented,
-        Maintenance
+        Maintenance,
+        Charging
     }
 }
