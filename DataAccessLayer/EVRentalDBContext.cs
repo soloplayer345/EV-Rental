@@ -15,103 +15,130 @@ namespace DataAccessLayer
         }
 
         public DbSet<Account> Accounts { get; set; }
-
-        public DbSet<Renter> Renters { get; set; }
-
-        public DbSet<Staff> Staffs { get; set; }
-
-        public DbSet<Vehicle> Vehicles { get; set; }
-
-        public DbSet<RentalRecord> RentalRecords { get; set; }
-
-        public DbSet<Payment> Payments { get; set; }
-
         public DbSet<Station> Stations { get; set; }
-
-        public DbSet<VehicleCheck> VehicleChecks { get; set; }
-
-        public DbSet<Report> Reports { get; set; }
+        public DbSet<Vehicle> Vehicles { get; set; }
+        public DbSet<RentalRecord> RentalRecords { get; set; }
+        public DbSet<Payment> Payments { get; set; }
+        public DbSet<InspectionProblem> InspectionProblems { get; set; }
+        public DbSet<RatingReview> RatingReviews { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Cấu hình mối quan hệ 1-1 giữa Account và Renter
-            modelBuilder.Entity<Account>()
-                .HasOne(a => a.Renter)
-                .WithOne(r => r.Account)
-                .HasForeignKey<Renter>(r => r.AccountId)
-                .OnDelete(DeleteBehavior.NoAction);
+            // Configure Account
+            modelBuilder.Entity<Account>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.FullName).HasMaxLength(200);
+                entity.Property(e => e.Email).HasMaxLength(200).IsRequired();
+                entity.HasIndex(e => e.Email).IsUnique();
+                entity.Property(e => e.Phone).HasMaxLength(20);
+                entity.Property(e => e.PasswordHash).HasMaxLength(255);
+                entity.Property(e => e.Role).IsRequired();
+                entity.Property(e => e.IsActive).HasDefaultValue(false);
+            });
 
-            // Cấu hình mối quan hệ 1-1 giữa Account và Staff
-            modelBuilder.Entity<Account>()
-                .HasOne(a => a.Staff)
-                .WithOne(s => s.Account)
-                .HasForeignKey<Staff>(s => s.AccountId)
-                .OnDelete(DeleteBehavior.NoAction);
+            // Configure Station
+            modelBuilder.Entity<Station>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Name).HasMaxLength(200).IsRequired();
+            });
 
-            // Cấu hình FK StationId cho Report -> Station
-            modelBuilder.Entity<Report>()
-                .HasOne(r => r.Station)
-                .WithMany()
-                .HasForeignKey(r => r.StationId)
-                .OnDelete(DeleteBehavior.NoAction);
+            // Configure Vehicle
+            modelBuilder.Entity<Vehicle>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Name).HasMaxLength(100);
+                entity.Property(e => e.Brand).HasMaxLength(50);
+                entity.Property(e => e.PlateNumber).HasMaxLength(50);
+                entity.Property(e => e.Model).HasMaxLength(100);
+                entity.Property(e => e.VehicleType).HasMaxLength(50);
+                entity.Property(e => e.PricePerHour).HasColumnType("decimal(12,2)");
+                entity.Property(e => e.PricePerDay).HasColumnType("decimal(12,2)");
 
-            // Cấu hình FK StationId cho Staff -> Station
-            modelBuilder.Entity<Staff>()
-                .HasOne(s => s.Station)
-                .WithMany(st => st.Staff)
-                .HasForeignKey(s => s.StationId)
-                .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(v => v.Station)
+                    .WithMany(s => s.Vehicles)
+                    .HasForeignKey(v => v.StationId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
 
-            // Cấu hình FK StationId cho Vehicle -> Station
-            modelBuilder.Entity<Vehicle>()
-                .HasOne(v => v.Station)
-                .WithMany(st => st.Vehicles)
-                .HasForeignKey(v => v.StationId)
-                .OnDelete(DeleteBehavior.Restrict);
+            // Configure RentalRecord
+            modelBuilder.Entity<RentalRecord>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.BasePrice).HasColumnType("decimal(12,2)");
+                entity.Property(e => e.DepositFee).HasColumnType("decimal(12,2)");
+                entity.Property(e => e.ReservationFee).HasColumnType("decimal(12,2)");
+                entity.Property(e => e.ExtraFees).HasColumnType("decimal(12,2)").HasDefaultValue(0);
+                entity.Property(e => e.Discount).HasColumnType("decimal(12,2)").HasDefaultValue(0);
+                entity.Property(e => e.TotalPrice).HasColumnType("decimal(12,2)");
+                entity.Property(e => e.OtpCode).HasMaxLength(6);
 
-            // Cấu hình FK StationId cho RentalRecord -> Station
-            modelBuilder.Entity<RentalRecord>()
-                .HasOne(r => r.Station)
-                .WithMany(st => st.RentalRecords)
-                .HasForeignKey(r => r.StationId)
-                .OnDelete(DeleteBehavior.Restrict);
+                // Renter relationship
+                entity.HasOne(r => r.Renter)
+                    .WithMany(a => a.RentalRecords)
+                    .HasForeignKey(r => r.RenterId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
-            // Cấu hình FK RenterId cho RentalRecord -> Renter
-            modelBuilder.Entity<RentalRecord>()
-                .HasOne(r => r.Renter)
-                .WithMany(rn => rn.RentalRecords)
-                .HasForeignKey(r => r.RenterId)
-                .OnDelete(DeleteBehavior.Restrict);
+                // Vehicle relationship
+                entity.HasOne(r => r.Vehicle)
+                    .WithMany(v => v.RentalRecords)
+                    .HasForeignKey(r => r.VehicleId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
-            // Cấu hình FK VehicleId cho RentalRecord -> Vehicle
-            modelBuilder.Entity<RentalRecord>()
-                .HasOne(r => r.Vehicle)
-                .WithMany(v => v.RentalRecords)
-                .HasForeignKey(r => r.VehicleId)
-                .OnDelete(DeleteBehavior.Restrict);
+                // Pickup Station relationship
+                entity.HasOne(r => r.PickupStation)
+                    .WithMany(s => s.PickupRentalRecords)
+                    .HasForeignKey(r => r.PickupStationId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
-            // Cấu hình FK RentalId cho Payment -> RentalRecord
-            modelBuilder.Entity<Payment>()
-                .HasOne(p => p.RentalRecord)
-                .WithMany(r => r.Payments)
-                .HasForeignKey(p => p.RentalId)
-                .OnDelete(DeleteBehavior.Restrict);
+                // Return Station relationship
+                entity.HasOne(r => r.ReturnStation)
+                    .WithMany(s => s.ReturnRentalRecords)
+                    .HasForeignKey(r => r.ReturnStationId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
 
-            // Cấu hình FK RentalId cho VehicleCheck -> RentalRecord
-            modelBuilder.Entity<VehicleCheck>()
-                .HasOne(vc => vc.RentalRecord)
-                .WithMany(r => r.VehicleChecks)
-                .HasForeignKey(vc => vc.RentalId)
-                .OnDelete(DeleteBehavior.Restrict);
+            // Configure Payment
+            modelBuilder.Entity<Payment>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Amount).HasColumnType("decimal(12,2)").IsRequired();
+                entity.Property(e => e.Method).HasMaxLength(50);
+                entity.Property(e => e.TransactionRef).HasMaxLength(200);
+                entity.Property(e => e.Status).HasMaxLength(30).HasDefaultValue("pending");
 
-            // Cấu hình FK StaffId cho VehicleCheck -> Staff
-            modelBuilder.Entity<VehicleCheck>()
-                .HasOne(vc => vc.Staff)
-                .WithMany(s => s.VehicleChecks)
-                .HasForeignKey(vc => vc.StaffId)
-                .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(p => p.RentalRecord)
+                    .WithMany(r => r.Payments)
+                    .HasForeignKey(p => p.RentalId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // Configure InspectionProblem
+            modelBuilder.Entity<InspectionProblem>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.IncidentType).HasMaxLength(50);
+                entity.Property(e => e.PenaltyAmount).HasColumnType("decimal(12,2)").HasDefaultValue(0);
+
+                entity.HasOne(i => i.RentalRecord)
+                    .WithMany(r => r.InspectionProblems)
+                    .HasForeignKey(i => i.RentalId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // Configure RatingReview
+            modelBuilder.Entity<RatingReview>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.HasOne(r => r.RentalRecord)
+                    .WithOne(rr => rr.RatingReview)
+                    .HasForeignKey<RatingReview>(r => r.RentalId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
 
             // Seed dữ liệu từ DataSeeder
             DataSeeder.SeedData(modelBuilder);

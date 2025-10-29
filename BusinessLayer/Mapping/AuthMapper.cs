@@ -8,31 +8,17 @@ namespace BusinessLayer.Mapping
         /// <summary>
         /// Map từ Account sang AuthResponseDto
         /// </summary>
-        public static AuthResponseDto ToAuthResponseDto(Account account, Renter? renter = null, Staff? staff = null)
+        public static AuthResponseDto ToAuthResponseDto(Account account)
         {
             var response = new AuthResponseDto
             {
                 AccountId = account.Id,
+                FullName = account.FullName,
                 Email = account.Email,
                 Phone = account.Phone,
                 Role = account.Role,
-                Status = account.Status
+                IsActive = account.IsActive
             };
-
-            // Map thông tin Renter nếu có
-            if (renter != null)
-            {
-                response.RenterId = renter.Id;
-                response.RenterIdCard = renter.IdCard;
-                response.RenterDriverLicense = renter.DriverLicense;
-            }
-
-            // Map thông tin Staff nếu có
-            if (staff != null)
-            {
-                response.StaffId = staff.Id;
-                response.StaffName = staff.FullName;
-            }
 
             return response;
         }
@@ -44,28 +30,12 @@ namespace BusinessLayer.Mapping
         {
             return new Account
             {
+                FullName = request.Email, // Có thể thay đổi sau
                 Email = request.Email,
                 Phone = request.Phone,
-                Password = request.Password, // TODO: Hash password with BCrypt
+                PasswordHash = request.Password, // TODO: Hash password with BCrypt
                 Role = DataAccessLayer.Enums.AccountRole.Renter,
-                Status = DataAccessLayer.Enums.AccountStatus.Active,
-                CreateDate = DateTime.UtcNow,
-                UpdateDate = DateTime.UtcNow,
-                IsDeleted = false
-            };
-        }
-
-        /// <summary>
-        /// Tạo Renter entity từ RegisterRequestDto
-        /// </summary>
-        public static Renter ToRenterEntity(RegisterRequestDto request, int accountId)
-        {
-            return new Renter
-            {
-                AccountId = accountId,
-                IdCard = request.IdCard,
-                DriverLicense = request.DriverLicense,
-                Status = DataAccessLayer.Enums.RenterStatus.Pending,
+                IsActive = true,
                 CreateDate = DateTime.UtcNow,
                 UpdateDate = DateTime.UtcNow,
                 IsDeleted = false

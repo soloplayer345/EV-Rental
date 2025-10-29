@@ -75,42 +75,25 @@ namespace DataAccessLayer.Repositories
         }
 
         /// <summary>
-        /// Lấy tất cả accounts theo status
+        /// Lấy tất cả accounts active
         /// </summary>
-        public async Task<IEnumerable<Account>> GetAccountsByStatusAsync(AccountStatus status)
+        public async Task<IEnumerable<Account>> GetActiveAccountsAsync()
         {
             return await _dbSet
-                .Where(x => !x.IsDeleted && x.Status == status)
+                .Where(x => !x.IsDeleted && x.IsActive)
                 .OrderByDescending(x => x.CreateDate)
                 .ToListAsync();
         }
 
         /// <summary>
-        /// Lấy account kèm theo Renter navigation property
+        /// Lấy tất cả accounts inactive
         /// </summary>
-        public async Task<Account?> GetAccountWithRenterAsync(int accountId)
+        public async Task<IEnumerable<Account>> GetInactiveAccountsAsync()
         {
-            if (accountId <= 0)
-                throw new ArgumentException("Account ID must be greater than 0", nameof(accountId));
-
             return await _dbSet
-                .Where(x => !x.IsDeleted)
-                .Include(a => a.Renter)
-                .FirstOrDefaultAsync(a => a.Id == accountId);
-        }
-
-        /// <summary>
-        /// Lấy account kèm theo Staff navigation property
-        /// </summary>
-        public async Task<Account?> GetAccountWithStaffAsync(int accountId)
-        {
-            if (accountId <= 0)
-                throw new ArgumentException("Account ID must be greater than 0", nameof(accountId));
-
-            return await _dbSet
-                .Where(x => !x.IsDeleted)
-                .Include(a => a.Staff)
-                .FirstOrDefaultAsync(a => a.Id == accountId);
+                .Where(x => !x.IsDeleted && !x.IsActive)
+                .OrderByDescending(x => x.CreateDate)
+                .ToListAsync();
         }
     }
 }

@@ -13,11 +13,12 @@ namespace DataAccessLayer
                 new Account
                 {
                     Id = 1,
+                    FullName = "Administrator",
                     Email = "admin@evrental.com",
                     Phone = "0123456789",
-                    Password = "Admin@123", // Trong thực tế nên hash password
+                    PasswordHash = "Admin@123", // Trong thực tế nên hash password
                     Role = AccountRole.Admin,
-                    Status = AccountStatus.Active,
+                    IsActive = true,
                     CreateDate = new DateTime(2025, 10, 24),
                     UpdateDate = new DateTime(2025, 10, 24),
                     IsDeleted = false

@@ -4,11 +4,18 @@ namespace DataAccessLayer.Entities
 {
     public class Vehicle : BaseEntity
     {
-        public string LicensePlate { get; set; }
-        public float BatteryCapacity { get; set; }
         public int StationId { get; set; }
-        public VehicleStatus Status { get; set; }
+        public string Name { get; set; } // Tên xe (VD: VinFast VF7 Plus 2025)
+        public string Brand { get; set; }
+        public string PlateNumber { get; set; } // Biển số xe
+        public string Model { get; set; }
+        public string VehicleType { get; set; } // 'scooter'|'motorbike'|'car'...
+        public VehicleStatus Status { get; set; } = VehicleStatus.Available; // 'available'|'rented'|'maintenance'|'charging'
         public decimal PricePerHour { get; set; }
+        public decimal PricePerDay { get; set; }
+        public string Features { get; set; } // e.g. {"gps":true,"insurance":true}
+        public string ImageUrl { get; set; }
+        public int MaxDistance { get; set; } // Quãng đường tối đa (km)
 
         // Navigation properties
         public virtual Station Station { get; set; }
