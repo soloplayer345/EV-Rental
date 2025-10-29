@@ -48,32 +48,14 @@ namespace BusinessLayer.Services
 
                 // Kiểm tra password (đơn giản - trong thực tế nên dùng BCrypt)
                 // TODO: Implement password hashing with BCrypt
-                if (account.Password != request.Password)
+                if (account.PasswordHash != request.Password)
                     return ServiceResultDto<AuthResponseDto>.FailureResult("Email/Số điện thoại hoặc mật khẩu không chính xác");
 
                 // Kiểm tra trạng thái account
-                if (account.Status == AccountStatus.Inactive)
-                    return ServiceResultDto<AuthResponseDto>.FailureResult("Tài khoản đã bị vô hiệu hóa");
+                if (!account.IsActive)
+                    return ServiceResultDto<AuthResponseDto>.FailureResult("Tài khoản chưa được kích hoạt hoặc đã bị vô hiệu hóa");
 
-                if (account.Status == AccountStatus.Banned)
-                    return ServiceResultDto<AuthResponseDto>.FailureResult("Tài khoản đã bị khóa");
-
-                // Lấy thông tin Renter hoặc Staff tùy theo role và map sang DTO
-                Renter? renter = null;
-                Staff? staff = null;
-
-                if (account.Role == AccountRole.Renter)
-                {
-                    var accountWithRenter = await _unitOfWork.AccountRepo.GetAccountWithRenterAsync(account.Id);
-                    renter = accountWithRenter?.Renter;
-                }
-                else if (account.Role == AccountRole.Staff || account.Role == AccountRole.Admin)
-                {
-                    var accountWithStaff = await _unitOfWork.AccountRepo.GetAccountWithStaffAsync(account.Id);
-                    staff = accountWithStaff?.Staff;
-                }
-
-                var response = AuthMapper.ToAuthResponseDto(account, renter, staff);
+                var response = AuthMapper.ToAuthResponseDto(account);
                 return ServiceResultDto<AuthResponseDto>.SuccessResult(response, "Đăng nhập thành công");
             }
             catch (Exception ex)
@@ -123,17 +105,11 @@ namespace BusinessLayer.Services
                 await _unitOfWork.AccountRepo.AddAsync(account);
                 await _unitOfWork.SaveChangesAsync(); // Save để lấy AccountId
 
-                // Tạo Renter từ DTO
-                var renter = AuthMapper.ToRenterEntity(request, account.Id);
-                var renterRepo = _unitOfWork.GetRepository<Renter>();
-                await renterRepo.AddAsync(renter);
-                await _unitOfWork.SaveChangesAsync();
-
                 // Commit transaction
                 await _unitOfWork.CommitTransactionAsync();
 
                 // Map sang response DTO
-                var response = AuthMapper.ToAuthResponseDto(account, renter);
+                var response = AuthMapper.ToAuthResponseDto(account);
                 return ServiceResultDto<AuthResponseDto>.SuccessResult(response, "Đăng ký thành công");
             }
             catch (Exception ex)

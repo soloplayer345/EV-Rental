@@ -30,18 +30,13 @@ namespace DataAccessLayer.Interfaces
         Task<IEnumerable<Account>> GetAccountsByRoleAsync(Enums.AccountRole role);
 
         /// <summary>
-        /// Lấy tất cả accounts theo status
+        /// Lấy tất cả accounts active
         /// </summary>
-        Task<IEnumerable<Account>> GetAccountsByStatusAsync(Enums.AccountStatus status);
+        Task<IEnumerable<Account>> GetActiveAccountsAsync();
 
         /// <summary>
-        /// Lấy account kèm theo Renter navigation property
+        /// Lấy tất cả accounts inactive
         /// </summary>
-        Task<Account?> GetAccountWithRenterAsync(int accountId);
-
-        /// <summary>
-        /// Lấy account kèm theo Staff navigation property
-        /// </summary>
-        Task<Account?> GetAccountWithStaffAsync(int accountId);
+        Task<IEnumerable<Account>> GetInactiveAccountsAsync();
     }
 }
