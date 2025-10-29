@@ -4,6 +4,25 @@
     ViewData["Title"] = "Đăng xuất";
 }
 
-<div class="container text-center mt-5">
-    <h2>Đang đăng xuất...</h2>
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-body text-center p-5">
+                    <div class="spinner-border text-primary mb-4" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h3 class="mb-3">Đang đăng xuất...</h3>
+                    <p class="text-muted">Vui lòng chờ trong giây lát</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+    // Auto redirect sau 2 giây
+    setTimeout(function() {
+        window.location.href = '/Account/Login';
+    }, 2000);
+</script>

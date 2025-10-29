@@ -1,5 +1,6 @@
 using BusinessLayer.DTOs;
 using DataAccessLayer.Entities;
+using BCrypt.Net;
 
 namespace BusinessLayer.Mapping
 {
@@ -30,10 +31,10 @@ namespace BusinessLayer.Mapping
         {
             return new Account
             {
-                FullName = request.Email, // Có thể thay đổi sau
+                FullName = request.FullName,
                 Email = request.Email,
                 Phone = request.Phone,
-                PasswordHash = request.Password, // TODO: Hash password with BCrypt
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
                 Role = DataAccessLayer.Enums.AccountRole.Renter,
                 IsActive = true,
                 CreateDate = DateTime.UtcNow,

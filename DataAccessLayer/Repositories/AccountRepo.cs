@@ -20,7 +20,6 @@ namespace DataAccessLayer.Repositories
                 throw new ArgumentException("Email cannot be null or empty", nameof(email));
 
             return await _dbSet
-                .Where(x => !x.IsDeleted)
                 .FirstOrDefaultAsync(a => a.Email == email);
         }
 
@@ -33,7 +32,6 @@ namespace DataAccessLayer.Repositories
                 throw new ArgumentException("Phone cannot be null or empty", nameof(phone));
 
             return await _dbSet
-                .Where(x => !x.IsDeleted)
                 .FirstOrDefaultAsync(a => a.Phone == phone);
         }
 
@@ -46,7 +44,6 @@ namespace DataAccessLayer.Repositories
                 return false;
 
             return await _dbSet
-                .Where(x => !x.IsDeleted)
                 .AnyAsync(a => a.Email == email);
         }
 
@@ -59,7 +56,6 @@ namespace DataAccessLayer.Repositories
                 return false;
 
             return await _dbSet
-                .Where(x => !x.IsDeleted)
                 .AnyAsync(a => a.Phone == phone);
         }
 
@@ -69,7 +65,7 @@ namespace DataAccessLayer.Repositories
         public async Task<IEnumerable<Account>> GetAccountsByRoleAsync(AccountRole role)
         {
             return await _dbSet
-                .Where(x => !x.IsDeleted && x.Role == role)
+                .Where(x => x.Role == role)
                 .OrderByDescending(x => x.CreateDate)
                 .ToListAsync();
         }
@@ -80,7 +76,7 @@ namespace DataAccessLayer.Repositories
         public async Task<IEnumerable<Account>> GetActiveAccountsAsync()
         {
             return await _dbSet
-                .Where(x => !x.IsDeleted && x.IsActive)
+                .Where(x => x.IsActive)
                 .OrderByDescending(x => x.CreateDate)
                 .ToListAsync();
         }
@@ -91,7 +87,7 @@ namespace DataAccessLayer.Repositories
         public async Task<IEnumerable<Account>> GetInactiveAccountsAsync()
         {
             return await _dbSet
-                .Where(x => !x.IsDeleted && !x.IsActive)
+                .Where(x => !x.IsActive)
                 .OrderByDescending(x => x.CreateDate)
                 .ToListAsync();
         }

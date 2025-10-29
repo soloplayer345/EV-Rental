@@ -4,6 +4,7 @@ using BusinessLayer.Mapping;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
 using DataAccessLayer.Interfaces;
+using BCrypt.Net;
 
 namespace BusinessLayer.Services
 {
@@ -46,9 +47,8 @@ namespace BusinessLayer.Services
                 if (account == null)
                     return ServiceResultDto<AuthResponseDto>.FailureResult("Email/Số điện thoại hoặc mật khẩu không chính xác");
 
-                // Kiểm tra password (đơn giản - trong thực tế nên dùng BCrypt)
-                // TODO: Implement password hashing with BCrypt
-                if (account.PasswordHash != request.Password)
+                // Kiểm tra password với BCrypt
+                if (!BCrypt.Net.BCrypt.Verify(request.Password, account.PasswordHash))
                     return ServiceResultDto<AuthResponseDto>.FailureResult("Email/Số điện thoại hoặc mật khẩu không chính xác");
 
                 // Kiểm tra trạng thái account
@@ -85,12 +85,6 @@ namespace BusinessLayer.Services
 
                 if (request.Password != request.ConfirmPassword)
                     return ServiceResultDto<AuthResponseDto>.FailureResult("Mật khẩu xác nhận không khớp");
-
-                if (string.IsNullOrWhiteSpace(request.IdCard))
-                    return ServiceResultDto<AuthResponseDto>.FailureResult("Số CCCD không được để trống");
-
-                if (string.IsNullOrWhiteSpace(request.DriverLicense))
-                    return ServiceResultDto<AuthResponseDto>.FailureResult("Số giấy phép lái xe không được để trống");
 
                 // Kiểm tra email đã tồn tại
                 if (await _unitOfWork.AccountRepo.IsEmailExistsAsync(request.Email))

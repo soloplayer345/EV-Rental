@@ -7,11 +7,12 @@
 <div class="container">
     <div class="row justify-content-center mt-5">
         <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-header bg-success text-white">
-                    <h3 class="mb-0">Đăng ký tài khoản</h3>
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-success text-white text-center py-4">
+                    <h3 class="mb-0"><i class="fas fa-user-plus me-2"></i>Đăng ký tài khoản</h3>
+                    <p class="mb-0 mt-2">Tạo tài khoản để bắt đầu thuê xe điện</p>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-5">
                     @if (!string.IsNullOrEmpty(Model.ErrorMessage))
                     {
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -21,50 +22,60 @@
                     }
 
                     <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="RegisterRequest.Email" class="form-label"></label>
-                                <input asp-for="RegisterRequest.Email" class="form-control" placeholder="example@email.com" />
+                            <div class="col-md-12 mb-4">
+                                <label asp-for="RegisterRequest.FullName" class="form-label fw-bold">
+                                    <i class="fas fa-user me-1"></i>Họ và tên
+                                </label>
+                                <input asp-for="RegisterRequest.FullName" class="form-control form-control-lg" placeholder="Nhập họ và tên đầy đủ" />
+                                <span asp-validation-for="RegisterRequest.FullName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="RegisterRequest.Email" class="form-label fw-bold">
+                                    <i class="fas fa-envelope me-1"></i>Email
+                                </label>
+                                <input asp-for="RegisterRequest.Email" class="form-control form-control-lg" placeholder="example@email.com" />
                                 <span asp-validation-for="RegisterRequest.Email" class="text-danger"></span>
                             </div>
 
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="RegisterRequest.Phone" class="form-label"></label>
-                                <input asp-for="RegisterRequest.Phone" class="form-control" placeholder="0123456789" />
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="RegisterRequest.Phone" class="form-label fw-bold">
+                                    <i class="fas fa-phone me-1"></i>Số điện thoại
+                                </label>
+                                <input asp-for="RegisterRequest.Phone" class="form-control form-control-lg" placeholder="0123456789" />
                                 <span asp-validation-for="RegisterRequest.Phone" class="text-danger"></span>
                             </div>
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="RegisterRequest.Password" class="form-label"></label>
-                                <input asp-for="RegisterRequest.Password" class="form-control" placeholder="Tối thiểu 6 ký tự" />
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="RegisterRequest.Password" class="form-label fw-bold">
+                                    <i class="fas fa-lock me-1"></i>Mật khẩu
+                                </label>
+                                <input asp-for="RegisterRequest.Password" class="form-control form-control-lg" placeholder="Tối thiểu 8 ký tự, gồm chữ hoa, chữ thường, số, ký tự đặc biệt" />
                                 <span asp-validation-for="RegisterRequest.Password" class="text-danger"></span>
                             </div>
 
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="RegisterRequest.ConfirmPassword" class="form-label"></label>
-                                <input asp-for="RegisterRequest.ConfirmPassword" class="form-control" />
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="RegisterRequest.ConfirmPassword" class="form-label fw-bold">
+                                    <i class="fas fa-lock me-1"></i>Xác nhận mật khẩu
+                                </label>
+                                <input asp-for="RegisterRequest.ConfirmPassword" class="form-control form-control-lg" placeholder="Nhập lại mật khẩu" />
                                 <span asp-validation-for="RegisterRequest.ConfirmPassword" class="text-danger"></span>
                             </div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="RegisterRequest.IdCard" class="form-label"></label>
-                                <input asp-for="RegisterRequest.IdCard" class="form-control" placeholder="Số CCCD" />
-                                <span asp-validation-for="RegisterRequest.IdCard" class="text-danger"></span>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="RegisterRequest.DriverLicense" class="form-label"></label>
-                                <input asp-for="RegisterRequest.DriverLicense" class="form-control" placeholder="Số GPLX" />
-                                <span asp-validation-for="RegisterRequest.DriverLicense" class="text-danger"></span>
-                            </div>
-                        </div>
+                        
 
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-success btn-lg">Đăng ký</button>
+                            <button type="submit" class="btn btn-success btn-lg py-3">
+                                <i class="fas fa-user-plus me-2"></i>Đăng ký
+                            </button>
                         </div>
 
                         <div class="text-center mt-3">

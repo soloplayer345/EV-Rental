@@ -4,6 +4,7 @@ using DataAccessLayer;
 using DataAccessLayer.Interfaces;
 using EV_Rental.Middlewares;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace EV_Rental
 {
@@ -26,7 +27,7 @@ namespace EV_Rental
 
             //add connection String
             builder.Services.AddDbContext<EVRentalDBContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("LocalSQLServer"))
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
             );
 
             // Register UnitOfWork and Services
