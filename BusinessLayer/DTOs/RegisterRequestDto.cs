@@ -4,6 +4,11 @@ namespace BusinessLayer.DTOs
 {
     public class RegisterRequestDto
     {
+        [Required(ErrorMessage = "Họ tên là bắt buộc")]
+        [StringLength(100, MinimumLength = 2, ErrorMessage = "Họ tên phải có ít nhất 2 ký tự")]
+        [Display(Name = "Họ và tên")]
+        public string FullName { get; set; } = string.Empty;
+
         [Required(ErrorMessage = "Email là bắt buộc")]
         [EmailAddress(ErrorMessage = "Email không hợp lệ")]
         [Display(Name = "Email")]
@@ -26,15 +31,5 @@ namespace BusinessLayer.DTOs
         [Compare("Password", ErrorMessage = "Mật khẩu xác nhận không khớp")]
         [Display(Name = "Xác nhận mật khẩu")]
         public string ConfirmPassword { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Số CCCD là bắt buộc")]
-        [StringLength(12, MinimumLength = 9, ErrorMessage = "Số CCCD phải có 9-12 số")]
-        [Display(Name = "Số CCCD")]
-        public string IdCard { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Số giấy phép lái xe là bắt buộc")]
-        [StringLength(20, ErrorMessage = "Số giấy phép lái xe không được vượt quá 20 ký tự")]
-        [Display(Name = "Số giấy phép lái xe")]
-        public string DriverLicense { get; set; } = string.Empty;
     }
 }
