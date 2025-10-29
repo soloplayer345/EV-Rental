@@ -25,21 +25,33 @@
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                         <div class="row">
+<<<<<<< HEAD
                             <div class="col-md-12 mb-4">
                                 <label asp-for="RegisterRequest.FullName" class="form-label fw-bold">
                                     <i class="fas fa-user me-1"></i>Họ và tên
                                 </label>
                                 <input asp-for="RegisterRequest.FullName" class="form-control form-control-lg" placeholder="Nhập họ và tên đầy đủ" />
+=======
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="RegisterRequest.FullName" class="form-label"></label>
+                                <input asp-for="RegisterRequest.FullName" class="form-control" placeholder="Nhập họ và tên" />
+>>>>>>> feature/send-otp
                                 <span asp-validation-for="RegisterRequest.FullName" class="text-danger"></span>
                             </div>
                         </div>
 
                         <div class="row">
+<<<<<<< HEAD
                             <div class="col-md-6 mb-4">
                                 <label asp-for="RegisterRequest.Email" class="form-label fw-bold">
                                     <i class="fas fa-envelope me-1"></i>Email
                                 </label>
                                 <input asp-for="RegisterRequest.Email" class="form-control form-control-lg" placeholder="example@email.com" />
+=======
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="RegisterRequest.Email" class="form-label"></label>
+                                <input asp-for="RegisterRequest.Email" class="form-control" placeholder="example@email.com" />
+>>>>>>> feature/send-otp
                                 <span asp-validation-for="RegisterRequest.Email" class="text-danger"></span>
                             </div>
 
@@ -88,6 +100,39 @@
     </div>
 </div>
 
+<!-- OTP Modal -->
+<div class="modal fade" id="otpModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác thực OTP</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Chúng tôi đã gửi mã 6 số đến email của bạn. Vui lòng nhập để xác nhận.</p>
+                <form method="post" asp-page-handler="VerifyOtp">
+                    <div class="mb-3">
+                        <input name="otp" class="form-control" maxlength="6" placeholder="Nhập mã 6 số" />
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary">Xác nhận</button>
+                        <button formaction="?handler=ResendOtp" formmethod="post" class="btn btn-link">Gửi lại mã</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            var show = '@(TempData["ShowOtpModal"] as string)';
+            if (show === 'true') {
+                var modal = new bootstrap.Modal(document.getElementById('otpModal'));
+                modal.show();
+            }
+        })();
+    </script>
 }

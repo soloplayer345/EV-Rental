@@ -6,7 +6,11 @@ namespace BusinessLayer.DTOs
     {
         [Required(ErrorMessage = "Họ tên là bắt buộc")]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Họ tên phải có ít nhất 2 ký tự")]
+<<<<<<< HEAD
         [Display(Name = "Họ tên")]
+=======
+        [Display(Name = "Họ và tên")]
+>>>>>>> feature/send-otp
         public string FullName { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Email là bắt buộc")]
