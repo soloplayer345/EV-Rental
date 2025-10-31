@@ -4,17 +4,14 @@ using DataAccessLayer.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace EV_Rental.Pages
+namespace EV_Rental.Pages.Staff
 {
-    public class IndexModel : PageModel
+    public class StaffIndexModel : PageModel
     {
-        private readonly ILogger<IndexModel> _logger;
-        private readonly IVehicleRepo _vehicleRepo;
-
-        public IndexModel(ILogger<IndexModel> logger, IVehicleRepo vehicleRepo)
+        private readonly IVehicleRepo _vehicleRpo;
+        public StaffIndexModel(IVehicleRepo vehicleRpo)
         {
-            _logger = logger;
-            _vehicleRepo = vehicleRepo;
+            _vehicleRpo = vehicleRpo;
         }
 
         [BindProperty(SupportsGet = true)]

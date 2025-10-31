@@ -1,0 +1,67 @@
+﻿@page
+@model CreateVehicleModel
+@{
+    ViewData["Title"] = "Thêm Xe Điện Mới";
+}
+
+<h2 class="mb-4">Thêm Xe Điện Mới</h2>
+
+<form method="post" enctype="multipart/form-data" class="card p-4 shadow-sm">
+    <div class="mb-3">
+        <label class="form-label">Tên xe</label>
+        <input asp-for="Vehicle.Name" class="form-control" />
+        <span asp-validation-for="Vehicle.Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Hãng xe</label>
+        <input asp-for="Vehicle.Brand" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Biển số xe</label>
+        <input asp-for="Vehicle.PlateNumber" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Kiểu dáng xe</label>
+        <input asp-for="Vehicle.Model" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Loại xe</label>
+        <input asp-for="Vehicle.VehicleType" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Giá/Giờ (VNĐ)</label>
+        <input asp-for="Vehicle.PricePerHour" class="form-control" type="number" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Giá/Ngày (VNĐ)</label>
+        <input asp-for="Vehicle.PricePerDay" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Tính năng xe</label>
+        <input asp-for="Vehicle.Features" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Ảnh xe</label>
+        <input asp-for="ImageFile" type="file" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Quãng đường tối đa</label>
+        <input asp-for="Vehicle.MaxDistance" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Thêm xe</button>
+    <a asp-page="Index" class="btn btn-secondary ms-2">Hủy</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
