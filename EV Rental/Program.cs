@@ -4,6 +4,7 @@ using DataAccessLayer;
 using DataAccessLayer.Interfaces;
 using EV_Rental.Middlewares;
 using Microsoft.EntityFrameworkCore;
+using EV_Rental.Helpers;
 
 namespace EV_Rental
 {
@@ -32,6 +33,10 @@ namespace EV_Rental
             // Register UnitOfWork and Services
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IAuthService, AuthService>();
+
+            // Bind SMTP settings & register EmailSender
+            builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("Smtp"));
+            builder.Services.AddSingleton<IEmailSender, SmtpEmailSender>();
 
             var app = builder.Build();
 

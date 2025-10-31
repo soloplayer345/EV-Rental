@@ -86,12 +86,6 @@ namespace BusinessLayer.Services
                 if (request.Password != request.ConfirmPassword)
                     return ServiceResultDto<AuthResponseDto>.FailureResult("Mật khẩu xác nhận không khớp");
 
-                if (string.IsNullOrWhiteSpace(request.IdCard))
-                    return ServiceResultDto<AuthResponseDto>.FailureResult("Số CCCD không được để trống");
-
-                if (string.IsNullOrWhiteSpace(request.DriverLicense))
-                    return ServiceResultDto<AuthResponseDto>.FailureResult("Số giấy phép lái xe không được để trống");
-
                 // Kiểm tra email đã tồn tại
                 if (await _unitOfWork.AccountRepo.IsEmailExistsAsync(request.Email))
                     return ServiceResultDto<AuthResponseDto>.FailureResult("Email đã được sử dụng");
