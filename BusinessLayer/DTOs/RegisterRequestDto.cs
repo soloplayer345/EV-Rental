@@ -6,7 +6,11 @@ namespace BusinessLayer.DTOs
     {
         [Required(ErrorMessage = "Họ tên là bắt buộc")]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Họ tên phải có ít nhất 2 ký tự")]
+<<<<<<< HEAD
+        [Display(Name = "Họ tên")]
+=======
         [Display(Name = "Họ và tên")]
+>>>>>>> feature/send-otp
         public string FullName { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Email là bắt buộc")]
@@ -21,7 +25,8 @@ namespace BusinessLayer.DTOs
         public string Phone { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Mật khẩu là bắt buộc")]
-        [StringLength(100, MinimumLength = 6, ErrorMessage = "Mật khẩu phải có ít nhất 6 ký tự")]
+        [StringLength(100, MinimumLength = 8, ErrorMessage = "Mật khẩu phải có ít nhất 8 ký tự")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$", ErrorMessage = "Mật khẩu phải có chữ hoa, chữ thường, số và ký tự đặc biệt")]
         [DataType(DataType.Password)]
         [Display(Name = "Mật khẩu")]
         public string Password { get; set; } = string.Empty;

@@ -30,6 +30,8 @@ namespace DataAccessLayer
             modelBuilder.Entity<Account>(entity =>
             {
                 entity.HasKey(e => e.Id);
+                entity.ToTable("Account");
+                entity.Ignore(e => e.IsDeleted); // DB không có cột IsDeleted
                 entity.Property(e => e.FullName).HasMaxLength(200);
                 entity.Property(e => e.Email).HasMaxLength(200).IsRequired();
                 entity.HasIndex(e => e.Email).IsUnique();
@@ -37,6 +39,8 @@ namespace DataAccessLayer
                 entity.Property(e => e.PasswordHash).HasMaxLength(255);
                 entity.Property(e => e.Role).IsRequired();
                 entity.Property(e => e.IsActive).HasDefaultValue(false);
+                entity.Property(e => e.CreateDate).HasColumnName("CreatedAt");
+                entity.Property(e => e.UpdateDate).HasColumnName("UpdatedAt");
             });
 
             // Configure Station

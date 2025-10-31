@@ -4,7 +4,11 @@ using DataAccessLayer;
 using DataAccessLayer.Interfaces;
 using EV_Rental.Middlewares;
 using Microsoft.EntityFrameworkCore;
+<<<<<<< HEAD
+using Microsoft.Extensions.Options;
+=======
 using EV_Rental.Helpers;
+>>>>>>> feature/send-otp
 
 namespace EV_Rental
 {
@@ -27,7 +31,7 @@ namespace EV_Rental
 
             //add connection String
             builder.Services.AddDbContext<EVRentalDBContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("LocalSQLServer"))
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
             );
 
             // Register UnitOfWork and Services
