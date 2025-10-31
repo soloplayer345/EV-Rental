@@ -4,11 +4,7 @@ using DataAccessLayer;
 using DataAccessLayer.Interfaces;
 using EV_Rental.Middlewares;
 using Microsoft.EntityFrameworkCore;
-<<<<<<< HEAD
-using Microsoft.Extensions.Options;
-=======
 using EV_Rental.Helpers;
->>>>>>> feature/send-otp
 
 namespace EV_Rental
 {

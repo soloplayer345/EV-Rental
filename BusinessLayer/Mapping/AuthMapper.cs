@@ -34,11 +34,7 @@ namespace BusinessLayer.Mapping
                 FullName = request.FullName,
                 Email = request.Email,
                 Phone = request.Phone,
-<<<<<<< HEAD
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-=======
-                PasswordHash = request.Password,
->>>>>>> feature/send-otp
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
                 Role = DataAccessLayer.Enums.AccountRole.Renter,
                 IsActive = true,
                 CreateDate = DateTime.UtcNow,

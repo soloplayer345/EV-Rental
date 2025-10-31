@@ -4,13 +4,9 @@ namespace BusinessLayer.DTOs
 {
     public class RegisterRequestDto
     {
-        [Required(ErrorMessage = "Họ tên là bắt buộc")]
-        [StringLength(100, MinimumLength = 2, ErrorMessage = "Họ tên phải có ít nhất 2 ký tự")]
-<<<<<<< HEAD
-        [Display(Name = "Họ tên")]
-=======
-        [Display(Name = "Họ và tên")]
->>>>>>> feature/send-otp
+    [Required(ErrorMessage = "Họ tên là bắt buộc")]
+    [StringLength(100, MinimumLength = 2, ErrorMessage = "Họ tên phải có ít nhất 2 ký tự")]
+    [Display(Name = "Họ và tên")]
         public string FullName { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Email là bắt buộc")]

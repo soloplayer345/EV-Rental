@@ -8,10 +8,10 @@ namespace EV_Rental.Pages.Staff
 {
     public class StaffIndexModel : PageModel
     {
-        private readonly IVehicleRepo _vehicleRpo;
-        public StaffIndexModel(IVehicleRepo vehicleRpo)
+        private readonly IVehicleRepo _vehicleRepo;
+        public StaffIndexModel(IVehicleRepo vehicleRepo)
         {
-            _vehicleRpo = vehicleRpo;
+            _vehicleRepo = vehicleRepo;
         }
 
         [BindProperty(SupportsGet = true)]
