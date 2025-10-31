@@ -1,15 +1,16 @@
 ﻿@page
-@model IndexModel
+@model StaffIndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Quản lý xe điện - Nhân viên";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome to EV Rental</h1>
-    <p>Hệ thống cho thuê xe điện</p>
-
-
-    <h2 class="mb-4">Danh sách xe điện</h2>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Quản lý xe điện</h2>
+        <a asp-page="/Vehicles/Create" class="btn btn-success btn-lg shadow-sm">
+            <i class="bi bi-plus-circle"></i> Thêm xe mới
+        </a>
+    </div>
 
     <!-- Thanh tìm kiếm -->
     <form method="get" class="mb-4">
@@ -24,7 +25,7 @@
             </div>
             <div class="col-md-3">
                 <label class="form-label">Loại xe</label>
-                <input type="text" name="Search.Type" value="@Model.Search.VehicleType" class="form-control" />
+                <input type="text" name="Search.VehicleType" value="@Model.Search.VehicleType" class="form-control" />
             </div>
             <div class="col-md-2">
                 <label class="form-label">Trạng thái</label>
@@ -37,7 +38,6 @@
                             @s
                         </option>
                     }
-
                 </select>
             </div>
             <div class="col-md-1 text-end">
@@ -62,8 +62,12 @@
                             <p class="card-text mb-1"><strong>Giá/giờ:</strong> @v.PricePerHour.ToString("N0") VNĐ</p>
                         </div>
                         <div class="card-footer bg-transparent border-0 text-center">
-                            <a asp-page="/Vehicles/Edit" asp-route-id="@v.Id" class="btn btn-outline-primary btn-sm me-2">Sửa</a>
-                            <a asp-page="/Vehicles/Delete" asp-route-id="@v.Id" class="btn btn-outline-danger btn-sm">Xóa</a>
+                            <a asp-page="/Vehicles/Edit" asp-route-id="@v.Id" class="btn btn-outline-primary btn-sm me-2">
+                                <i class="bi bi-pencil-square"></i> Sửa
+                            </a>
+                            <a asp-page="/Vehicles/Delete" asp-route-id="@v.Id" class="btn btn-outline-danger btn-sm">
+                                <i class="bi bi-trash"></i> Xóa
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -76,5 +80,4 @@
             </div>
         }
     </div>
-
 </div>

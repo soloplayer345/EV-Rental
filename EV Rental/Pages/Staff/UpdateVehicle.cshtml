@@ -1,0 +1,74 @@
+﻿@page "{id:int}"
+@model UpdateVehicleModel
+@{
+    ViewData["Title"] = "Cập Nhật Xe Điện";
+}
+
+<h2 class="mb-4">Cập Nhật Xe Điện</h2>
+
+<form method="post" enctype="multipart/form-data" class="card p-4 shadow-sm">
+    <input type="hidden" asp-for="Vehicle.Id" />
+
+    <div class="mb-3">
+        <label class="form-label">Trạm</label>
+        <input asp-for="Vehicle.StationId" class="form-control" type="number" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Tên xe</label>
+        <input asp-for="Vehicle.Name" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Hãng xe</label>
+        <input asp-for="Vehicle.Brand" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Biển số xe</label>
+        <input asp-for="Vehicle.PlateNumber" class="form-control" type="number" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Loại xe</label>
+        <input asp-for="Vehicle.Model" class="form-control" type="number" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Loại xe</label>
+        <input asp-for="Vehicle.VehicleType" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Trạng thái</label>
+        <input asp-for="Vehicle.Status" class="form-control" type="number" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Giá/Giờ</label>
+        <input asp-for="Vehicle.PricePerHour" class="form-control" type="number" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Giá/Ngày</label>
+        <input asp-for="Vehicle.PricePerDay" class="form-control" type="number" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Chức năng</label>
+        <input asp-for="Vehicle.Features" class="form-control" type="number" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Đổi ảnh mới (nếu có)</label>
+        <input asp-for="Image" type="file" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Quảng đường tối đa</label>
+        <input asp-for="Vehicle.MaxDistance" class="form-control" type="number" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Cập nhật</button>
+    <a asp-page="Index" class="btn btn-secondary ms-2">Hủy</a>
+</form>
