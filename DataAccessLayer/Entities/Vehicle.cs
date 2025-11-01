@@ -16,6 +16,7 @@ namespace DataAccessLayer.Entities
         public string Features { get; set; } // e.g. {"gps":true,"insurance":true}
         public string ImageUrl { get; set; }
         public int MaxDistance { get; set; } // Quãng đường tối đa (km)
+        public int seartCapacity { get; set; } // Sức chứa chỗ ngồi
 
         // Navigation properties
         public virtual Station Station { get; set; }

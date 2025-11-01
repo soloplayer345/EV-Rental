@@ -106,5 +106,14 @@ namespace EV_Rental.Helpers
             var user = GetUserSession(session);
             return user?.Role.ToString();
         }
+
+        /// <summary>
+        /// Lấy ID của user hiện tại
+        /// </summary>
+        public static int? GetAccountId(HttpContext context)
+        {
+            var user = GetUserSession(context.Session);
+            return user?.AccountId;
+        }
     }
 }

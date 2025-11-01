@@ -130,6 +130,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true}",
                     ImageUrl = "https://www.vinfastvietnam.net.vn/uploads/data/3097/imgproducts/vinfastvietnam.net.vnvfe34.jpg3.jpg",
                     MaxDistance = 285,
+                    seartCapacity = 5,
                     CreateDate = new DateTime(2025, 10, 21),
                     UpdateDate = new DateTime(2025, 10, 21),
                     IsDeleted = false
@@ -149,6 +150,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true}",
                     ImageUrl = "https://shop.vinfastauto.com/on/demandware.static/-/Sites-app_vinfast_vn-Library/default/dw02b7ceb2/images/kara/head-banner.png",
                     MaxDistance = 90,
+                    seartCapacity = 2,
                     CreateDate = new DateTime(2025, 10, 21),
                     UpdateDate = new DateTime(2025, 10, 21),
                     IsDeleted = false
@@ -169,6 +171,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true,\"usbCharging\":true,\"antiTheft\":true}",
                     ImageUrl = "https://vcdn1-vnexpress.vnecdn.net/2021/11/30/weaver-200-1-1638229818-5666-1638230365.jpg?w=460&h=0&q=100&dpr=2&fit=crop&s=tEMINgIF_iQNoKpS66-pQQ",
                     MaxDistance = 120,
+                    seartCapacity = 2,
                     CreateDate = new DateTime(2025, 10, 21),
                     UpdateDate = new DateTime(2025, 10, 21),
                     IsDeleted = false
@@ -188,6 +191,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true,\"usbCharging\":true}",
                     ImageUrl = "https://dat.bike/cdn/shop/files/datbike-1_1728x_ead528e3-8a1c-4de4-89b9-4a567cfa2fdb.jpg?v=1668681506",
                     MaxDistance = 100,
+                    seartCapacity = 2,
                     CreateDate = new DateTime(2025, 10, 21),
                     UpdateDate = new DateTime(2025, 10, 21),
                     IsDeleted = false
@@ -208,6 +212,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"autopilot\":true}",
                     ImageUrl = "https://giaxeoto.vn/admin/upload/images/resize/640-tesla-model-3-2024-co-gi-moi.jpg",
                     MaxDistance = 491,
+                    seartCapacity = 5,
                     CreateDate = new DateTime(2025, 10, 21),
                     UpdateDate = new DateTime(2025, 10, 21),
                     IsDeleted = false
@@ -227,6 +232,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true,\"usbCharging\":true}",
                     ImageUrl = "https://xedienvietthanh.com/wp-content/uploads/2022/01/1-2.jpg",
                     MaxDistance = 80,
+                    seartCapacity = 2,
                     CreateDate = new DateTime(2025, 10, 21),
                     UpdateDate = new DateTime(2025, 10, 21),
                     IsDeleted = false
@@ -247,6 +253,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"sunroof\":true,\"leatherSeats\":true,\"panoramicRoof\":true}",
                     ImageUrl = "https://images.netdirector.co.uk/gforces-auto/image/upload/w_412,h_309,q_auto,c_fill,f_auto,fl_lossy/auto-titan/e9fc28a92a2bff98fdb38daeb05779d0/ix3_new_highlights.png",
                     MaxDistance = 460,
+                    seartCapacity = 5,
                     CreateDate = new DateTime(2025, 10, 21),
                     UpdateDate = new DateTime(2025, 10, 21),
                     IsDeleted = false
@@ -266,6 +273,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true}",
                     ImageUrl = "https://imgs.vietnamnet.vn/Images/2010/12/18/15/20101218153440_HondaEV_neo1.jpg?width=0&s=nYxnKbZLc3xcypiHjjRVgA",
                     MaxDistance = 90,
+                    seartCapacity = 2,
                     CreateDate = new DateTime(2025, 10, 21),
                     UpdateDate = new DateTime(2025, 10, 21),
                     IsDeleted = false
@@ -286,6 +294,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"autopilot\":true}",
                     ImageUrl = "https://vinfast-cars.vn/wp-content/uploads/2025/02/vinfast-vf8-den.png",
                     MaxDistance = 420,
+                    seartCapacity = 5,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -305,6 +314,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true,\"usbCharging\":true}",
                     ImageUrl = "https://thegioixechaydien.com.vn/upload/hinhanh/xe-may-dien-pega-xmen-350.jpg",
                     MaxDistance = 85,
+                    seartCapacity = 2,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -324,6 +334,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"leatherSeats\":true,\"sportMode\":true}",
                     ImageUrl = "https://i1-vnexpress.vnecdn.net/2024/11/23/DSC09878JPG-1732351567.jpg?w=750&h=450&q=100&dpr=1&fit=crop&s=UVB1kqgA08fA_pGNG7EjvA",
                     MaxDistance = 488,
+                    seartCapacity = 4,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -343,6 +354,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true,\"usbCharging\":true}",
                     ImageUrl = "https://xedoisong.vn/uploads/20221030/xedoisong_chi_tiet_mau_xe_tay_ga_thuan_dien_yamaha_e01_1__bggd.jpg",
                     MaxDistance = 110,
+                    seartCapacity = 2,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -362,6 +374,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"leatherSeats\":true,\"massage\":true,\"panoramicRoof\":true}",
                     ImageUrl = "https://i1-vnexpress.vnecdn.net/2023/03/29/Mercedes-EQS-2022-VnE-7034-JPG.jpg?w=2400&h=0&q=100&dpr=1&fit=crop&s=VNrfMglzD7glUa199o-N6A&t=image",
                     MaxDistance = 770,
+                    seartCapacity = 5,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -381,6 +394,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true,\"batterySwap\":true}",
                     ImageUrl = "https://autopro8.mediacdn.vn/2017/-1495870369869.jpg",
                     MaxDistance = 110,
+                    seartCapacity = 2,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -400,6 +414,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"leatherSeats\":true,\"sportMode\":true,\"launch\":true}",
                     ImageUrl = "https://i1-vnexpress.vnecdn.net/2024/10/18/Porsche-Taycan-Vnexpress-net-11-JPG.jpg?w=2400&h=0&q=100&dpr=1&fit=crop&s=LoskMEDqKHzXgrHyeWd5Ag&t=image",
                     MaxDistance = 484,
+                    seartCapacity = 4,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -419,6 +434,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true,\"usbCharging\":true}",
                     ImageUrl = "https://xedienducanh.com/upload/product/xe-may-dien-xmen-gt13030.jpg",
                     MaxDistance = 95,
+                    seartCapacity = 2,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -438,6 +454,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"7seats\":true,\"panoramicRoof\":true}",
                     ImageUrl = "https://shop.vinfastauto.com/on/demandware.static/-/Sites-app_vinfast_vn-Library/default/dw1a73c862/images/PDP/vf9/202406/exterior/CE1W.webp",
                     MaxDistance = 438,
+                    seartCapacity = 7,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -457,6 +474,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"autopilot\":true,\"7seats\":true}",
                     ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQuPPGwtfobtphn2JnZfRLJU_ELJXj4mEweQ&s",
                     MaxDistance = 525,
+                    seartCapacity = 7,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -476,6 +494,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"solarRoof\":true}",
                     ImageUrl = "https://i1-vnexpress.vnecdn.net/2023/07/31/Hyundai-IONIQ-5-7.jpg?w=2400&h=0&q=100&dpr=1&fit=crop&s=gqOfVmNy6EZxHps0rNBfCA&t=image",
                     MaxDistance = 481,
+                    seartCapacity = 5,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -495,6 +514,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"fastCharging\":true}",
                     ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDRNkoUruCHw69jdLnwmvz09ncLCsAcLnsJA&s",
                     MaxDistance = 528,
+                    seartCapacity = 5,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -514,6 +534,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true,\"usbCharging\":true,\"antiTheft\":true}",
                     ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4I4PWW4787JMocGpiEGGCSx1vybQqpptKWg&s",
                     MaxDistance = 150,
+                    seartCapacity = 2,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -533,6 +554,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true,\"usbCharging\":true}",
                     ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDSr3w-Z6dXCDd1X2htVbLBP6VL4YXEd-Ofw&s",
                     MaxDistance = 75,
+                    seartCapacity = 2,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -552,6 +574,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"googleIntegration\":true}",
                     ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFP_xRoDnlB2qUUnef4lw1c-HTf7Xnvi_hWw&s",
                     MaxDistance = 540,
+                    seartCapacity = 5,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -571,6 +594,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"proPilot\":true}",
                     ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNR4feHONvrN5Y-HK13689YKvLgkYgtqWiyA&s",
                     MaxDistance = 500,
+                    seartCapacity = 5,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -590,6 +614,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true}",
                     ImageUrl = "https://shop.vinfastauto.com/on/demandware.static/-/Sites-app_vinfast_vn-Library/default/dw0b27b768/images/PDP-XMD/evo200/img-evo-red.png",
                     MaxDistance = 85,
+                    seartCapacity = 2,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -609,6 +634,7 @@ namespace DataAccessLayer
                     Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"panoramicSunroof\":true}",
                     ImageUrl = "https://img1.oto.com.vn/2024/07/26/OpzfnMD2/atto-3-0f7e.webp",
                     MaxDistance = 480,
+                    seartCapacity = 5,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false

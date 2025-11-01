@@ -1,12 +1,31 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using BusinessLayer.Services;
+using DataAccessLayer.Entities;
 
 namespace EV_Rental.Pages.Renter
 {
     public class VehicleDetailModel : PageModel
     {
-        public void OnGet(int id)
+        private readonly VehicleService _vehicleService;
+
+        public VehicleDetailModel(VehicleService vehicleService)
         {
-            // TODO: Load vehicle data from database using id
+            _vehicleService = vehicleService;
+        }
+
+        public Vehicle? Vehicle { get; set; }
+
+        public async Task<IActionResult> OnGetAsync(int id)
+        {
+            Vehicle = await _vehicleService.GetVehicleByIdAsync(id);
+            
+            if (Vehicle == null)
+            {
+                return RedirectToPage("/Renter/Index");
+            }
+            
+            return Page();
         }
     }
 }

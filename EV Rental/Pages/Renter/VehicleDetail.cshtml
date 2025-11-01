@@ -35,15 +35,39 @@
             <div class="detail-grid">
                 <!-- Left: Vehicle Image -->
                 <div class="vehicle-image-container">
-                    <img src="https://www.vinfastvietnam.net.vn/uploads/data/3097/imgproducts/vinfastvietnam.net.vnvfe34.jpg3.jpg" 
-                         alt="VinFast VF e34" 
-                         class="vehicle-detail-image">
+                    @if (!string.IsNullOrEmpty(Model.Vehicle?.ImageUrl))
+                    {
+                        <img src="@Model.Vehicle.ImageUrl" 
+                             alt="@Model.Vehicle.Name" 
+                             class="vehicle-detail-image">
+                    }
+                    else
+                    {
+                        <div class="placeholder-img-large">
+                            @if (Model.Vehicle?.VehicleType.ToLower().Contains("car") == true)
+                            {
+                                <span>🚗</span>
+                            }
+                            else if (Model.Vehicle?.VehicleType.ToLower().Contains("scooter") == true)
+                            {
+                                <span>🛵</span>
+                            }
+                            else if (Model.Vehicle?.VehicleType.ToLower().Contains("bike") == true)
+                            {
+                                <span>🏍️</span>
+                            }
+                            else
+                            {
+                                <span>🚙</span>
+                            }
+                        </div>
+                    }
                 </div>
 
                 <!-- Right: Vehicle Info -->
                 <div class="vehicle-info-box">
-                    <h1 class="vehicle-title">VinFast VF e34</h1>
-                    <p class="vehicle-type">Loại xe: SUV Điện</p>
+                    <h1 class="vehicle-title">@Model.Vehicle?.Name</h1>
+                    <p class="vehicle-type">Loại xe: @Model.Vehicle?.VehicleType</p>
                     
                     <div class="rating">
                         <span class="stars">★★★★★</span>
@@ -54,35 +78,53 @@
                         <div class="spec-item">
                             <span class="spec-icon">🔋</span>
                             <span class="spec-label">Quãng đường</span>
-                            <span class="spec-value">285 km</span>
-                        </div>
-                        <div class="spec-item">
-                            <span class="spec-icon">⚡</span>
-                            <span class="spec-label">Pin</span>
-                            <span class="spec-value">42 kWh</span>
+                            <span class="spec-value">@Model.Vehicle?.MaxDistance km</span>
                         </div>
                         <div class="spec-item">
                             <span class="spec-icon">👥</span>
-                            <span class="spec-label">Chỗ ngồi</span>
-                            <span class="spec-value">5 chỗ</span>
+                            <span class="spec-label">Số ghế</span>
+                            <span class="spec-value">@Model.Vehicle?.seartCapacity chỗ</span>
                         </div>
                         <div class="spec-item">
-                            <span class="spec-icon">⚙️</span>
-                            <span class="spec-label">Hộp số</span>
-                            <span class="spec-value">Tự động</span>
+                            <span class="spec-icon">🏢</span>
+                            <span class="spec-label">Hãng</span>
+                            <span class="spec-value">@Model.Vehicle?.Brand</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-icon">📍</span>
+                            <span class="spec-label">Trạm</span>
+                            <span class="spec-value">@Model.Vehicle?.Station?.Name</span>
                         </div>
                     </div>
 
                     <div class="price-section">
                         <div class="price-label">Giá thuê</div>
-                        <div class="price-amount">1,200,000 đ/ngày</div>
+                        <div class="price-amount">@Model.Vehicle?.PricePerDay.ToString("N0") đ/ngày</div>
                     </div>
 
                     <div class="availability">
-                        <span class="status-badge available">✓ Có sẵn ngay</span>
+                        @if (Model.Vehicle?.Status == DataAccessLayer.Enums.VehicleStatus.Available)
+                        {
+                            <span class="status-badge available">✓ Có sẵn ngay</span>
+                        }
+                        else if (Model.Vehicle?.Status == DataAccessLayer.Enums.VehicleStatus.Rented)
+                        {
+                            <span class="status-badge rented">⚠ Đang được thuê</span>
+                        }
+                        else
+                        {
+                            <span class="status-badge maintenance">🔧 Bảo trì</span>
+                        }
                     </div>
 
-                    <button class="btn-rent-now">Thuê Xe Ngay</button>
+                    @if (Model.Vehicle?.Status == DataAccessLayer.Enums.VehicleStatus.Available)
+                    {
+                        <button class="btn-rent-now" onclick="window.location.href='/Renter/RentVehicle/@Model.Vehicle.Id'">Thuê Xe Ngay</button>
+                    }
+                    else
+                    {
+                        <button class="btn-rent-now" disabled style="background-color: #9ca3af; cursor: not-allowed;">Xe Không Khả Dụng</button>
+                    }
                 </div>
             </div>
         </div>
@@ -94,15 +136,18 @@
             <div class="content-card">
                 <h2 class="section-title">Mô Tả Xe</h2>
                 <p class="description-text">
-                    VinFast VF e34 là mẫu SUV điện hiện đại, được thiết kế đặc biệt cho thị trường Việt Nam. 
-                    Với công nghệ pin tiên tiến, xe có thể di chuyển tới 285km với một lần sạc đầy. 
-                    Nội thất rộng rãi, thoải mái với 5 chỗ ngồi, hệ thống điều hòa thông minh và các 
-                    tiện nghi hiện đại như màn hình cảm ứng 10 inch, kết nối Bluetooth, camera 360 độ.
+                    <strong>@Model.Vehicle?.Name</strong> là @Model.Vehicle?.VehicleType của hãng <strong>@Model.Vehicle?.Brand</strong>, model @Model.Vehicle?.Model. 
+                    Biển số xe: <strong>@Model.Vehicle?.PlateNumber</strong>.
                     <br><br>
-                    Xe được bảo trì định kỳ, đảm bảo an toàn tuyệt đối cho người sử dụng. Phù hợp cho 
-                    gia đình, chuyến du lịch ngắn ngày hoặc công tác trong thành phố.
+                    Với công nghệ điện hiện đại, xe có thể di chuyển tới <strong>@Model.Vehicle?.MaxDistance km</strong> với một lần sạc đầy. 
+                    Xe được bảo trì định kỳ, đảm bảo an toàn tuyệt đối cho người sử dụng. 
+                    <br><br>
+                    Hiện đang có sẵn tại trạm: <strong>@Model.Vehicle?.Station?.Name</strong> - @Model.Vehicle?.Station?.Address
+                    <br><br>
+                    <strong>Giá thuê:</strong><br>
+                    - Theo giờ: <strong>@Model.Vehicle?.PricePerHour.ToString("N0") đ/giờ</strong><br>
+                    - Theo ngày: <strong>@Model.Vehicle?.PricePerDay.ToString("N0") đ/ngày</strong>
                 </p>
-                <a href="#" class="show-more">Xem thêm →</a>
             </div>
         </div>
     </section>
@@ -114,36 +159,65 @@
                 <h2 class="section-title">Thông Số Kỹ Thuật</h2>
                 <div class="specs-grid">
                     <div class="spec-row">
+                        <span class="spec-name">Tên xe</span>
+                        <span class="spec-detail">@Model.Vehicle?.Name</span>
+                    </div>
+                    <div class="spec-row">
+                        <span class="spec-name">Hãng xe</span>
+                        <span class="spec-detail">@Model.Vehicle?.Brand</span>
+                    </div>
+                    <div class="spec-row">
+                        <span class="spec-name">Model</span>
+                        <span class="spec-detail">@Model.Vehicle?.Model</span>
+                    </div>
+                    <div class="spec-row">
+                        <span class="spec-name">Biển số xe</span>
+                        <span class="spec-detail">@Model.Vehicle?.PlateNumber</span>
+                    </div>
+                    <div class="spec-row">
+                        <span class="spec-name">Loại xe</span>
+                        <span class="spec-detail">@Model.Vehicle?.VehicleType</span>
+                    </div>
+                    <div class="spec-row">
                         <span class="spec-name">Quãng đường tối đa</span>
-                        <span class="spec-detail">285 km</span>
-                    </div>
-                    <div class="spec-row">
-                        <span class="spec-name">Dung lượng pin</span>
-                        <span class="spec-detail">42 kWh</span>
-                    </div>
-                    <div class="spec-row">
-                        <span class="spec-name">Công suất</span>
-                        <span class="spec-detail">110 kW (150 PS)</span>
-                    </div>
-                    <div class="spec-row">
-                        <span class="spec-name">Thời gian sạc nhanh</span>
-                        <span class="spec-detail">30 phút (0-80%)</span>
+                        <span class="spec-detail">@Model.Vehicle?.MaxDistance km</span>
                     </div>
                     <div class="spec-row">
                         <span class="spec-name">Số chỗ ngồi</span>
-                        <span class="spec-detail">5 chỗ</span>
+                        <span class="spec-detail">@Model.Vehicle?.seartCapacity chỗ</span>
                     </div>
                     <div class="spec-row">
-                        <span class="spec-name">Màu sắc</span>
-                        <span class="spec-detail">Trắng ngọc trai</span>
+                        <span class="spec-name">Giá theo giờ</span>
+                        <span class="spec-detail">@Model.Vehicle?.PricePerHour.ToString("N0") đ/giờ</span>
                     </div>
                     <div class="spec-row">
-                        <span class="spec-name">Hộp số</span>
-                        <span class="spec-detail">Tự động 1 cấp</span>
+                        <span class="spec-name">Giá theo ngày</span>
+                        <span class="spec-detail">@Model.Vehicle?.PricePerDay.ToString("N0") đ/ngày</span>
                     </div>
                     <div class="spec-row">
-                        <span class="spec-name">Năm sản xuất</span>
-                        <span class="spec-detail">2024</span>
+                        <span class="spec-name">Trạng thái</span>
+                        <span class="spec-detail">
+                            @if (Model.Vehicle?.Status == DataAccessLayer.Enums.VehicleStatus.Available)
+                            {
+                                <span style="color: #059669;">Có sẵn</span>
+                            }
+                            else if (Model.Vehicle?.Status == DataAccessLayer.Enums.VehicleStatus.Rented)
+                            {
+                                <span style="color: #dc2626;">Đang được thuê</span>
+                            }
+                            else
+                            {
+                                <span style="color: #f59e0b;">Bảo trì</span>
+                            }
+                        </span>
+                    </div>
+                    <div class="spec-row">
+                        <span class="spec-name">Trạm xe</span>
+                        <span class="spec-detail">@Model.Vehicle?.Station?.Name</span>
+                    </div>
+                    <div class="spec-row">
+                        <span class="spec-name">Địa chỉ trạm</span>
+                        <span class="spec-detail">@Model.Vehicle?.Station?.Address</span>
                     </div>
                 </div>
             </div>
@@ -295,6 +369,17 @@
             object-fit: cover;
         }
 
+        .placeholder-img-large {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 120px;
+        }
+
         .vehicle-info-box {
             display: flex;
             flex-direction: column;
@@ -393,6 +478,16 @@
         .status-badge.available {
             background-color: #d1fae5;
             color: #065f46;
+        }
+
+        .status-badge.rented {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-badge.maintenance {
+            background-color: #fef3c7;
+            color: #92400e;
         }
 
         .btn-rent-now {

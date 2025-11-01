@@ -39,6 +39,7 @@ namespace EV_Rental
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<VehicleService>();
+            builder.Services.AddScoped<RentalService>();
 
             // Bind SMTP settings & register EmailSender
             builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("Smtp"));

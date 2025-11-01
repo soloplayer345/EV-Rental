@@ -1,0 +1,463 @@
+@page "{vehicleId:int}"
+@model EV_Rental.Pages.Renter.RentVehicleModel
+@{
+    ViewData["Title"] = "Tạo Đơn Thuê Xe";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <h1 class="logo">🔋 Hệ Thống Thuê Xe Điện</h1>
+                <nav class="nav">
+                    <a href="/Renter/Index" class="nav-link">Trang Chủ</a>
+                    <a href="/Renter/Index" class="nav-link">Xe Điện</a>
+                    <a href="#" class="nav-link">Trạm Xe</a>
+                    <a href="#" class="nav-link">Chuyến Đi Của Tôi</a>
+                    <a href="#" class="nav-link active">Thuê Xe</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <section class="rent-section">
+        <div class="container">
+            <div class="rent-grid">
+                <!-- Left: Vehicle Info Summary -->
+                <div class="vehicle-summary-card">
+                    <h2 class="card-title">Thông Tin Xe</h2>
+                    
+                    @if (!string.IsNullOrEmpty(Model.Vehicle?.ImageUrl))
+                    {
+                        <img src="@Model.Vehicle.ImageUrl" alt="@Model.Vehicle.Name" class="summary-vehicle-img">
+                    }
+                    else
+                    {
+                        <div class="summary-placeholder-img">
+                            @if (Model.Vehicle?.VehicleType.ToLower().Contains("car") == true)
+                            {
+                                <span>🚗</span>
+                            }
+                            else if (Model.Vehicle?.VehicleType.ToLower().Contains("scooter") == true)
+                            {
+                                <span>🛵</span>
+                            }
+                            else if (Model.Vehicle?.VehicleType.ToLower().Contains("bike") == true)
+                            {
+                                <span>🏍️</span>
+                            }
+                            else
+                            {
+                                <span>🚙</span>
+                            }
+                        </div>
+                    }
+
+                    <div class="summary-info">
+                        <h3 class="vehicle-name">@Model.Vehicle?.Name</h3>
+                        <div class="info-row">
+                            <span class="info-label">Hãng:</span>
+                            <span class="info-value">@Model.Vehicle?.Brand</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Loại xe:</span>
+                            <span class="info-value">@Model.Vehicle?.VehicleType</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Biển số:</span>
+                            <span class="info-value">@Model.Vehicle?.PlateNumber</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Quãng đường:</span>
+                            <span class="info-value">@Model.Vehicle?.MaxDistance km</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Trạm:</span>
+                            <span class="info-value">@Model.Vehicle?.Station?.Name</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Địa chỉ:</span>
+                            <span class="info-value">@Model.Vehicle?.Station?.Address</span>
+                        </div>
+                    </div>
+
+                    <div class="price-summary">
+                        <div class="price-row">
+                            <span>Giá theo giờ:</span>
+                            <span class="price-value">@Model.Vehicle?.PricePerHour.ToString("N0") đ</span>
+                        </div>
+                        <div class="price-row">
+                            <span>Giá theo ngày:</span>
+                            <span class="price-value">@Model.Vehicle?.PricePerDay.ToString("N0") đ</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Rental Form -->
+                <div class="rental-form-card">
+                    <h2 class="card-title">Thông Tin Thuê Xe</h2>
+                    
+                    <form method="post" class="rental-form">
+                        <input type="hidden" name="VehicleId" value="@Model.Vehicle?.Id" />
+
+                        <div class="form-group">
+                            <label class="form-label">Thời gian bắt đầu <span class="required">*</span></label>
+                            <input type="datetime-local" 
+                                   name="StartDate" 
+                                   class="form-input" 
+                                   required 
+                                   min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Thời gian kết thúc <span class="required">*</span></label>
+                            <input type="datetime-local" 
+                                   name="EndDate" 
+                                   class="form-input" 
+                                   required 
+                                   min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Trạm nhận xe <span class="required">*</span></label>
+                            <select name="PickupStationId" class="form-select" required>
+                                <option value="">-- Chọn trạm nhận xe --</option>
+                                @foreach (var station in Model.AllStations)
+                                {
+                                    <option value="@station.Id" selected="@(station.Id == Model.Vehicle?.StationId)">
+                                        @station.Name - @station.Address
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Trạm trả xe <span class="required">*</span></label>
+                            <select name="ReturnStationId" class="form-select" required>
+                                <option value="">-- Chọn trạm trả xe --</option>
+                                @foreach (var station in Model.AllStations)
+                                {
+                                    <option value="@station.Id" selected="@(station.Id == Model.Vehicle?.StationId)">
+                                        @station.Name - @station.Address
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Ghi chú</label>
+                            <textarea name="Notes" 
+                                      class="form-textarea" 
+                                      rows="4" 
+                                      placeholder="Nhập ghi chú của bạn (nếu có)..."></textarea>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                        {
+                            <div class="error-message">
+                                ⚠️ @Model.ErrorMessage
+                            </div>
+                        }
+
+                        <div class="form-actions">
+                            <a href="/Renter/VehicleDetail/@Model.Vehicle?.Id" class="btn-secondary">Quay Lại</a>
+                            <button type="submit" class="btn-primary">Xác Nhận Thuê Xe</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Hệ Thống Thuê Xe Điện. Bản quyền thuộc về chúng tôi.</p>
+        </div>
+    </footer>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 1.3rem;
+            color: #2563eb;
+            font-weight: 700;
+        }
+
+        .nav {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #666;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: #2563eb;
+        }
+
+        /* Rent Section */
+        .rent-section {
+            padding: 2rem 0;
+            min-height: calc(100vh - 200px);
+        }
+
+        .rent-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .vehicle-summary-card,
+        .rental-form-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        /* Vehicle Summary */
+        .summary-vehicle-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .summary-placeholder-img {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            margin-bottom: 1rem;
+        }
+
+        .summary-info {
+            margin-bottom: 1.5rem;
+        }
+
+        .vehicle-name {
+            font-size: 1.3rem;
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .info-label {
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        .price-summary {
+            background: #eff6ff;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #2563eb;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+        }
+
+        .price-value {
+            color: #2563eb;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        /* Rental Form */
+        .rental-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .required {
+            color: #dc2626;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .error-message {
+            background-color: #fee2e2;
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 4px solid #dc2626;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e5e7eb;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #1f2937;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 2rem;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .rent-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav {
+                gap: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</body>
+</html>
