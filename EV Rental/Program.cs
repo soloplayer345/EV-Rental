@@ -2,6 +2,7 @@ using BusinessLayer.Interfaces;
 using BusinessLayer.Services;
 using DataAccessLayer;
 using DataAccessLayer.Interfaces;
+using DataAccessLayer.Repositories;
 using EV_Rental.Middlewares;
 using Microsoft.EntityFrameworkCore;
 using EV_Rental.Helpers;
@@ -29,6 +30,10 @@ namespace EV_Rental
             builder.Services.AddDbContext<EVRentalDBContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
             );
+
+            // Register Repositories
+            builder.Services.AddScoped<IVehicleRepo, VehicleRepo>();
+            builder.Services.AddScoped<IAccountRepo, AccountRepo>();
 
             // Register UnitOfWork and Services
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

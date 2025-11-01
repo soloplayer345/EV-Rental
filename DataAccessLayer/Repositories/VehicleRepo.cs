@@ -34,7 +34,7 @@ namespace DataAccessLayer.Repositories
                 query = query.Where(v => v.VehicleType.Equals(vehicleType, StringComparison.OrdinalIgnoreCase));
             }
 
-            if (Enum.IsDefined(typeof(VehicleStatus), status))
+            if (status.HasValue && Enum.IsDefined(typeof(VehicleStatus), status.Value))
             {
                 query = query.Where(v => v.Status == status);
             }
