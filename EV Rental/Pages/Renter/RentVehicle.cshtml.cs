@@ -71,28 +71,29 @@ namespace EV_Rental.Pages.Renter
             Vehicle = await _vehicleService.GetVehicleByIdAsync(vehicleId);
             AllStations = await _rentalService.GetAllStationsAsync();
 
-            // Create rental request
-            var request = new CreateRentalRequestDto
+            // Validate dates
+            if (startDate < DateTime.Now)
             {
-                VehicleId = vehicleId,
-                PickupStationId = pickupStationId,
-                ReturnStationId = returnStationId,
-                StartTime = startDate,
-                ExpectedEndTime = endDate,
-                Notes = notes
-            };
-
-            // Call rental service
-            var result = await _rentalService.CreateRentalAsync(accountId.Value, request);
-
-            if (result.Success)
-            {
-                TempData["SuccessMessage"] = result.Message;
-                return RedirectToPage("/Renter/Index");
+                ErrorMessage = "Thời gian bắt đầu phải lớn hơn thời gian hiện tại.";
+                return Page();
             }
 
-            ErrorMessage = result.Message;
-            return Page();
+            if (endDate <= startDate)
+            {
+                ErrorMessage = "Thời gian kết thúc phải lớn hơn thời gian bắt đầu.";
+                return Page();
+            }
+
+            // Redirect to confirmation page with all parameters
+            return RedirectToPage("/Renter/ConfirmRental", new
+            {
+                vehicleId = vehicleId,
+                startDate = startDate.ToString("yyyy-MM-ddTHH:mm:ss"),
+                endDate = endDate.ToString("yyyy-MM-ddTHH:mm:ss"),
+                pickupStationId = pickupStationId,
+                returnStationId = returnStationId,
+                notes = notes
+            });
         }
     }
 }
