@@ -10,7 +10,6 @@
     <div class="mb-3">
         <label class="form-label">Tên xe</label>
         <input asp-for="Vehicle.Name" class="form-control" />
-        <span asp-validation-for="Vehicle.Name" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
@@ -50,7 +49,7 @@
 
     <div class="mb-3">
         <label class="form-label">Ảnh xe</label>
-        <input asp-for="ImageFile" type="file" class="form-control" />
+        <input asp-for="Vehicle.ImageUrl" type="file" class="form-control" />
     </div>
 
     <div class="mb-3">
