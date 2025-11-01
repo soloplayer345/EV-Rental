@@ -1,4 +1,5 @@
 ﻿@page
+@using DataAccessLayer.Enums
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
@@ -16,15 +17,15 @@
         <div class="row g-2 align-items-end">
             <div class="col-md-3">
                 <label class="form-label">Tên xe</label>
-                <input type="text" name="Search.Name" value="@Model.Search.Name" class="form-control" />
+                <input type="text" name="Search.Name" value="@Model.SearchName" class="form-control" />
             </div>
             <div class="col-md-3">
                 <label class="form-label">Hãng</label>
-                <input type="text" name="Search.Brand" value="@Model.Search.Brand" class="form-control" />
+                <input type="text" name="Search.Brand" value="@Model.SearchBrand" class="form-control" />
             </div>
             <div class="col-md-3">
                 <label class="form-label">Loại xe</label>
-                <input type="text" name="Search.Type" value="@Model.Search.VehicleType" class="form-control" />
+                <input type="text" name="Search.Type" value="@Model.SearchType" class="form-control" />
             </div>
             <div class="col-md-2">
                 <label class="form-label">Trạng thái</label>
@@ -32,8 +33,7 @@
                     <option value="">-- Tất cả --</option>
                     @foreach (var s in Enum.GetValues(typeof(DataAccessLayer.Enums.VehicleStatus)))
                     {
-                        <option value="@s"
-                                selected="@(Model.Search.Status.HasValue && Model.Search.Status.Value == (DataAccessLayer.Enums.VehicleStatus)s)">
+                        <option value="@s" selected="@(Model.SearchStatus == (VehicleStatus)s)">
                             @s
                         </option>
                     }
