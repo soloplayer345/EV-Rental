@@ -518,7 +518,7 @@ public class AdminPageModel : PageModel
 // Tự động redirect user dựa trên role
 // Admin → /Admin/Dashboard
 // Staff → /Staff/Dashboard
-// Renter → /Renter/Dashboard
+// Renter → /Renter/Index
 ```
 
 ---

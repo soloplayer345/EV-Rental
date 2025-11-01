@@ -64,7 +64,7 @@ namespace EV_Rental.Pages.Account
             }
             else
             {
-                return RedirectToPage("/Renter/Dashboard");
+                return RedirectToPage("/Renter/Index");
             }
         }
     }

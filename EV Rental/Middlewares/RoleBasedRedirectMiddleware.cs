@@ -59,7 +59,7 @@ namespace EV_Rental.Middlewares
                     // Renter chỉ được truy cập /Renter/*
                     if (!path.StartsWith("/renter") && path != "/account/logout")
                     {
-                        context.Response.Redirect("/Renter/Dashboard");
+                        context.Response.Redirect("/Renter/Index");
                         return;
                     }
                 }

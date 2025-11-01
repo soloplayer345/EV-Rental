@@ -1,0 +1,436 @@
+@page
+@model EV_Rental.Pages.Renter.IndexModel
+@{
+    ViewData["Title"] = "EV Rental Home";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <h1 class="logo">🔋 Hệ Thống Thuê Xe Điện</h1>
+                <nav class="nav">
+                    <a href="/Renter/Index" class="nav-link active">Trang Chủ</a>
+                    <a href="#" class="nav-link">Chuyến Đi Của Tôi</a>
+                    <a href="#" class="nav-link">Trạm Xe</a>
+                    <a href="#" class="nav-link">Hồ Sơ</a>
+                    <a href="/Account/Logout" class="nav-link">Đăng Xuất</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h2 class="hero-title">Tìm Xe Điện Hoàn Hảo Của Bạn</h2>
+            <p class="hero-subtitle">Chọn, thuê và lái xe điện từ các trạm gần bạn</p>
+            <button class="btn-primary" onclick="document.getElementById('vehicles-section').scrollIntoView({behavior: 'smooth'})">Tìm Xe Ngay</button>
+        </div>
+    </section>
+
+    <!-- Available Vehicles Section -->
+    <section id="vehicles-section" class="vehicles-section">
+        <div class="container">
+            <h2 class="section-title">Xe Điện Có Sẵn</h2>
+            @if (Model.AvailableVehicles.Any())
+            {
+                <div class="vehicles-grid">
+                    @foreach (var vehicle in Model.AvailableVehicles)
+                    {
+                        <!-- Vehicle Card -->
+                        <article class="vehicle-card">
+                            <div class="vehicle-image">
+                                @if (!string.IsNullOrEmpty(vehicle.ImageUrl))
+                                {
+                                    <img src="@vehicle.ImageUrl" alt="@vehicle.Name" class="vehicle-img">
+                                }
+                                else
+                                {
+                                    <div class="placeholder-img">
+                                        @if (vehicle.VehicleType.ToLower().Contains("car"))
+                                        {
+                                            <span>🚗</span>
+                                        }
+                                        else if (vehicle.VehicleType.ToLower().Contains("scooter"))
+                                        {
+                                            <span>🛵</span>
+                                        }
+                                        else if (vehicle.VehicleType.ToLower().Contains("bike"))
+                                        {
+                                            <span>�</span>
+                                        }
+                                        else
+                                        {
+                                            <span>🚙</span>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                            <div class="vehicle-info">
+                                <h3 class="vehicle-name">@vehicle.Name</h3>
+                                <p class="vehicle-type">Loại xe: @vehicle.VehicleType</p>
+                                <p class="vehicle-brand">Hãng: @vehicle.Brand</p>
+                                <p class="vehicle-distance">Quãng đường: @vehicle.MaxDistance km</p>
+                                <p class="vehicle-price">@vehicle.PricePerDay.ToString("N0") đ/ngày</p>
+                                <button class="btn-rent" onclick="window.location.href='/Renter/VehicleDetail/@vehicle.Id'">Thuê Ngay</button>
+                            </div>
+                        </article>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="no-vehicles">
+                    <p>Hiện tại không có xe nào có sẵn. Vui lòng quay lại sau!</p>
+                </div>
+            }
+
+            <!-- Pagination -->
+            @if (Model.TotalPages > 1)
+            {
+                <div class="pagination">
+                    <div class="pagination-info">
+                        Hiển thị @((Model.CurrentPage - 1) * 6 + 1) - @(Math.Min(Model.CurrentPage * 6, Model.TotalVehicles)) trong tổng số @Model.TotalVehicles xe
+                    </div>
+                    <div class="pagination-controls">
+                        @if (Model.CurrentPage > 1)
+                        {
+                            <a href="?pageNumber=@(Model.CurrentPage - 1)" class="pagination-btn">
+                                ← Trang Trước
+                            </a>
+                        }
+                        
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            if (i == Model.CurrentPage)
+                            {
+                                <span class="pagination-btn active">@i</span>
+                            }
+                            else if (i == 1 || i == Model.TotalPages || (i >= Model.CurrentPage - 2 && i <= Model.CurrentPage + 2))
+                            {
+                                <a href="?pageNumber=@i" class="pagination-btn">@i</a>
+                            }
+                            else if (i == Model.CurrentPage - 3 || i == Model.CurrentPage + 3)
+                            {
+                                <span class="pagination-dots">...</span>
+                            }
+                        }
+                        
+                        @if (Model.CurrentPage < Model.TotalPages)
+                        {
+                            <a href="?pageNumber=@(Model.CurrentPage + 1)" class="pagination-btn">
+                                Trang Sau →
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Hệ Thống Thuê Xe Điện. Bản quyền thuộc về chúng tôi.</p>
+        </div>
+    </footer>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            color: #2563eb;
+            font-weight: 700;
+        }
+
+        .nav {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #666;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: #2563eb;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6rem 0;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+
+        .btn-primary {
+            background-color: #fff;
+            color: #667eea;
+            border: none;
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        /* Vehicles Section */
+        .vehicles-section {
+            padding: 4rem 0;
+            background-color: #fff;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #1f2937;
+        }
+
+        .vehicles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .vehicle-card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .vehicle-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+
+        .vehicle-image {
+            background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .placeholder-img {
+            font-size: 4rem;
+        }
+
+        .vehicle-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .vehicle-info {
+            padding: 1.5rem;
+        }
+
+        .vehicle-brand,
+        .vehicle-distance {
+            margin: 0.5rem 0;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .no-vehicles {
+            text-align: center;
+            padding: 3rem;
+            font-size: 1.2rem;
+            color: #6b7280;
+        }
+
+        /* Pagination */
+        .pagination {
+            margin-top: 3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .pagination-info {
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .pagination-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e5e7eb;
+            background-color: white;
+            color: #374151;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .pagination-btn:hover {
+            background-color: #f3f4f6;
+            border-color: #2563eb;
+            color: #2563eb;
+        }
+
+        .pagination-btn.active {
+            background-color: #2563eb;
+            color: white;
+            border-color: #2563eb;
+            cursor: default;
+        }
+
+        .pagination-dots {
+            padding: 0.5rem 0.25rem;
+            color: #9ca3af;
+        }
+
+        .vehicle-name {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+        }
+
+        .vehicle-type,
+        .vehicle-battery,
+        .vehicle-price {
+            margin: 0.5rem 0;
+            color: #6b7280;
+        }
+
+        .vehicle-price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #2563eb;
+            margin: 1rem 0;
+        }
+
+        .btn-rent {
+            width: 100%;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-rent:hover {
+            background-color: #1d4ed8;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #1f2937;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .nav {
+                gap: 1rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .vehicles-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .steps-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</body>
+</html>
