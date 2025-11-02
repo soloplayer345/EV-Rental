@@ -248,6 +248,52 @@
                                 <input type="hidden" name="ReturnStationId" value="@Model.ReturnStationId" />
                                 <input type="hidden" name="Notes" value="@Model.Notes" />
                                 
+                                <!-- Payment Method Selection -->
+                                <div class="payment-method-section">
+                                    <h3 class="payment-title">
+                                        <span class="icon-small">💳</span>
+                                        Chọn Phương Thức Thanh Toán
+                                    </h3>
+                                    
+                                    <div class="payment-options">
+                                        <!-- VNPay Option -->
+                                        <label class="payment-option">
+                                            <input type="radio" name="PaymentMethod" value="vnpay" checked />
+                                            <div class="payment-card">
+                                                <div class="payment-header">
+                                                    <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-VNPAY-QR.png" 
+                                                         alt="VNPay" class="payment-logo" />
+                                                    <div class="payment-badge recommended">Khuyến nghị</div>
+                                                </div>
+                                                <h4 class="payment-name">VNPay</h4>
+                                                <p class="payment-desc">Thanh toán trực tuyến qua VNPay - Nhanh chóng & An toàn</p>
+                                                <ul class="payment-features">
+                                                    <li>✓ Thanh toán ngay lập tức</li>
+                                                    <li>✓ Hỗ trợ nhiều ngân hàng</li>
+                                                    <li>✓ Bảo mật cao</li>
+                                                </ul>
+                                            </div>
+                                        </label>
+
+                                        <!-- Cash Option -->
+                                        <label class="payment-option">
+                                            <input type="radio" name="PaymentMethod" value="cash" />
+                                            <div class="payment-card">
+                                                <div class="payment-header">
+                                                    <span class="payment-icon">💵</span>
+                                                </div>
+                                                <h4 class="payment-name">Tiền Mặt</h4>
+                                                <p class="payment-desc">Thanh toán bằng tiền mặt tại trạm nhận xe</p>
+                                                <ul class="payment-features">
+                                                    <li>✓ Thanh toán khi nhận xe</li>
+                                                    <li>✓ Không cần thẻ ngân hàng</li>
+                                                    <li>⚠️ Cần mang đủ tiền mặt</li>
+                                                </ul>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                
                                 <div class="form-actions">
                                     <button type="button" onclick="history.back()" class="btn-secondary">
                                         <span>⬅️</span> Quay Lại
@@ -572,6 +618,120 @@
             margin-top: 1rem;
         }
 
+        /* Payment Method Section */
+        .payment-method-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: #f9fafb;
+            border-radius: 12px;
+            border: 2px dashed #d1d5db;
+        }
+
+        .payment-title {
+            font-size: 1.2rem;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .payment-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .payment-option {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .payment-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .payment-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 3px solid #e5e7eb;
+            transition: all 0.3s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .payment-option input[type="radio"]:checked + .payment-card {
+            border-color: #2563eb;
+            background: #eff6ff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .payment-card:hover {
+            border-color: #93c5fd;
+            transform: translateY(-2px);
+        }
+
+        .payment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            min-height: 60px;
+        }
+
+        .payment-logo {
+            height: 50px;
+            object-fit: contain;
+        }
+
+        .payment-icon {
+            font-size: 3rem;
+        }
+
+        .payment-badge {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .payment-badge.recommended {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .payment-name {
+            font-size: 1.2rem;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .payment-desc {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .payment-features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .payment-features li {
+            padding: 0.4rem 0;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+
         /* Form Actions */
         .confirm-form {
             margin-top: 1.5rem;
@@ -648,6 +808,14 @@
 
             .form-actions {
                 grid-template-columns: 1fr;
+            }
+
+            .payment-options {
+                grid-template-columns: 1fr;
+            }
+
+            .payment-logo {
+                height: 40px;
             }
         }
     </style>
