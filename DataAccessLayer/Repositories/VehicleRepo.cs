@@ -41,5 +41,23 @@ namespace DataAccessLayer.Repositories
 
             return await query.ToListAsync();
         }
+
+        // Override GetByIdAsync to include Station
+        public new async Task<Vehicle> GetByIdAsync(int id)
+        {
+            if (id <= 0)
+                throw new ArgumentException("ID must be greater than 0", nameof(id));
+
+            Vehicle? vehicle = await _dbSet
+                .Include(v => v.Station)
+                .FirstOrDefaultAsync(v => v.Id == id && !v.IsDeleted);
+            
+            if (vehicle == null)
+            {
+                throw new KeyNotFoundException($"Vehicle with ID {id} not found");
+            }
+            
+            return vehicle;
+        }
     }
 }

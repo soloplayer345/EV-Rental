@@ -38,10 +38,16 @@ namespace EV_Rental
             // Register UnitOfWork and Services
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<VehicleService>();
+            builder.Services.AddScoped<RentalService>();
+            builder.Services.AddScoped<PaymentService>();
 
             // Bind SMTP settings & register EmailSender
             builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("Smtp"));
             builder.Services.AddSingleton<IEmailSender, SmtpEmailSender>();
+
+            // Bind VNPay settings
+            builder.Services.Configure<VNPaySettings>(builder.Configuration.GetSection("VNPay"));
 
             var app = builder.Build();
 
