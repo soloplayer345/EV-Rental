@@ -38,5 +38,10 @@ namespace DataAccessLayer.Interfaces
         /// Lấy tất cả accounts inactive
         /// </summary>
         Task<IEnumerable<Account>> GetInactiveAccountsAsync();
+
+        /// <summary>
+        /// Lấy account theo ID (không check IsDeleted)
+        /// </summary>
+        Task<Account?> GetAccountByIdAsync(int id);
     }
 }

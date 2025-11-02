@@ -91,5 +91,17 @@ namespace DataAccessLayer.Repositories
                 .OrderByDescending(x => x.CreateDate)
                 .ToListAsync();
         }
+
+        /// <summary>
+        /// Lấy account theo ID (không check IsDeleted)
+        /// </summary>
+        public async Task<Account?> GetAccountByIdAsync(int id)
+        {
+            if (id <= 0)
+                return null;
+
+            return await _dbSet
+                .FirstOrDefaultAsync(a => a.Id == id);
+        }
     }
 }
