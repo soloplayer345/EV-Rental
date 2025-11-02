@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Options;
 using BusinessLayer.Services;
 using BusinessLayer.DTOs;
 using DataAccessLayer.Entities;
@@ -12,11 +13,19 @@ namespace EV_Rental.Pages.Renter
     {
         private readonly VehicleService _vehicleService;
         private readonly RentalService _rentalService;
+        private readonly PaymentService _paymentService;
+        private readonly VNPaySettings _vnPaySettings;
 
-        public ConfirmRentalModel(VehicleService vehicleService, RentalService rentalService)
+        public ConfirmRentalModel(
+            VehicleService vehicleService, 
+            RentalService rentalService,
+            PaymentService paymentService,
+            IOptions<VNPaySettings> vnPaySettings)
         {
             _vehicleService = vehicleService;
             _rentalService = rentalService;
+            _paymentService = paymentService;
+            _vnPaySettings = vnPaySettings.Value;
         }
 
         public Vehicle? Vehicle { get; set; }
@@ -213,17 +222,96 @@ namespace EV_Rental.Pages.Renter
                 Notes = notes
             };
 
-            // Call rental service
-            var result = await _rentalService.CreateRentalAsync(accountId.Value, request);
+            // Calculate booking cost (don't create rental yet)
+            var result = await _rentalService.CalculateBookingCostAsync(accountId.Value, request);
 
-            if (result.Success)
+            if (!result.Success || result.Data == null)
             {
-                TempData["SuccessMessage"] = $"Đặt xe thành công! Tổng chi phí: {TotalCost:N0} đ. Vui lòng đến trạm nhận xe đúng giờ và thanh toán.";
-                return RedirectToPage("/Renter/Index");
+                ErrorMessage = result.Message;
+                return Page();
             }
 
-            ErrorMessage = result.Message;
-            return Page();
+            var bookingDto = result.Data;
+
+            // Generate transaction reference
+            var transactionRef = $"BOOKING{accountId.Value}_{DateTime.Now:yyyyMMddHHmmss}";
+
+            // Store booking info in session for later use (when payment succeeds)
+            HttpContext.Session.SetString($"BookingData_{transactionRef}", System.Text.Json.JsonSerializer.Serialize(bookingDto));
+
+            // Redirect to VNPay
+            var vnpayUrl = CreateVNPayPaymentUrl(transactionRef, TotalCost, $"Thanh toan thue xe {Vehicle?.Name}");
+            return Redirect(vnpayUrl);
+        }
+
+        private string CreateVNPayPaymentUrl(string orderId, decimal amount, string orderInfo)
+        {
+            var vnpay = new VNPayLibrary();
+            
+            // Lấy IP address
+            string ipAddr = GetIpAddress();
+            if (string.IsNullOrEmpty(ipAddr))
+            {
+                ipAddr = "127.0.0.1";
+            }
+
+            // Thêm các tham số theo đúng thứ tự và format VNPay yêu cầu
+            vnpay.AddRequestData("vnp_Version", "2.1.0");
+            vnpay.AddRequestData("vnp_Command", "pay");
+            vnpay.AddRequestData("vnp_TmnCode", _vnPaySettings.TmnCode);
+            vnpay.AddRequestData("vnp_Amount", ((long)(amount * 100)).ToString());
+            vnpay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
+            vnpay.AddRequestData("vnp_CurrCode", "VND");
+            vnpay.AddRequestData("vnp_IpAddr", ipAddr);
+            vnpay.AddRequestData("vnp_Locale", "vn");
+            vnpay.AddRequestData("vnp_OrderInfo", orderInfo);
+            vnpay.AddRequestData("vnp_OrderType", "other");
+            vnpay.AddRequestData("vnp_ReturnUrl", _vnPaySettings.ReturnUrl);
+            vnpay.AddRequestData("vnp_TxnRef", orderId);
+
+            var paymentUrl = vnpay.CreateRequestUrl(_vnPaySettings.PaymentUrl, _vnPaySettings.HashSecret);
+            
+            // DEBUG: Log URL để kiểm tra
+            Console.WriteLine("=== VNPAY DEBUG ===");
+            Console.WriteLine($"Order ID: {orderId}");
+            Console.WriteLine($"Amount: {amount} VND = {(long)(amount * 100)} (x100)");
+            Console.WriteLine($"TmnCode: {_vnPaySettings.TmnCode}");
+            Console.WriteLine($"HashSecret: {_vnPaySettings.HashSecret.Substring(0, 10)}...");
+            Console.WriteLine($"ReturnUrl: {_vnPaySettings.ReturnUrl}");
+            Console.WriteLine($"IP: {ipAddr}");
+            Console.WriteLine($"Full URL: {paymentUrl}");
+            Console.WriteLine("===================");
+            
+            return paymentUrl;
+        }
+
+        private string GetIpAddress()
+        {
+            var ipAddress = string.Empty;
+            try
+            {
+                var remoteIpAddress = HttpContext.Connection.RemoteIpAddress;
+                
+                if (remoteIpAddress != null)
+                {
+                    if (remoteIpAddress.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+                    {
+                        remoteIpAddress = System.Net.Dns.GetHostEntry(remoteIpAddress).AddressList
+                            .FirstOrDefault(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+                    }
+
+                    if (remoteIpAddress != null)
+                    {
+                        ipAddress = remoteIpAddress.ToString();
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                ipAddress = "127.0.0.1";
+            }
+
+            return ipAddress;
         }
     }
 }
