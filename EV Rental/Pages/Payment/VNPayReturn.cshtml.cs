@@ -1,27 +1,39 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 using BusinessLayer.Services;
 using BusinessLayer.DTOs;
 using DataAccessLayer.Entities;
+using DataAccessLayer.Interfaces;
 using EV_Rental.Helpers;
 
 namespace EV_Rental.Pages.Payment
 {
+    [AllowAnonymous]
     public class VNPayReturnModel : PageModel
     {
         private readonly VNPaySettings _vnPaySettings;
         private readonly PaymentService _paymentService;
         private readonly RentalService _rentalService;
+        private readonly VehicleService _vehicleService;
+        private readonly IEmailSender _emailSender;
+        private readonly IAccountRepo _accountRepo;
 
         public VNPayReturnModel(
             IOptions<VNPaySettings> vnPaySettings, 
             PaymentService paymentService,
-            RentalService rentalService)
+            RentalService rentalService,
+            VehicleService vehicleService,
+            IEmailSender emailSender,
+            IAccountRepo accountRepo)
         {
             _vnPaySettings = vnPaySettings.Value;
             _paymentService = paymentService;
             _rentalService = rentalService;
+            _vehicleService = vehicleService;
+            _emailSender = emailSender;
+            _accountRepo = accountRepo;
         }
 
         public bool Success { get; set; }
@@ -63,89 +75,118 @@ namespace EV_Rental.Pages.Payment
             {
                 if (vnp_ResponseCode == "00")
                 {
-                    // Payment successful - Get booking data from session
-                    var bookingDataJson = HttpContext.Session.GetString($"BookingData_{vnp_OrderId}");
+                    // Payment successful - Get pending rental ID from session
+                    var rentalIdStr = HttpContext.Session.GetString($"PendingRentalId_{vnp_OrderId}");
                     
-                    if (!string.IsNullOrEmpty(bookingDataJson))
+                    if (!string.IsNullOrEmpty(rentalIdStr) && int.TryParse(rentalIdStr, out int rentalId))
                     {
-                        var bookingDto = System.Text.Json.JsonSerializer.Deserialize<PendingBookingDto>(bookingDataJson);
+                        // Confirm the pending rental
+                        var confirmResult = await _rentalService.ConfirmPendingRentalAsync(rentalId);
                         
-                        if (bookingDto != null)
+                        if (confirmResult.Success && confirmResult.Data != null)
                         {
-                            // Create rental record now that payment is successful
-                            var rentalResult = await _rentalService.CreateRentalAfterPaymentAsync(bookingDto);
+                            var rental = confirmResult.Data;
                             
-                            if (rentalResult.Success && rentalResult.Data != null)
+                            // Create payment record with rental ID
+                            await _paymentService.CreatePaymentForRentalAsync(
+                                rental.Id, 
+                                vnp_Amount, 
+                                "vnpay", 
+                                vnp_OrderId
+                            );
+                            
+                            // Send OTP email to renter
+                            try
                             {
-                                var rental = rentalResult.Data;
-                                
-                                // Create payment record with rental ID
-                                await _paymentService.CreatePaymentForRentalAsync(
-                                    rental.Id, 
-                                    vnp_Amount, 
-                                    "vnpay", 
-                                    vnp_OrderId
-                                );
-                                
-                                // Clear session data
-                                HttpContext.Session.Remove($"BookingData_{vnp_OrderId}");
-                                
-                                // Redirect to success page with rental details
-                                return RedirectToPage("/Payment/PaymentSuccess", new
+                                var renterAccount = await _accountRepo.GetByIdAsync(rental.RenterId);
+                                if (renterAccount != null)
                                 {
-                                    transactionId = vnp_TransactionId,
-                                    orderId = vnp_OrderId,
-                                    paymentMethod = bankName,
-                                    orderDescription = vnp_OrderInfo,
-                                    amount = vnp_Amount,
-                                    paymentTime = paymentTime.ToString("yyyy-MM-ddTHH:mm:ss"),
-                                    rentalId = rental.Id,
-                                    vehicleId = rental.VehicleId,
-                                    otpCode = rental.OtpCode,
-                                    startTime = rental.StartTime?.ToString("yyyy-MM-ddTHH:mm:ss"),
-                                    endTime = rental.ExpectedEndTime?.ToString("yyyy-MM-ddTHH:mm:ss")
-                                });
+                                    await SendOtpEmailAsync(renterAccount.Email, renterAccount.FullName, rental);
+                                    Console.WriteLine($"[EMAIL] OTP email sent to {renterAccount.Email}");
+                                }
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                // Failed to create rental
-                                return RedirectToPage("/Payment/PaymentFailure", new
-                                {
-                                    message = "Thanh toán thành công nhưng không thể tạo đơn thuê: " + rentalResult.Message,
-                                    transactionId = vnp_TransactionId,
-                                    orderId = vnp_OrderId,
-                                    paymentMethod = bankName,
-                                    orderDescription = vnp_OrderInfo,
-                                    amount = vnp_Amount,
-                                    paymentTime = paymentTime.ToString("yyyy-MM-ddTHH:mm:ss"),
-                                    responseCode = "RENTAL_CREATE_FAILED"
-                                });
+                                Console.WriteLine($"[EMAIL ERROR] Failed to send OTP email: {ex.Message}");
+                                // Don't fail the payment flow if email fails
                             }
+                            
+                            // Clear session data
+                            HttpContext.Session.Remove($"PendingRentalId_{vnp_OrderId}");
+                            
+                            // Redirect to success page with rental details
+                            return RedirectToPage("/Payment/PaymentSuccess", new
+                            {
+                                transactionId = vnp_TransactionId,
+                                orderId = vnp_OrderId,
+                                paymentMethod = bankName,
+                                orderDescription = vnp_OrderInfo,
+                                amount = vnp_Amount,
+                                paymentTime = paymentTime.ToString("yyyy-MM-ddTHH:mm:ss"),
+                                rentalId = rental.Id,
+                                vehicleId = rental.VehicleId,
+                                otpCode = rental.OtpCode,
+                                startTime = rental.StartTime?.ToString("yyyy-MM-ddTHH:mm:ss"),
+                                endTime = rental.ExpectedEndTime?.ToString("yyyy-MM-ddTHH:mm:ss")
+                            });
+                        }
+                        else
+                        {
+                            // Failed to confirm rental
+                            return RedirectToPage("/Payment/PaymentFailure", new
+                            {
+                                message = "Thanh toán thành công nhưng không thể xác nhận đơn thuê: " + confirmResult.Message,
+                                transactionId = vnp_TransactionId,
+                                orderId = vnp_OrderId,
+                                paymentMethod = bankName,
+                                orderDescription = vnp_OrderInfo,
+                                amount = vnp_Amount,
+                                paymentTime = paymentTime.ToString("yyyy-MM-ddTHH:mm:ss"),
+                                responseCode = "RENTAL_CONFIRM_FAILED"
+                            });
                         }
                     }
                     
-                    // No booking data found
+                    // No pending rental found
                     return RedirectToPage("/Payment/PaymentFailure", new
                     {
-                        message = "Không tìm thấy thông tin đặt xe",
+                        message = "Không tìm thấy thông tin đơn thuê chờ thanh toán",
                         transactionId = vnp_TransactionId,
                         orderId = vnp_OrderId,
                         paymentMethod = bankName,
                         orderDescription = vnp_OrderInfo,
                         amount = vnp_Amount,
                         paymentTime = paymentTime.ToString("yyyy-MM-ddTHH:mm:ss"),
-                        responseCode = "BOOKING_DATA_NOT_FOUND"
+                        responseCode = "PENDING_RENTAL_NOT_FOUND"
                     });
                 }
                 else
                 {
-                    // Payment failed - just clear session and redirect to failure page
+                    // Payment failed - cancel pending rental and redirect to failure page
                     var message = GetVNPayResponseMessage(vnp_ResponseCode);
                     
-                    // Clear session data if exists
-                    HttpContext.Session.Remove($"BookingData_{vnp_OrderId}");
+                    // Cancel the pending rental if exists
+                    var rentalIdStr = HttpContext.Session.GetString($"PendingRentalId_{vnp_OrderId}");
+                    if (!string.IsNullOrEmpty(rentalIdStr) && int.TryParse(rentalIdStr, out int rentalId))
+                    {
+                        try
+                        {
+                            var rental = await _rentalService.GetRentalByIdAsync(rentalId);
+                            if (rental != null && rental.Status == DataAccessLayer.Enums.RentalRecordStatus.Pending)
+                            {
+                                await _rentalService.CancelRentalAsync(rentalId, rental.RenterId);
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            // Log error but continue
+                        }
+                    }
+                    
+                    // Clear session data
+                    HttpContext.Session.Remove($"PendingRentalId_{vnp_OrderId}");
 
-                    // Redirect to failure page (no rental or payment created)
+                    // Redirect to failure page
                     return RedirectToPage("/Payment/PaymentFailure", new
                     {
                         message = message,
@@ -161,11 +202,29 @@ namespace EV_Rental.Pages.Payment
             }
             else
             {
-                // Invalid signature - clear session and redirect to failure page
+                // Invalid signature - cancel pending rental and redirect to failure page
                 var message = "Chữ ký không hợp lệ. Giao dịch có thể bị giả mạo.";
                 
-                // Clear session data if exists
-                HttpContext.Session.Remove($"BookingData_{vnp_OrderId}");
+                // Cancel the pending rental if exists
+                var rentalIdStr = HttpContext.Session.GetString($"PendingRentalId_{vnp_OrderId}");
+                if (!string.IsNullOrEmpty(rentalIdStr) && int.TryParse(rentalIdStr, out int rentalId))
+                {
+                    try
+                    {
+                        var rental = await _rentalService.GetRentalByIdAsync(rentalId);
+                        if (rental != null && rental.Status == DataAccessLayer.Enums.RentalRecordStatus.Pending)
+                        {
+                            await _rentalService.CancelRentalAsync(rentalId, rental.RenterId);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // Log error but continue
+                    }
+                }
+                
+                // Clear session data
+                HttpContext.Session.Remove($"PendingRentalId_{vnp_OrderId}");
                 
                 // Redirect to failure page
                 return RedirectToPage("/Payment/PaymentFailure", new
@@ -222,6 +281,150 @@ namespace EV_Rental.Pages.Payment
                 "VNMART" => "Ví VnMart",
                 _ => bankCode
             };
+        }
+
+        private async Task SendOtpEmailAsync(string toEmail, string customerName, DataAccessLayer.Entities.RentalRecord rentalRecord)
+        {
+            var subject = $"🔋 Mã OTP #{rentalRecord.Id} - Thanh Toán Thành Công - EV Rental";
+            
+            // Get vehicle info
+            var vehicle = await _vehicleService.GetVehicleByIdAsync(rentalRecord.VehicleId);
+            var vehicleName = vehicle?.Name ?? "N/A";
+            
+            // Get station info
+            var stations = await _rentalService.GetAllStationsAsync();
+            var pickupStation = stations.FirstOrDefault(s => s.Id == rentalRecord.PickupStationId)?.Name ?? "N/A";
+            var returnStation = stations.FirstOrDefault(s => s.Id == rentalRecord.ReturnStationId)?.Name ?? "N/A";
+            
+            var htmlBody = $@"
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <style>
+        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f5f5f5; }}
+        .container {{ max-width: 600px; margin: 20px auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }}
+        .header {{ background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 40px 30px; text-align: center; }}
+        .header h1 {{ margin: 0; font-size: 28px; }}
+        .header p {{ margin: 10px 0 0 0; font-size: 16px; opacity: 0.9; }}
+        .content {{ padding: 30px; }}
+        .greeting {{ font-size: 18px; color: #1f2937; margin-bottom: 15px; }}
+        .success-badge {{ display: inline-block; background: #d1fae5; color: #065f46; padding: 8px 16px; border-radius: 20px; font-weight: 600; margin: 15px 0; }}
+        .otp-section {{ background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 3px dashed #2563eb; padding: 25px; text-align: center; margin: 25px 0; border-radius: 12px; }}
+        .otp-label {{ font-size: 14px; color: #6b7280; margin: 0 0 10px 0; font-weight: 500; }}
+        .otp-code {{ font-size: 42px; font-weight: bold; color: #2563eb; letter-spacing: 10px; margin: 15px 0; font-family: 'Courier New', monospace; }}
+        .info-box {{ background: #f9fafb; padding: 20px; margin: 20px 0; border-radius: 10px; border-left: 4px solid #10b981; }}
+        .info-box h3 {{ margin: 0 0 15px 0; color: #1f2937; font-size: 16px; }}
+        .info-row {{ display: flex; padding: 8px 0; border-bottom: 1px solid #e5e7eb; }}
+        .info-row:last-child {{ border-bottom: none; }}
+        .info-label {{ font-weight: 600; color: #6b7280; width: 140px; flex-shrink: 0; }}
+        .info-value {{ color: #1f2937; flex-grow: 1; }}
+        .cost-box {{ background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0; }}
+        .cost-label {{ font-size: 14px; opacity: 0.9; margin: 0; }}
+        .cost-amount {{ font-size: 32px; font-weight: bold; margin: 10px 0; }}
+        .warning-box {{ background: #fef3c7; padding: 18px; border-radius: 10px; border-left: 4px solid #f59e0b; margin: 20px 0; }}
+        .warning-box strong {{ color: #92400e; }}
+        .warning-box ul {{ margin: 10px 0 0 0; padding-left: 20px; color: #78350f; }}
+        .warning-box li {{ margin: 6px 0; }}
+        .btn {{ display: inline-block; padding: 14px 28px; background: #2563eb; color: white; text-decoration: none; border-radius: 8px; margin: 20px 0; font-weight: 600; }}
+        .btn:hover {{ background: #1d4ed8; }}
+        .footer {{ background: #1f2937; color: #9ca3af; text-align: center; padding: 25px; font-size: 13px; }}
+        .footer p {{ margin: 5px 0; }}
+        .divider {{ height: 1px; background: linear-gradient(to right, transparent, #e5e7eb, transparent); margin: 20px 0; }}
+        .status-badge {{ display: inline-block; padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 600; }}
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <div class='header'>
+            <h1>✅ THANH TOÁN THÀNH CÔNG</h1>
+            <p>Đơn Thuê Xe Đã Được Xác Nhận</p>
+        </div>
+        
+        <div class='content'>
+            <p class='greeting'>Xin chào <strong>{customerName}</strong>,</p>
+            <p>Chúc mừng! Thanh toán của bạn đã được xử lý thành công. Đơn thuê xe của bạn đã được xác nhận! 🎉</p>
+            
+            <div class='success-badge'>✓ ĐÃ THANH TOÁN THÀNH CÔNG</div>
+            
+            <div class='otp-section'>
+                <p class='otp-label'>🔐 MÃ OTP XÁC NHẬN NHẬN XE</p>
+                <div class='otp-code'>{rentalRecord.OtpCode}</div>
+                <p style='margin: 10px 0 0 0; font-size: 13px; color: #6b7280;'>Vui lòng xuất trình mã này khi nhận xe</p>
+            </div>
+
+            <div class='info-box'>
+                <h3>📋 Thông Tin Chi Tiết Đơn Thuê</h3>
+                <div class='info-row'>
+                    <span class='info-label'>Mã đơn hàng:</span>
+                    <span class='info-value'><strong>#{rentalRecord.Id}</strong></span>
+                </div>
+                <div class='info-row'>
+                    <span class='info-label'>Xe thuê:</span>
+                    <span class='info-value'>{vehicleName}</span>
+                </div>
+                <div class='info-row'>
+                    <span class='info-label'>Trạm nhận xe:</span>
+                    <span class='info-value'>{pickupStation}</span>
+                </div>
+                <div class='info-row'>
+                    <span class='info-label'>Trạm trả xe:</span>
+                    <span class='info-value'>{returnStation}</span>
+                </div>
+                <div class='info-row'>
+                    <span class='info-label'>Thời gian nhận:</span>
+                    <span class='info-value'><strong>{rentalRecord.StartTime:dd/MM/yyyy HH:mm}</strong></span>
+                </div>
+                <div class='info-row'>
+                    <span class='info-label'>Thời gian trả:</span>
+                    <span class='info-value'><strong>{rentalRecord.ExpectedEndTime:dd/MM/yyyy HH:mm}</strong></span>
+                </div>
+                <div class='info-row'>
+                    <span class='info-label'>Trạng thái:</span>
+                    <span class='info-value'><span class='status-badge'>✓ Đã xác nhận</span></span>
+                </div>
+            </div>
+
+            <div class='cost-box'>
+                <p class='cost-label'>💰 Đã Thanh Toán</p>
+                <div class='cost-amount'>{rentalRecord.TotalPrice:N0} VNĐ</div>
+                <p style='margin: 0; font-size: 13px; opacity: 0.9;'>Thanh toán qua VNPay</p>
+            </div>
+
+            <div class='warning-box'>
+                <p style='margin: 0 0 8px 0;'><strong>📌 LƯU Ý QUAN TRỌNG</strong></p>
+                <ul>
+                    <li><strong>Mang theo mã OTP</strong> khi đến nhận xe tại trạm</li>
+                    <li>Xuất trình mã OTP cho nhân viên để xác nhận danh tính</li>
+                    <li>Đến đúng giờ nhận xe: <strong>{rentalRecord.StartTime:dd/MM/yyyy HH:mm}</strong></li>
+                    <li>Mang theo <strong>CMND/CCCD và Giấy phép lái xe</strong> (bản gốc)</li>
+                    <li>Kiểm tra kỹ xe trước khi nhận</li>
+                </ul>
+            </div>
+
+            <div class='divider'></div>
+
+            <p style='text-align: center; margin: 25px 0;'>
+                <a href='https://localhost:7158/Renter/MyTrips' class='btn'>👉 Xem Chi Tiết Đơn Thuê</a>
+            </p>
+
+            <p style='color: #6b7280; font-size: 13px; text-align: center; margin: 20px 0 0 0;'>
+                Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ hotline: <strong style='color: #2563eb;'>1900-xxxx</strong>
+            </p>
+        </div>
+        
+        <div class='footer'>
+            <p style='font-weight: 600; color: white; margin-bottom: 10px;'>🔋 EV RENTAL SYSTEM</p>
+            <p>Email này được gửi tự động từ hệ thống</p>
+            <p>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
+            <p style='margin-top: 15px;'>&copy; 2025 EV Rental System. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>";
+
+            await _emailSender.SendAsync(toEmail, subject, htmlBody);
         }
     }
 }

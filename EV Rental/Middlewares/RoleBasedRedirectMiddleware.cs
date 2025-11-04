@@ -14,12 +14,13 @@ namespace EV_Rental.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
-            var path = context.Request.Path.Value?.ToLower();
+            var path = context.Request.Path.Value?.ToLower() ?? "";
 
-            // Bỏ qua các static files và login/register
+            // Bỏ qua các static files, login/register, và payment callbacks
             if (path.StartsWith("/css") || path.StartsWith("/js") || 
                 path.StartsWith("/lib") || path.StartsWith("/account/login") || 
-                path.StartsWith("/account/register") || path == "/")
+                path.StartsWith("/account/register") || path.StartsWith("/payment") ||
+                path == "/")
             {
                 await _next(context);
                 return;

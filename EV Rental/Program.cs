@@ -49,6 +49,9 @@ namespace EV_Rental
             // Bind VNPay settings
             builder.Services.Configure<VNPaySettings>(builder.Configuration.GetSection("VNPay"));
 
+            // Bind MoMo settings
+            builder.Services.Configure<MoMoSettings>(builder.Configuration.GetSection("MoMo"));
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
