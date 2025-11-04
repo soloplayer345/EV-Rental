@@ -17,6 +17,7 @@ namespace EV_Rental.Pages.Renter
         private readonly RentalService _rentalService;
         private readonly PaymentService _paymentService;
         private readonly VNPaySettings _vnPaySettings;
+        private readonly MoMoSettings _momoSettings;
         private readonly IEmailSender _emailSender;
         private readonly IAccountRepo _accountRepo;
 
@@ -25,6 +26,7 @@ namespace EV_Rental.Pages.Renter
             RentalService rentalService,
             PaymentService paymentService,
             IOptions<VNPaySettings> vnPaySettings,
+            IOptions<MoMoSettings> momoSettings,
             IEmailSender emailSender,
             IAccountRepo accountRepo)
         {
@@ -32,6 +34,7 @@ namespace EV_Rental.Pages.Renter
             _rentalService = rentalService;
             _paymentService = paymentService;
             _vnPaySettings = vnPaySettings.Value;
+            _momoSettings = momoSettings.Value;
             _emailSender = emailSender;
             _accountRepo = accountRepo;
         }
@@ -64,7 +67,7 @@ namespace EV_Rental.Pages.Renter
         public string? ErrorMessage { get; set; }
         
         [BindProperty]
-        public string PaymentMethod { get; set; } = "vnpay"; // Default: VNPay
+        public string PaymentMethod { get; set; } = "momo"; // Default: MoMo
 
         public async Task<IActionResult> OnGetAsync(
             int vehicleId,
@@ -244,15 +247,55 @@ namespace EV_Rental.Pages.Renter
 
             var bookingDto = result.Data;
 
-            // Generate transaction reference
+            // Generate transaction reference and OTP code
             var transactionRef = $"BOOKING{accountId.Value}_{DateTime.Now:yyyyMMddHHmmss}";
-
-            // Store booking info in session for later use (when payment succeeds)
-            HttpContext.Session.SetString($"BookingData_{transactionRef}", System.Text.Json.JsonSerializer.Serialize(bookingDto));
+            var otpCode = GenerateOtpCode();
 
             // Process based on payment method
-            if (PaymentMethod == "vnpay")
+            if (PaymentMethod == "momo")
             {
+                // Create pending rental first (before payment)
+                var pendingRentalResult = await _rentalService.CreatePendingRentalAsync(bookingDto, otpCode);
+                
+                if (!pendingRentalResult.Success || pendingRentalResult.Data == null)
+                {
+                    ErrorMessage = $"Không thể tạo đơn thuê: {pendingRentalResult.Message}";
+                    return Page();
+                }
+
+                var pendingRental = pendingRentalResult.Data;
+
+                // Store rental ID in session to look up after payment
+                HttpContext.Session.SetString($"PendingRentalId_{transactionRef}", pendingRental.Id.ToString());
+
+                // Redirect to MoMo
+                try
+                {
+                    var momoUrl = await CreateMoMoPaymentUrl(transactionRef, TotalCost, $"Thanh toan thue xe {Vehicle?.Name}");
+                    return Redirect(momoUrl);
+                }
+                catch (Exception ex)
+                {
+                    ErrorMessage = $"Không thể tạo thanh toán MoMo: {ex.Message}";
+                    return Page();
+                }
+            }
+            else if (PaymentMethod == "vnpay")
+            {
+                // Create pending rental first (before payment)
+                var pendingRentalResult = await _rentalService.CreatePendingRentalAsync(bookingDto, otpCode);
+                
+                if (!pendingRentalResult.Success || pendingRentalResult.Data == null)
+                {
+                    ErrorMessage = $"Không thể tạo đơn thuê: {pendingRentalResult.Message}";
+                    return Page();
+                }
+
+                var pendingRental = pendingRentalResult.Data;
+
+                // Store rental ID in session to look up after payment
+                HttpContext.Session.SetString($"PendingRentalId_{transactionRef}", pendingRental.Id.ToString());
+
                 // Redirect to VNPay
                 var vnpayUrl = CreateVNPayPaymentUrl(transactionRef, TotalCost, $"Thanh toan thue xe {Vehicle?.Name}");
                 return Redirect(vnpayUrl);
@@ -339,6 +382,46 @@ namespace EV_Rental.Pages.Renter
             Console.WriteLine("===================");
             
             return paymentUrl;
+        }
+
+        private async Task<string> CreateMoMoPaymentUrl(string orderId, decimal amount, string orderInfo)
+        {
+            try
+            {
+                // Remove Vietnamese characters and special chars from orderInfo for signature
+                // MoMo may have issues with UTF-8 in signature calculation
+                var cleanOrderInfo = RemoveVietnameseTones(orderInfo);
+                
+                var paymentUrl = await MoMoLibrary.CreatePaymentUrl(
+                    endpoint: _momoSettings.PaymentUrl,
+                    partnerCode: _momoSettings.PartnerCode,
+                    accessKey: _momoSettings.AccessKey,
+                    secretKey: _momoSettings.SecretKey,
+                    orderId: orderId,
+                    amount: amount,
+                    orderInfo: cleanOrderInfo,
+                    returnUrl: _momoSettings.ReturnUrl,
+                    ipnUrl: _momoSettings.IpnUrl,
+                    requestType: _momoSettings.RequestType,
+                    extraData: ""
+                );
+
+                // DEBUG: Log URL để kiểm tra
+                Console.WriteLine("=== MOMO DEBUG ===");
+                Console.WriteLine($"Order ID: {orderId}");
+                Console.WriteLine($"Amount: {amount} VND");
+                Console.WriteLine($"PartnerCode: {_momoSettings.PartnerCode}");
+                Console.WriteLine($"ReturnUrl: {_momoSettings.ReturnUrl}");
+                Console.WriteLine($"Full URL: {paymentUrl}");
+                Console.WriteLine("==================");
+
+                return paymentUrl;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"MoMo Error: {ex.Message}");
+                throw;
+            }
         }
 
         private string GetIpAddress()
@@ -511,6 +594,46 @@ namespace EV_Rental.Pages.Renter
 </html>";
 
             await _emailSender.SendAsync(toEmail, subject, htmlBody);
+        }
+
+        private string GenerateOtpCode()
+        {
+            Random random = new Random();
+            return random.Next(100000, 999999).ToString();
+        }
+
+        private string RemoveVietnameseTones(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+            
+            var vietnameseSigns = new string[]
+            {
+                "aAeEoOuUiIdDyY",
+                "áàạảãâấầậẩẫăắằặẳẵ",
+                "ÁÀẠẢÃÂẤẦẬẨẪĂẮẰẶẲẴ",
+                "éèẹẻẽêếềệểễ",
+                "ÉÈẸẺẼÊẾỀỆỂỄ",
+                "óòọỏõôốồộổỗơớờợởỡ",
+                "ÓÒỌỎÕÔỐỒỘỔỖƠỚỜỢỞỠ",
+                "úùụủũưứừựửữ",
+                "ÚÙỤỦŨƯỨỪỰỬỮ",
+                "íìịỉĩ",
+                "ÍÌỊỈĨ",
+                "đ",
+                "Đ",
+                "ýỳỵỷỹ",
+                "ÝỲỴỶỸ"
+            };
+
+            for (int i = 1; i < vietnameseSigns.Length; i++)
+            {
+                for (int j = 0; j < vietnameseSigns[i].Length; j++)
+                {
+                    text = text.Replace(vietnameseSigns[i][j], vietnameseSigns[0][i - 1]);
+                }
+            }
+
+            return text;
         }
     }
 }

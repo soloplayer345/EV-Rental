@@ -256,14 +256,34 @@
                                     </h3>
                                     
                                     <div class="payment-options">
-                                        <!-- VNPay Option -->
+                                        <!-- MoMo Option -->
                                         <label class="payment-option">
-                                            <input type="radio" name="PaymentMethod" value="vnpay" checked />
+                                            <input type="radio" name="PaymentMethod" value="momo" checked />
+                                            <div class="payment-card">
+                                                <div class="payment-header">
+                                                    <img src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png" 
+                                                         alt="MoMo" class="payment-logo" 
+                                                         onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI0E1MDA4NyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjQwIiBmb250LWZhbWlseT0iQXJpYWwiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+TW88L3RleHQ+PC9zdmc+';" />
+                                                    <div class="payment-badge recommended">Khuyến nghị</div>
+                                                </div>
+                                                <h4 class="payment-name">MoMo ATM</h4>
+                                                <p class="payment-desc">Thanh toán qua thẻ ATM/Ngân hàng liên kết MoMo</p>
+                                                <ul class="payment-features">
+                                                    <li>✓ Liên kết thẻ ATM với MoMo</li>
+                                                    <li>✓ Thanh toán nhanh chóng</li>
+                                                    <li>✓ Bảo mật cao</li>
+                                                    <li>✓ Nhận mã OTP qua email ngay lập tức</li>
+                                                </ul>
+                                            </div>
+                                        </label>
+
+                                        <!-- VNPay Option - HIDDEN -->
+                                        <label class="payment-option" style="display: none;">
+                                            <input type="radio" name="PaymentMethod" value="vnpay" />
                                             <div class="payment-card">
                                                 <div class="payment-header">
                                                     <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-VNPAY-QR.png" 
                                                          alt="VNPay" class="payment-logo" />
-                                                    <div class="payment-badge recommended">Khuyến nghị</div>
                                                 </div>
                                                 <h4 class="payment-name">VNPay</h4>
                                                 <p class="payment-desc">Thanh toán trực tuyến qua VNPay - Nhanh chóng & An toàn</p>
@@ -275,8 +295,8 @@
                                             </div>
                                         </label>
 
-                                        <!-- Cash Option -->
-                                        <label class="payment-option">
+                                        <!-- Cash Option - HIDDEN -->
+                                        <label class="payment-option" style="display: none;">
                                             <input type="radio" name="PaymentMethod" value="cash" />
                                             <div class="payment-card">
                                                 <div class="payment-header">
@@ -638,7 +658,7 @@
 
         .payment-options {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr;
             gap: 1rem;
         }
 
