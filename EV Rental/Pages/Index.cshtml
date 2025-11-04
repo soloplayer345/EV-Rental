@@ -61,10 +61,17 @@
                             <p class="card-text mb-1"><strong>Model:</strong> @v.Model</p>
                             <p class="card-text mb-1"><strong>Giá/giờ:</strong> @v.PricePerHour.ToString("N0") VNĐ</p>
                         </div>
-                        <div class="card-footer bg-transparent border-0 text-center">
+
+                        @if (User.IsInRole("Staff"))
+                        {
                             <a asp-page="/Vehicles/Edit" asp-route-id="@v.Id" class="btn btn-outline-primary btn-sm me-2">Sửa</a>
                             <a asp-page="/Vehicles/Delete" asp-route-id="@v.Id" class="btn btn-outline-danger btn-sm">Xóa</a>
-                        </div>
+                        }
+                        else if (User.IsInRole("Renter"))
+                        {
+                            <a asp-page="/Rentals/Create" asp-route-vehicleId="@v.Id" class="btn btn-success btn-sm">Thuê xe</a>
+                        }
+
                     </div>
                 </div>
             }
