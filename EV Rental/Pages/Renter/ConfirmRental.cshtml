@@ -1,0 +1,843 @@
+@page
+@model EV_Rental.Pages.Renter.ConfirmRentalModel
+@{
+    ViewData["Title"] = "Xác Nhận Thuê Xe";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <h1 class="logo">🔋 Hệ Thống Thuê Xe Điện</h1>
+                <nav class="nav">
+                    <a href="/Renter/Index" class="nav-link">Trang Chủ</a>
+                    <a href="/Renter/Index" class="nav-link">Xe Điện</a>
+                    <a href="#" class="nav-link">Trạm Xe</a>
+                    <a href="/Renter/MyTrips" class="nav-link">Chuyến Đi Của Tôi</a>
+                    <a href="#" class="nav-link active">Xác Nhận Thuê</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <section class="confirm-section">
+        <div class="container">
+            <div class="confirm-wrapper">
+                <div class="page-header">
+                    <h1 class="page-title">Xác Nhận Thuê Xe</h1>
+                    <p class="page-subtitle">Vui lòng kiểm tra kỹ thông tin trước khi xác nhận</p>
+                </div>
+
+                <div class="confirm-grid">
+                    <!-- Left: Vehicle & Rental Info -->
+                    <div class="info-column">
+                        <!-- Vehicle Card -->
+                        <div class="info-card">
+                            <h2 class="card-title">
+                                <span class="icon">🚗</span>
+                                Thông Tin Xe
+                            </h2>
+                            
+                            @if (!string.IsNullOrEmpty(Model.Vehicle?.ImageUrl))
+                            {
+                                <img src="@Model.Vehicle.ImageUrl" alt="@Model.Vehicle.Name" class="vehicle-img">
+                            }
+                            else
+                            {
+                                <div class="vehicle-placeholder">
+                                    @if (Model.Vehicle?.VehicleType.ToLower().Contains("car") == true)
+                                    {
+                                        <span>🚗</span>
+                                    }
+                                    else if (Model.Vehicle?.VehicleType.ToLower().Contains("scooter") == true)
+                                    {
+                                        <span>🛵</span>
+                                    }
+                                    else if (Model.Vehicle?.VehicleType.ToLower().Contains("bike") == true)
+                                    {
+                                        <span>🏍️</span>
+                                    }
+                                    else
+                                    {
+                                        <span>🚙</span>
+                                    }
+                                </div>
+                            }
+
+                            <div class="info-details">
+                                <h3 class="vehicle-name">@Model.Vehicle?.Name</h3>
+                                <div class="detail-row">
+                                    <span class="detail-label">Hãng xe:</span>
+                                    <span class="detail-value">@Model.Vehicle?.Brand</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Loại xe:</span>
+                                    <span class="detail-value">@Model.Vehicle?.VehicleType</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Biển số:</span>
+                                    <span class="detail-value">@Model.Vehicle?.PlateNumber</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Quãng đường:</span>
+                                    <span class="detail-value">@Model.Vehicle?.MaxDistance km</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rental Details Card -->
+                        <div class="info-card">
+                            <h2 class="card-title">
+                                <span class="icon">📋</span>
+                                Chi Tiết Thuê Xe
+                            </h2>
+                            
+                            <div class="info-details">
+                                <div class="detail-row">
+                                    <span class="detail-label">
+                                        <span class="icon-small">📅</span>
+                                        Thời gian bắt đầu:
+                                    </span>
+                                    <span class="detail-value highlight">@Model.StartDate.ToString("dd/MM/yyyy HH:mm")</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">
+                                        <span class="icon-small">📅</span>
+                                        Thời gian kết thúc:
+                                    </span>
+                                    <span class="detail-value highlight">@Model.EndDate.ToString("dd/MM/yyyy HH:mm")</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">
+                                        <span class="icon-small">⏱️</span>
+                                        Thời lượng thuê:
+                                    </span>
+                                    <span class="detail-value">@Model.RentalDuration</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">
+                                        <span class="icon-small">📍</span>
+                                        Trạm nhận xe:
+                                    </span>
+                                    <span class="detail-value">@Model.PickupStationName</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">
+                                        <span class="icon-small">📍</span>
+                                        Trạm trả xe:
+                                    </span>
+                                    <span class="detail-value">@Model.ReturnStationName</span>
+                                </div>
+                                @if (!string.IsNullOrEmpty(Model.Notes))
+                                {
+                                    <div class="detail-row">
+                                        <span class="detail-label">
+                                            <span class="icon-small">📝</span>
+                                            Ghi chú:
+                                        </span>
+                                        <span class="detail-value">@Model.Notes</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Cost Breakdown -->
+                    <div class="cost-column">
+                        <div class="cost-card">
+                            <h2 class="card-title">
+                                <span class="icon">💰</span>
+                                Chi Tiết Chi Phí
+                            </h2>
+
+                            <div class="cost-breakdown">
+                                <!-- Base Price -->
+                                <div class="cost-item">
+                                    <div class="cost-label">
+                                        <span class="cost-icon">🚗</span>
+                                        <div>
+                                            <div class="cost-name">Phí thuê xe</div>
+                                            <div class="cost-desc">
+                                                @if (Model.IsHourlyRental)
+                                                {
+                                                    <span>@Model.RentalHours giờ × @Model.Vehicle?.PricePerHour.ToString("N0") đ</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>@Model.RentalDays ngày × @Model.Vehicle?.PricePerDay.ToString("N0") đ</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="cost-amount">@Model.BasePrice.ToString("N0") đ</div>
+                                </div>
+
+                                <!-- Reservation Fee (if advance booking > 1 day) -->
+                                @if (Model.HasReservationFee)
+                                {
+                                    <div class="cost-item">
+                                        <div class="cost-label">
+                                            <span class="cost-icon">📅</span>
+                                            <div>
+                                                <div class="cost-name">Phí giữ chỗ</div>
+                                                <div class="cost-desc">Đặt trước @Model.DaysUntilPickup ngày</div>
+                                            </div>
+                                        </div>
+                                        <div class="cost-amount">@Model.ReservationFee.ToString("N0") đ</div>
+                                    </div>
+                                }
+
+                                <!-- Deposit -->
+                                <div class="cost-item">
+                                    <div class="cost-label">
+                                        <span class="cost-icon">🔒</span>
+                                        <div>
+                                            <div class="cost-name">Phí cọc</div>
+                                            <div class="cost-desc">Hoàn trả khi trả xe</div>
+                                        </div>
+                                    </div>
+                                    <div class="cost-amount">@Model.DepositAmount.ToString("N0") đ</div>
+                                </div>
+
+                                <div class="cost-divider"></div>
+
+                                <!-- Total -->
+                                <div class="cost-total">
+                                    <div class="total-label">Tổng chi phí</div>
+                                    <div class="total-amount">@Model.TotalCost.ToString("N0") đ</div>
+                                </div>
+
+                                <div class="cost-note">
+                                    <span class="note-icon">ℹ️</span>
+                                    <div class="note-text">
+                                        <strong>Lưu ý:</strong>
+                                        <ul>
+                                            <li>Phí cọc <strong>@Model.DepositAmount.ToString("N0") đ</strong> sẽ được hoàn trả khi bạn trả xe đúng thời gian và không có hư hại.</li>
+                                            @if (Model.HasReservationFee)
+                                            {
+                                                <li>Phí giữ chỗ <strong>@Model.ReservationFee.ToString("N0") đ</strong> áp dụng khi đặt xe trước hơn 1 ngày để đảm bảo xe sẵn sàng cho bạn.</li>
+                                            }
+                                            <li>Vui lòng thanh toán đầy đủ trước khi nhận xe tại trạm.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                            {
+                                <div class="error-message">
+                                    ⚠️ @Model.ErrorMessage
+                                </div>
+                            }
+
+                            <form method="post" class="confirm-form">
+                                <input type="hidden" name="VehicleId" value="@Model.VehicleId" />
+                                <input type="hidden" name="StartDate" value="@Model.StartDate.ToString("yyyy-MM-ddTHH:mm:ss")" />
+                                <input type="hidden" name="EndDate" value="@Model.EndDate.ToString("yyyy-MM-ddTHH:mm:ss")" />
+                                <input type="hidden" name="PickupStationId" value="@Model.PickupStationId" />
+                                <input type="hidden" name="ReturnStationId" value="@Model.ReturnStationId" />
+                                <input type="hidden" name="Notes" value="@Model.Notes" />
+                                
+                                <!-- Payment Method Selection -->
+                                <div class="payment-method-section">
+                                    <h3 class="payment-title">
+                                        <span class="icon-small">💳</span>
+                                        Chọn Phương Thức Thanh Toán
+                                    </h3>
+                                    
+                                    <div class="payment-options">
+                                        <!-- MoMo Option -->
+                                        <label class="payment-option">
+                                            <input type="radio" name="PaymentMethod" value="momo" checked />
+                                            <div class="payment-card">
+                                                <div class="payment-header">
+                                                    <img src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png" 
+                                                         alt="MoMo" class="payment-logo" 
+                                                         onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI0E1MDA4NyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjQwIiBmb250LWZhbWlseT0iQXJpYWwiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+TW88L3RleHQ+PC9zdmc+';" />
+                                                    <div class="payment-badge recommended">Khuyến nghị</div>
+                                                </div>
+                                                <h4 class="payment-name">MoMo ATM</h4>
+                                                <p class="payment-desc">Thanh toán qua thẻ ATM/Ngân hàng liên kết MoMo</p>
+                                                <ul class="payment-features">
+                                                    <li>✓ Liên kết thẻ ATM với MoMo</li>
+                                                    <li>✓ Thanh toán nhanh chóng</li>
+                                                    <li>✓ Bảo mật cao</li>
+                                                    <li>✓ Nhận mã OTP qua email ngay lập tức</li>
+                                                </ul>
+                                            </div>
+                                        </label>
+
+                                        <!-- VNPay Option - HIDDEN -->
+                                        <label class="payment-option" style="display: none;">
+                                            <input type="radio" name="PaymentMethod" value="vnpay" />
+                                            <div class="payment-card">
+                                                <div class="payment-header">
+                                                    <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-VNPAY-QR.png" 
+                                                         alt="VNPay" class="payment-logo" />
+                                                </div>
+                                                <h4 class="payment-name">VNPay</h4>
+                                                <p class="payment-desc">Thanh toán trực tuyến qua VNPay - Nhanh chóng & An toàn</p>
+                                                <ul class="payment-features">
+                                                    <li>✓ Thanh toán ngay lập tức</li>
+                                                    <li>✓ Hỗ trợ nhiều ngân hàng</li>
+                                                    <li>✓ Bảo mật cao</li>
+                                                </ul>
+                                            </div>
+                                        </label>
+
+                                        <!-- Cash Option - HIDDEN -->
+                                        <label class="payment-option" style="display: none;">
+                                            <input type="radio" name="PaymentMethod" value="cash" />
+                                            <div class="payment-card">
+                                                <div class="payment-header">
+                                                    <span class="payment-icon">💵</span>
+                                                </div>
+                                                <h4 class="payment-name">Tiền Mặt</h4>
+                                                <p class="payment-desc">Thanh toán bằng tiền mặt tại trạm nhận xe</p>
+                                                <ul class="payment-features">
+                                                    <li>✓ Thanh toán khi nhận xe</li>
+                                                    <li>✓ Không cần thẻ ngân hàng</li>
+                                                    <li>⚠️ Cần mang đủ tiền mặt</li>
+                                                </ul>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="button" onclick="history.back()" class="btn-secondary">
+                                        <span>⬅️</span> Quay Lại
+                                    </button>
+                                    <button type="submit" class="btn-primary">
+                                        <span>✓</span> Xác Nhận Thuê Xe
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Hệ Thống Thuê Xe Điện. Bản quyền thuộc về chúng tôi.</p>
+        </div>
+    </footer>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 1.3rem;
+            color: #2563eb;
+            font-weight: 700;
+        }
+
+        .nav {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #666;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: #2563eb;
+        }
+
+        /* Confirm Section */
+        .confirm-section {
+            padding: 2rem 0;
+            min-height: calc(100vh - 200px);
+        }
+
+        .confirm-wrapper {
+            margin-top: 1rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: #6b7280;
+            font-size: 1rem;
+        }
+
+        .confirm-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        /* Cards */
+        .info-card,
+        .cost-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .icon {
+            font-size: 1.5rem;
+        }
+
+        /* Vehicle Image */
+        .vehicle-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .vehicle-placeholder {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            margin-bottom: 1rem;
+        }
+
+        /* Info Details */
+        .info-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .vehicle-name {
+            font-size: 1.4rem;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 0.75rem;
+            background: #f9fafb;
+            border-radius: 6px;
+            border-left: 3px solid #2563eb;
+        }
+
+        .detail-label {
+            color: #6b7280;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .icon-small {
+            font-size: 1rem;
+        }
+
+        .detail-value {
+            color: #1f2937;
+            font-weight: 600;
+            text-align: right;
+            flex: 1;
+        }
+
+        .detail-value.highlight {
+            color: #2563eb;
+        }
+
+        /* Cost Breakdown */
+        .cost-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 8px;
+            border-left: 4px solid #10b981;
+        }
+
+        .cost-label {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+            flex: 1;
+        }
+
+        .cost-icon {
+            font-size: 1.5rem;
+        }
+
+        .cost-name {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .cost-desc {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        .cost-amount {
+            font-weight: 700;
+            color: #059669;
+            font-size: 1.1rem;
+            white-space: nowrap;
+        }
+
+        .cost-divider {
+            height: 2px;
+            background: linear-gradient(to right, transparent, #e5e7eb, transparent);
+            margin: 0.5rem 0;
+        }
+
+        .cost-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            border-radius: 8px;
+            color: white;
+        }
+
+        .total-label {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .total-amount {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .cost-note {
+            display: flex;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: #fef3c7;
+            border-radius: 8px;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .note-icon {
+            font-size: 1.5rem;
+        }
+
+        .note-text {
+            flex: 1;
+            color: #78350f;
+        }
+
+        .note-text strong {
+            color: #92400e;
+        }
+
+        .note-text ul {
+            margin-top: 0.5rem;
+            margin-left: 1.25rem;
+        }
+
+        .note-text li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Error Message */
+        .error-message {
+            background-color: #fee2e2;
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #dc2626;
+            margin-top: 1rem;
+        }
+
+        /* Payment Method Section */
+        .payment-method-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: #f9fafb;
+            border-radius: 12px;
+            border: 2px dashed #d1d5db;
+        }
+
+        .payment-title {
+            font-size: 1.2rem;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .payment-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .payment-option {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .payment-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .payment-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 3px solid #e5e7eb;
+            transition: all 0.3s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .payment-option input[type="radio"]:checked + .payment-card {
+            border-color: #2563eb;
+            background: #eff6ff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .payment-card:hover {
+            border-color: #93c5fd;
+            transform: translateY(-2px);
+        }
+
+        .payment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            min-height: 60px;
+        }
+
+        .payment-logo {
+            height: 50px;
+            object-fit: contain;
+        }
+
+        .payment-icon {
+            font-size: 3rem;
+        }
+
+        .payment-badge {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .payment-badge.recommended {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .payment-name {
+            font-size: 1.2rem;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .payment-desc {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .payment-features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .payment-features li {
+            padding: 0.4rem 0;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+
+        /* Form Actions */
+        .confirm-form {
+            margin-top: 1.5rem;
+        }
+
+        .form-actions {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 1rem;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-secondary {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e5e7eb;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #1f2937;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 2rem;
+        }
+
+        /* Responsive */
+        @@media (max-width: 1024px) {
+            .confirm-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .nav {
+                gap: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .form-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .payment-options {
+                grid-template-columns: 1fr;
+            }
+
+            .payment-logo {
+                height: 40px;
+            }
+        }
+    </style>
+</body>
+</html>

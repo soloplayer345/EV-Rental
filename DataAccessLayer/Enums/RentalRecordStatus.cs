@@ -8,9 +8,10 @@ namespace DataAccessLayer.Enums
 {
     public enum RentalRecordStatus
     {
-        Pending,
-        Active,
-        Completed,
-        Cancelled
+        Pending,      // Đang chờ thanh toán
+        Confirmed,    // Đã thanh toán, chờ nhận xe
+        Active,       // Đang thuê
+        Completed,    // Đã hoàn thành
+        Cancelled     // Đã hủy
     }
 }

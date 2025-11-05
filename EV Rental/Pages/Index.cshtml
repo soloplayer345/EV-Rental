@@ -1,4 +1,5 @@
 ﻿@page
+@using DataAccessLayer.Enums
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
@@ -7,4 +8,80 @@
 <div class="text-center">
     <h1 class="display-4">Welcome to EV Rental</h1>
     <p>Hệ thống cho thuê xe điện</p>
+
+
+    <h2 class="mb-4">Danh sách xe điện</h2>
+
+    <!-- Thanh tìm kiếm -->
+    <form method="get" class="mb-4">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">Tên xe</label>
+                <input type="text" name="Search.Name" value="@Model.SearchName" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Hãng</label>
+                <input type="text" name="Search.Brand" value="@Model.SearchBrand" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Loại xe</label>
+                <input type="text" name="Search.Type" value="@Model.SearchType" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Trạng thái</label>
+                <select name="Search.Status" class="form-select">
+                    <option value="">-- Tất cả --</option>
+                    @foreach (var s in Enum.GetValues(typeof(DataAccessLayer.Enums.VehicleStatus)))
+                    {
+                        <option value="@s" selected="@(Model.SearchStatus == (VehicleStatus)s)">
+                            @s
+                        </option>
+                    }
+
+                </select>
+            </div>
+            <div class="col-md-1 text-end">
+                <button type="submit" class="btn btn-primary w-100">Tìm</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Danh sách xe -->
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @if (Model.Vehicles != null && Model.Vehicles.Any())
+        {
+            @foreach (var v in Model.Vehicles)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0">
+                        <img src="@v.ImageUrl" class="card-img-top" alt="@v.Name" style="height:200px; object-fit:cover;" />
+                        <div class="card-body text-start">
+                            <h5 class="card-title">@v.Name</h5>
+                            <p class="card-text mb-1"><strong>Hãng:</strong> @v.Brand</p>
+                            <p class="card-text mb-1"><strong>Model:</strong> @v.Model</p>
+                            <p class="card-text mb-1"><strong>Giá/giờ:</strong> @v.PricePerHour.ToString("N0") VNĐ</p>
+                        </div>
+
+                        @if (User.IsInRole("Staff"))
+                        {
+                            <a asp-page="/Vehicles/Edit" asp-route-id="@v.Id" class="btn btn-outline-primary btn-sm me-2">Sửa</a>
+                            <a asp-page="/Vehicles/Delete" asp-route-id="@v.Id" class="btn btn-outline-danger btn-sm">Xóa</a>
+                        }
+                        else if (User.IsInRole("Renter"))
+                        {
+                            <a asp-page="/Rentals/Create" asp-route-vehicleId="@v.Id" class="btn btn-success btn-sm">Thuê xe</a>
+                        }
+
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col">
+                <p class="text-muted">Không có xe nào phù hợp với tiêu chí tìm kiếm.</p>
+            </div>
+        }
+    </div>
+
 </div>

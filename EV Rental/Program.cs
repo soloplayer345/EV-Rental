@@ -2,8 +2,10 @@ using BusinessLayer.Interfaces;
 using BusinessLayer.Services;
 using DataAccessLayer;
 using DataAccessLayer.Interfaces;
+using DataAccessLayer.Repositories;
 using EV_Rental.Middlewares;
 using Microsoft.EntityFrameworkCore;
+using EV_Rental.Helpers;
 
 namespace EV_Rental
 {
@@ -26,12 +28,29 @@ namespace EV_Rental
 
             //add connection String
             builder.Services.AddDbContext<EVRentalDBContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("LocalSQLServer"))
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
             );
+
+            // Register Repositories
+            builder.Services.AddScoped<IVehicleRepo, VehicleRepo>();
+            builder.Services.AddScoped<IAccountRepo, AccountRepo>();
 
             // Register UnitOfWork and Services
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<VehicleService>();
+            builder.Services.AddScoped<RentalService>();
+            builder.Services.AddScoped<PaymentService>();
+
+            // Bind SMTP settings & register EmailSender
+            builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("Smtp"));
+            builder.Services.AddSingleton<IEmailSender, SmtpEmailSender>();
+
+            // Bind VNPay settings
+            builder.Services.Configure<VNPaySettings>(builder.Configuration.GetSection("VNPay"));
+
+            // Bind MoMo settings
+            builder.Services.Configure<MoMoSettings>(builder.Configuration.GetSection("MoMo"));
 
             var app = builder.Build();
 

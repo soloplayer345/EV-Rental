@@ -31,35 +31,47 @@ namespace DataAccessLayer.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CreatedAt");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Password")
+                    b.Property<string>("FullName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Phone")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<int>("Role")
                         .HasColumnType("int");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("UpdatedAt");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Accounts");
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("Account", (string)null);
 
                     b.HasData(
                         new
@@ -67,13 +79,97 @@ namespace DataAccessLayer.Migrations
                             Id = 1,
                             CreateDate = new DateTime(2025, 10, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@evrental.com",
-                            IsDeleted = false,
-                            Password = "Admin@123",
+                            FullName = "Administrator",
+                            IsActive = true,
+                            PasswordHash = "$2a$12$cCtbISaErU6KdR09HUiVvuX0Ur2saXpU/sEB3sQJ72obhp8jKbCa.",
                             Phone = "0123456789",
                             Role = 2,
-                            Status = 0,
                             UpdateDate = new DateTime(2025, 10, 24, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreateDate = new DateTime(2025, 10, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "staff@evrental.com",
+                            FullName = "Nguyen Van Staff",
+                            IsActive = true,
+                            PasswordHash = "$2a$12$cCtbISaErU6KdR09HUiVvuX0Ur2saXpU/sEB3sQJ72obhp8jKbCa.",
+                            Phone = "0987654321",
+                            Role = 1,
+                            UpdateDate = new DateTime(2025, 10, 24, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreateDate = new DateTime(2025, 10, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "renter1@gmail.com",
+                            FullName = "Tran Thi Renter",
+                            IsActive = true,
+                            PasswordHash = "$2a$12$cCtbISaErU6KdR09HUiVvuX0Ur2saXpU/sEB3sQJ72obhp8jKbCa.",
+                            Phone = "0901234567",
+                            Role = 0,
+                            UpdateDate = new DateTime(2025, 10, 25, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreateDate = new DateTime(2025, 10, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "renter2@gmail.com",
+                            FullName = "Le Van Renter",
+                            IsActive = true,
+                            PasswordHash = "$2a$12$cCtbISaErU6KdR09HUiVvuX0Ur2saXpU/sEB3sQJ72obhp8jKbCa.",
+                            Phone = "0912345678",
+                            Role = 0,
+                            UpdateDate = new DateTime(2025, 10, 25, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
+                });
+
+            modelBuilder.Entity("DataAccessLayer.Entities.InspectionProblem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Evidence")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IncidentType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("PenaltyAmount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(12,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<int>("RentalId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RentalId");
+
+                    b.ToTable("InspectionProblems");
                 });
 
             modelBuilder.Entity("DataAccessLayer.Entities.Payment", b =>
@@ -85,31 +181,38 @@ namespace DataAccessLayer.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(12,2)");
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<decimal>("Deposit")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("Method")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
-                    b.Property<DateTime>("PaymentDate")
+                    b.Property<DateTime?>("PaidAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<decimal>("Refund")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("RentalId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("UpdateDate")
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)")
+                        .HasDefaultValue("pending");
+
+                    b.Property<string>("TransactionRef")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -117,6 +220,41 @@ namespace DataAccessLayer.Migrations
                     b.HasIndex("RentalId");
 
                     b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("DataAccessLayer.Entities.RatingReview", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RentalId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RentalId")
+                        .IsUnique();
+
+                    b.ToTable("RatingReviews");
                 });
 
             modelBuilder.Entity("DataAccessLayer.Entities.RentalRecord", b =>
@@ -127,35 +265,61 @@ namespace DataAccessLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ContractUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("ActualEndTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("BasePrice")
+                        .HasColumnType("decimal(12,2)");
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("EndTime")
+                    b.Property<decimal>("DepositFee")
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<decimal>("Discount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(12,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<DateTime?>("ExpectedEndTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<decimal>("ExtraFees")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(12,2)")
+                        .HasDefaultValue(0m);
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<string>("OtpCode")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
+
+                    b.Property<int>("PickupStationId")
+                        .HasColumnType("int");
+
                     b.Property<int>("RenterId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime2");
+                    b.Property<decimal>("ReservationFee")
+                        .HasColumnType("decimal(12,2)");
 
-                    b.Property<int>("StationId")
+                    b.Property<int?>("ReturnStationId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("StartTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("TotalCost")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(12,2)");
 
-                    b.Property<DateTime>("UpdateDate")
+                    b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("VehicleId")
@@ -163,144 +327,15 @@ namespace DataAccessLayer.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("PickupStationId");
+
                     b.HasIndex("RenterId");
 
-                    b.HasIndex("StationId");
+                    b.HasIndex("ReturnStationId");
 
                     b.HasIndex("VehicleId");
 
                     b.ToTable("RentalRecords");
-                });
-
-            modelBuilder.Entity("DataAccessLayer.Entities.Renter", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AccountId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("ApprovedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("ApprovedBy")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DriverLicense")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("IdCard")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AccountId")
-                        .IsUnique();
-
-                    b.ToTable("Renters");
-                });
-
-            modelBuilder.Entity("DataAccessLayer.Entities.Report", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ReportType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("StationId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("StationId1")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StationId");
-
-                    b.HasIndex("StationId1")
-                        .IsUnique()
-                        .HasFilter("[StationId1] IS NOT NULL");
-
-                    b.ToTable("Reports");
-                });
-
-            modelBuilder.Entity("DataAccessLayer.Entities.Staff", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AccountId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Position")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("StationId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AccountId")
-                        .IsUnique();
-
-                    b.HasIndex("StationId");
-
-                    b.ToTable("Staffs");
                 });
 
             modelBuilder.Entity("DataAccessLayer.Entities.Station", b =>
@@ -321,22 +356,63 @@ namespace DataAccessLayer.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<float>("Latitude")
-                        .HasColumnType("real");
-
-                    b.Property<float>("Longitude")
-                        .HasColumnType("real");
-
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("State")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("UpdateDate")
+                    b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
                     b.ToTable("Stations");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Address = "123 Lê Lợi, Phường Bến Thành, Quận 1, TP.HCM",
+                            CreateDate = new DateTime(2025, 10, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            Name = "Trạm Quận 1 - Bến Thành",
+                            State = "Active",
+                            UpdateDate = new DateTime(2025, 10, 20, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Address = "456 Cộng Hòa, Phường 13, Quận Tân Bình, TP.HCM",
+                            CreateDate = new DateTime(2025, 10, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            Name = "Trạm Quận 3 - Cộng Hòa",
+                            State = "Active",
+                            UpdateDate = new DateTime(2025, 10, 20, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Address = "789 Nguyễn Văn Linh, Phường Tân Phú, Quận 7, TP.HCM",
+                            CreateDate = new DateTime(2025, 10, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            Name = "Trạm Quận 7 - Phú Mỹ Hưng",
+                            State = "Active",
+                            UpdateDate = new DateTime(2025, 10, 20, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Address = "208 Nguyễn Hữu Cảnh, Phường 22, TP. Thủ Đức, TP.HCM",
+                            CreateDate = new DateTime(2025, 10, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            Name = "Trạm Thủ Đức - Landmark 81",
+                            State = "Active",
+                            UpdateDate = new DateTime(2025, 10, 20, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
             modelBuilder.Entity("DataAccessLayer.Entities.Vehicle", b =>
@@ -347,21 +423,48 @@ namespace DataAccessLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<float>("BatteryCapacity")
-                        .HasColumnType("real");
+                    b.Property<string>("Brand")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LicensePlate")
+                    b.Property<string>("Features")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MaxDistance")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PlateNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("PricePerDay")
+                        .HasColumnType("decimal(12,2)");
+
                     b.Property<decimal>("PricePerHour")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(12,2)");
 
                     b.Property<int>("StationId")
                         .HasColumnType("int");
@@ -369,60 +472,555 @@ namespace DataAccessLayer.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("UpdateDate")
+                    b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("VehicleType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("seartCapacity")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("StationId");
 
                     b.ToTable("Vehicles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Brand = "VinFast",
+                            CreateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true}",
+                            ImageUrl = "https://www.vinfastvietnam.net.vn/uploads/data/3097/imgproducts/vinfastvietnam.net.vnvfe34.jpg3.jpg",
+                            IsDeleted = false,
+                            MaxDistance = 285,
+                            Model = "VF e34",
+                            Name = "VinFast VF e34",
+                            PlateNumber = "59A-12345",
+                            PricePerDay = 1200000m,
+                            PricePerHour = 150000m,
+                            StationId = 1,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 0
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Brand = "VinFast",
+                            CreateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true}",
+                            ImageUrl = "https://shop.vinfastauto.com/on/demandware.static/-/Sites-app_vinfast_vn-Library/default/dw02b7ceb2/images/kara/head-banner.png",
+                            IsDeleted = false,
+                            MaxDistance = 90,
+                            Model = "Klara S",
+                            Name = "VinFast Klara S",
+                            PlateNumber = "59B-67890",
+                            PricePerDay = 200000m,
+                            PricePerHour = 30000m,
+                            StationId = 1,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "scooter",
+                            seartCapacity = 0
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Brand = "DatBike",
+                            CreateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true,\"usbCharging\":true,\"antiTheft\":true}",
+                            ImageUrl = "https://vcdn1-vnexpress.vnecdn.net/2021/11/30/weaver-200-1-1638229818-5666-1638230365.jpg?w=460&h=0&q=100&dpr=2&fit=crop&s=tEMINgIF_iQNoKpS66-pQQ",
+                            IsDeleted = false,
+                            MaxDistance = 120,
+                            Model = "Weaver 200",
+                            Name = "DatBike Weaver 200",
+                            PlateNumber = "51A-11111",
+                            PricePerDay = 250000m,
+                            PricePerHour = 35000m,
+                            StationId = 2,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "motorbike",
+                            seartCapacity = 0
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Brand = "DatBike",
+                            CreateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true,\"usbCharging\":true}",
+                            ImageUrl = "https://dat.bike/cdn/shop/files/datbike-1_1728x_ead528e3-8a1c-4de4-89b9-4a567cfa2fdb.jpg?v=1668681506",
+                            IsDeleted = false,
+                            MaxDistance = 100,
+                            Model = "Weaver 100",
+                            Name = "DatBike Weaver 100",
+                            PlateNumber = "51B-22222",
+                            PricePerDay = 195000m,
+                            PricePerHour = 28000m,
+                            StationId = 2,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "scooter",
+                            seartCapacity = 0
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Brand = "Tesla",
+                            CreateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"autopilot\":true}",
+                            ImageUrl = "https://giaxeoto.vn/admin/upload/images/resize/640-tesla-model-3-2024-co-gi-moi.jpg",
+                            IsDeleted = false,
+                            MaxDistance = 491,
+                            Model = "Model 3 Standard Range",
+                            Name = "Tesla Model 3",
+                            PlateNumber = "59C-33333",
+                            PricePerDay = 1800000m,
+                            PricePerHour = 220000m,
+                            StationId = 3,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 0
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Brand = "Yadea",
+                            CreateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"usbCharging\":true}",
+                            ImageUrl = "https://xedienvietthanh.com/wp-content/uploads/2022/01/1-2.jpg",
+                            IsDeleted = false,
+                            MaxDistance = 80,
+                            Model = "G5 Pro",
+                            Name = "Yadea G5",
+                            PlateNumber = "59D-44444",
+                            PricePerDay = 160000m,
+                            PricePerHour = 22000m,
+                            StationId = 3,
+                            Status = 1,
+                            UpdateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "scooter",
+                            seartCapacity = 0
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Brand = "BMW",
+                            CreateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"sunroof\":true,\"leatherSeats\":true,\"panoramicRoof\":true}",
+                            ImageUrl = "https://images.netdirector.co.uk/gforces-auto/image/upload/w_412,h_309,q_auto,c_fill,f_auto,fl_lossy/auto-titan/e9fc28a92a2bff98fdb38daeb05779d0/ix3_new_highlights.png",
+                            IsDeleted = false,
+                            MaxDistance = 460,
+                            Model = "iX3 M Sport",
+                            Name = "BMW iX3",
+                            PlateNumber = "51C-55555",
+                            PricePerDay = 2200000m,
+                            PricePerHour = 280000m,
+                            StationId = 4,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 0
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Brand = "Honda",
+                            CreateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true}",
+                            ImageUrl = "https://imgs.vietnamnet.vn/Images/2010/12/18/15/20101218153440_HondaEV_neo1.jpg?width=0&s=nYxnKbZLc3xcypiHjjRVgA",
+                            IsDeleted = false,
+                            MaxDistance = 90,
+                            Model = "EV-neo Electric",
+                            Name = "Honda EV-neo",
+                            PlateNumber = "51D-66666",
+                            PricePerDay = 185000m,
+                            PricePerHour = 26000m,
+                            StationId = 4,
+                            Status = 2,
+                            UpdateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "scooter",
+                            seartCapacity = 0
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Brand = "VinFast",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"autopilot\":true}",
+                            ImageUrl = "https://vinfast-cars.vn/wp-content/uploads/2025/02/vinfast-vf8-den.png",
+                            IsDeleted = false,
+                            MaxDistance = 420,
+                            Model = "VF 8 Plus",
+                            Name = "VinFast VF 8",
+                            PlateNumber = "59E-77777",
+                            PricePerDay = 1400000m,
+                            PricePerHour = 180000m,
+                            StationId = 1,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 0
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Brand = "Pega",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"usbCharging\":true}",
+                            ImageUrl = "https://thegioixechaydien.com.vn/upload/hinhanh/xe-may-dien-pega-xmen-350.jpg",
+                            IsDeleted = false,
+                            MaxDistance = 85,
+                            Model = "Xmen 110",
+                            Name = "Pega Xmen",
+                            PlateNumber = "59F-88888",
+                            PricePerDay = 175000m,
+                            PricePerHour = 25000m,
+                            StationId = 1,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "scooter",
+                            seartCapacity = 0
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Brand = "Audi",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"leatherSeats\":true,\"sportMode\":true}",
+                            ImageUrl = "https://i1-vnexpress.vnecdn.net/2024/11/23/DSC09878JPG-1732351567.jpg?w=750&h=450&q=100&dpr=1&fit=crop&s=UVB1kqgA08fA_pGNG7EjvA",
+                            IsDeleted = false,
+                            MaxDistance = 488,
+                            Model = "e-tron GT quattro",
+                            Name = "Audi e-tron GT",
+                            PlateNumber = "51E-99999",
+                            PricePerDay = 2500000m,
+                            PricePerHour = 320000m,
+                            StationId = 2,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 0
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Brand = "Yamaha",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true,\"usbCharging\":true}",
+                            ImageUrl = "https://xedoisong.vn/uploads/20221030/xedoisong_chi_tiet_mau_xe_tay_ga_thuan_dien_yamaha_e01_1__bggd.jpg",
+                            IsDeleted = false,
+                            MaxDistance = 110,
+                            Model = "E01 Electric",
+                            Name = "Yamaha E01",
+                            PlateNumber = "51F-11122",
+                            PricePerDay = 270000m,
+                            PricePerHour = 38000m,
+                            StationId = 2,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "motorbike",
+                            seartCapacity = 0
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Brand = "Mercedes-Benz",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"leatherSeats\":true,\"massage\":true,\"panoramicRoof\":true}",
+                            ImageUrl = "https://i1-vnexpress.vnecdn.net/2023/03/29/Mercedes-EQS-2022-VnE-7034-JPG.jpg?w=2400&h=0&q=100&dpr=1&fit=crop&s=VNrfMglzD7glUa199o-N6A&t=image",
+                            IsDeleted = false,
+                            MaxDistance = 770,
+                            Model = "EQS 450+",
+                            Name = "Mercedes EQS",
+                            PlateNumber = "59G-22233",
+                            PricePerDay = 2800000m,
+                            PricePerHour = 350000m,
+                            StationId = 3,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 0
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Brand = "Gogoro",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true,\"batterySwap\":true}",
+                            ImageUrl = "https://autopro8.mediacdn.vn/2017/-1495870369869.jpg",
+                            IsDeleted = false,
+                            MaxDistance = 110,
+                            Model = "Gogoro 2 Plus",
+                            Name = "Gogoro 2",
+                            PlateNumber = "59H-33344",
+                            PricePerDay = 220000m,
+                            PricePerHour = 32000m,
+                            StationId = 3,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "scooter",
+                            seartCapacity = 0
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Brand = "Porsche",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"leatherSeats\":true,\"sportMode\":true,\"launch\":true}",
+                            ImageUrl = "https://i1-vnexpress.vnecdn.net/2024/10/18/Porsche-Taycan-Vnexpress-net-11-JPG.jpg?w=2400&h=0&q=100&dpr=1&fit=crop&s=LoskMEDqKHzXgrHyeWd5Ag&t=image",
+                            IsDeleted = false,
+                            MaxDistance = 484,
+                            Model = "Taycan 4S",
+                            Name = "Porsche Taycan",
+                            PlateNumber = "51G-44455",
+                            PricePerDay = 3000000m,
+                            PricePerHour = 380000m,
+                            StationId = 4,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 0
+                        },
+                        new
+                        {
+                            Id = 16,
+                            Brand = "Pega",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true,\"usbCharging\":true}",
+                            ImageUrl = "https://xedienducanh.com/upload/product/xe-may-dien-xmen-gt13030.jpg",
+                            IsDeleted = false,
+                            MaxDistance = 95,
+                            Model = "Xmen GT Pro",
+                            Name = "Xmen GT",
+                            PlateNumber = "51H-55566",
+                            PricePerDay = 190000m,
+                            PricePerHour = 28000m,
+                            StationId = 4,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "scooter",
+                            seartCapacity = 0
+                        },
+                        new
+                        {
+                            Id = 17,
+                            Brand = "VinFast",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"7seats\":true,\"panoramicRoof\":true}",
+                            ImageUrl = "https://shop.vinfastauto.com/on/demandware.static/-/Sites-app_vinfast_vn-Library/default/dw1a73c862/images/PDP/vf9/202406/exterior/CE1W.webp",
+                            IsDeleted = false,
+                            MaxDistance = 438,
+                            Model = "VF 9 Plus",
+                            Name = "VinFast VF 9",
+                            PlateNumber = "59I-66677",
+                            PricePerDay = 1600000m,
+                            PricePerHour = 200000m,
+                            StationId = 1,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 0
+                        },
+                        new
+                        {
+                            Id = 18,
+                            Brand = "Tesla",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"autopilot\":true,\"7seats\":true}",
+                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQuPPGwtfobtphn2JnZfRLJU_ELJXj4mEweQ&s",
+                            IsDeleted = false,
+                            MaxDistance = 525,
+                            Model = "Model Y Long Range",
+                            Name = "Tesla Model Y",
+                            PlateNumber = "51I-77788",
+                            PricePerDay = 1900000m,
+                            PricePerHour = 240000m,
+                            StationId = 2,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 0
+                        },
+                        new
+                        {
+                            Id = 19,
+                            Brand = "Hyundai",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"solarRoof\":true}",
+                            ImageUrl = "https://i1-vnexpress.vnecdn.net/2023/07/31/Hyundai-IONIQ-5-7.jpg?w=2400&h=0&q=100&dpr=1&fit=crop&s=gqOfVmNy6EZxHps0rNBfCA&t=image",
+                            IsDeleted = false,
+                            MaxDistance = 481,
+                            Model = "Ioniq 5 Long Range",
+                            Name = "Hyundai Ioniq 5",
+                            PlateNumber = "59J-88899",
+                            PricePerDay = 1500000m,
+                            PricePerHour = 190000m,
+                            StationId = 3,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 0
+                        },
+                        new
+                        {
+                            Id = 20,
+                            Brand = "Kia",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"fastCharging\":true}",
+                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDRNkoUruCHw69jdLnwmvz09ncLCsAcLnsJA&s",
+                            IsDeleted = false,
+                            MaxDistance = 528,
+                            Model = "EV6 GT-Line",
+                            Name = "Kia EV6",
+                            PlateNumber = "51J-99900",
+                            PricePerDay = 1550000m,
+                            PricePerHour = 195000m,
+                            StationId = 4,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 0
+                        },
+                        new
+                        {
+                            Id = 21,
+                            Brand = "DatBike",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true,\"usbCharging\":true,\"antiTheft\":true}",
+                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4I4PWW4787JMocGpiEGGCSx1vybQqpptKWg&s",
+                            IsDeleted = false,
+                            MaxDistance = 150,
+                            Model = "Weaver 300 Pro",
+                            Name = "DatBike Weaver 300",
+                            PlateNumber = "59K-11100",
+                            PricePerDay = 280000m,
+                            PricePerHour = 40000m,
+                            StationId = 1,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "motorbike",
+                            seartCapacity = 0
+                        },
+                        new
+                        {
+                            Id = 22,
+                            Brand = "Yadea",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true,\"usbCharging\":true}",
+                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDSr3w-Z6dXCDd1X2htVbLBP6VL4YXEd-Ofw&s",
+                            IsDeleted = false,
+                            MaxDistance = 75,
+                            Model = "C1S Smart",
+                            Name = "Yadea C1S",
+                            PlateNumber = "51K-22211",
+                            PricePerDay = 170000m,
+                            PricePerHour = 24000m,
+                            StationId = 2,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "scooter",
+                            seartCapacity = 0
+                        },
+                        new
+                        {
+                            Id = 23,
+                            Brand = "Polestar",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"googleIntegration\":true}",
+                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFP_xRoDnlB2qUUnef4lw1c-HTf7Xnvi_hWw&s",
+                            IsDeleted = false,
+                            MaxDistance = 540,
+                            Model = "Polestar 2 Long Range",
+                            Name = "Polestar 2",
+                            PlateNumber = "59L-33322",
+                            PricePerDay = 1850000m,
+                            PricePerHour = 230000m,
+                            StationId = 3,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 0
+                        },
+                        new
+                        {
+                            Id = 24,
+                            Brand = "Nissan",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"proPilot\":true}",
+                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNR4feHONvrN5Y-HK13689YKvLgkYgtqWiyA&s",
+                            IsDeleted = false,
+                            MaxDistance = 500,
+                            Model = "Ariya e-4ORCE",
+                            Name = "Nissan Ariya",
+                            PlateNumber = "51L-44433",
+                            PricePerDay = 1700000m,
+                            PricePerHour = 210000m,
+                            StationId = 4,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 0
+                        },
+                        new
+                        {
+                            Id = 25,
+                            Brand = "VinFast",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true}",
+                            ImageUrl = "https://shop.vinfastauto.com/on/demandware.static/-/Sites-app_vinfast_vn-Library/default/dw0b27b768/images/PDP-XMD/evo200/img-evo-red.png",
+                            IsDeleted = false,
+                            MaxDistance = 85,
+                            Model = "Evo200 Lite",
+                            Name = "VinFast Evo200",
+                            PlateNumber = "59M-55544",
+                            PricePerDay = 185000m,
+                            PricePerHour = 27000m,
+                            StationId = 1,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "scooter",
+                            seartCapacity = 0
+                        },
+                        new
+                        {
+                            Id = 26,
+                            Brand = "BYD",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"panoramicSunroof\":true}",
+                            ImageUrl = "https://img1.oto.com.vn/2024/07/26/OpzfnMD2/atto-3-0f7e.webp",
+                            IsDeleted = false,
+                            MaxDistance = 480,
+                            Model = "Atto 3 Extended",
+                            Name = "BYD Atto 3",
+                            PlateNumber = "51M-66655",
+                            PricePerDay = 1450000m,
+                            PricePerHour = 185000m,
+                            StationId = 2,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 0
+                        });
                 });
 
-            modelBuilder.Entity("DataAccessLayer.Entities.VehicleCheck", b =>
+            modelBuilder.Entity("DataAccessLayer.Entities.InspectionProblem", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.HasOne("DataAccessLayer.Entities.RentalRecord", "RentalRecord")
+                        .WithMany("InspectionProblems")
+                        .HasForeignKey("RentalId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CheckType")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ConditionNote")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("PhotoUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("RentalId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StaffId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RentalId");
-
-                    b.HasIndex("StaffId");
-
-                    b.ToTable("VehicleChecks");
+                    b.Navigation("RentalRecord");
                 });
 
             modelBuilder.Entity("DataAccessLayer.Entities.Payment", b =>
@@ -436,19 +1034,35 @@ namespace DataAccessLayer.Migrations
                     b.Navigation("RentalRecord");
                 });
 
+            modelBuilder.Entity("DataAccessLayer.Entities.RatingReview", b =>
+                {
+                    b.HasOne("DataAccessLayer.Entities.RentalRecord", "RentalRecord")
+                        .WithOne("RatingReview")
+                        .HasForeignKey("DataAccessLayer.Entities.RatingReview", "RentalId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("RentalRecord");
+                });
+
             modelBuilder.Entity("DataAccessLayer.Entities.RentalRecord", b =>
                 {
-                    b.HasOne("DataAccessLayer.Entities.Renter", "Renter")
+                    b.HasOne("DataAccessLayer.Entities.Station", "PickupStation")
+                        .WithMany("PickupRentalRecords")
+                        .HasForeignKey("PickupStationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("DataAccessLayer.Entities.Account", "Renter")
                         .WithMany("RentalRecords")
                         .HasForeignKey("RenterId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("DataAccessLayer.Entities.Station", "Station")
-                        .WithMany("RentalRecords")
-                        .HasForeignKey("StationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.HasOne("DataAccessLayer.Entities.Station", "ReturnStation")
+                        .WithMany("ReturnRentalRecords")
+                        .HasForeignKey("ReturnStationId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("DataAccessLayer.Entities.Vehicle", "Vehicle")
                         .WithMany("RentalRecords")
@@ -456,56 +1070,13 @@ namespace DataAccessLayer.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.Navigation("PickupStation");
+
                     b.Navigation("Renter");
 
-                    b.Navigation("Station");
+                    b.Navigation("ReturnStation");
 
                     b.Navigation("Vehicle");
-                });
-
-            modelBuilder.Entity("DataAccessLayer.Entities.Renter", b =>
-                {
-                    b.HasOne("DataAccessLayer.Entities.Account", "Account")
-                        .WithOne("Renter")
-                        .HasForeignKey("DataAccessLayer.Entities.Renter", "AccountId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Account");
-                });
-
-            modelBuilder.Entity("DataAccessLayer.Entities.Report", b =>
-                {
-                    b.HasOne("DataAccessLayer.Entities.Station", "Station")
-                        .WithMany()
-                        .HasForeignKey("StationId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("DataAccessLayer.Entities.Station", null)
-                        .WithOne("Report")
-                        .HasForeignKey("DataAccessLayer.Entities.Report", "StationId1");
-
-                    b.Navigation("Station");
-                });
-
-            modelBuilder.Entity("DataAccessLayer.Entities.Staff", b =>
-                {
-                    b.HasOne("DataAccessLayer.Entities.Account", "Account")
-                        .WithOne("Staff")
-                        .HasForeignKey("DataAccessLayer.Entities.Staff", "AccountId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("DataAccessLayer.Entities.Station", "Station")
-                        .WithMany("Staff")
-                        .HasForeignKey("StationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Account");
-
-                    b.Navigation("Station");
                 });
 
             modelBuilder.Entity("DataAccessLayer.Entities.Vehicle", b =>
@@ -519,59 +1090,26 @@ namespace DataAccessLayer.Migrations
                     b.Navigation("Station");
                 });
 
-            modelBuilder.Entity("DataAccessLayer.Entities.VehicleCheck", b =>
-                {
-                    b.HasOne("DataAccessLayer.Entities.RentalRecord", "RentalRecord")
-                        .WithMany("VehicleChecks")
-                        .HasForeignKey("RentalId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("DataAccessLayer.Entities.Staff", "Staff")
-                        .WithMany("VehicleChecks")
-                        .HasForeignKey("StaffId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("RentalRecord");
-
-                    b.Navigation("Staff");
-                });
-
             modelBuilder.Entity("DataAccessLayer.Entities.Account", b =>
                 {
-                    b.Navigation("Renter")
-                        .IsRequired();
-
-                    b.Navigation("Staff")
-                        .IsRequired();
+                    b.Navigation("RentalRecords");
                 });
 
             modelBuilder.Entity("DataAccessLayer.Entities.RentalRecord", b =>
                 {
+                    b.Navigation("InspectionProblems");
+
                     b.Navigation("Payments");
 
-                    b.Navigation("VehicleChecks");
-                });
-
-            modelBuilder.Entity("DataAccessLayer.Entities.Renter", b =>
-                {
-                    b.Navigation("RentalRecords");
-                });
-
-            modelBuilder.Entity("DataAccessLayer.Entities.Staff", b =>
-                {
-                    b.Navigation("VehicleChecks");
+                    b.Navigation("RatingReview")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("DataAccessLayer.Entities.Station", b =>
                 {
-                    b.Navigation("RentalRecords");
+                    b.Navigation("PickupRentalRecords");
 
-                    b.Navigation("Report")
-                        .IsRequired();
-
-                    b.Navigation("Staff");
+                    b.Navigation("ReturnRentalRecords");
 
                     b.Navigation("Vehicles");
                 });

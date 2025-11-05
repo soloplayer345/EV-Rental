@@ -33,7 +33,7 @@ namespace DataAccessLayer.Repositories
         /// <summary>
         /// Xóa vật lý entity khỏi database (Hard Delete)
         /// </summary>
-        public void Delete(TModel model)
+        public async Task Delete(TModel model)
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
@@ -88,7 +88,7 @@ namespace DataAccessLayer.Repositories
         /// <summary>
         /// Cập nhật entity
         /// </summary>
-        public void Update(TModel model)
+        public async Task Update(TModel model)
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(model));

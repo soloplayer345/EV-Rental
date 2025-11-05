@@ -6,6 +6,7 @@ namespace EV_Rental.Helpers
     public static class SessionHelper
     {
         private const string USER_SESSION_KEY = "UserSession";
+        private const string REGISTER_OTP_SESSION_KEY = "RegisterOtpSession";
 
         /// <summary>
         /// Lưu thông tin user vào session
@@ -44,6 +45,32 @@ namespace EV_Rental.Helpers
             session.Clear();
         }
 
+        public class RegisterOtpSession
+        {
+            public BusinessLayer.DTOs.RegisterRequestDto RegisterRequest { get; set; }
+            public string OtpCode { get; set; }
+            public DateTime ExpireAtUtc { get; set; }
+            public int ResendCount { get; set; }
+        }
+
+        public static void SetRegisterOtpSession(ISession session, RegisterOtpSession data)
+        {
+            var json = JsonSerializer.Serialize(data);
+            session.SetString(REGISTER_OTP_SESSION_KEY, json);
+        }
+
+        public static RegisterOtpSession? GetRegisterOtpSession(ISession session)
+        {
+            var json = session.GetString(REGISTER_OTP_SESSION_KEY);
+            if (string.IsNullOrEmpty(json)) return null;
+            return JsonSerializer.Deserialize<RegisterOtpSession>(json);
+        }
+
+        public static void ClearRegisterOtp(ISession session)
+        {
+            session.Remove(REGISTER_OTP_SESSION_KEY);
+        }
+
         /// <summary>
         /// Kiểm tra user có role Admin không
         /// </summary>
@@ -78,6 +105,15 @@ namespace EV_Rental.Helpers
         {
             var user = GetUserSession(session);
             return user?.Role.ToString();
+        }
+
+        /// <summary>
+        /// Lấy ID của user hiện tại
+        /// </summary>
+        public static int? GetAccountId(HttpContext context)
+        {
+            var user = GetUserSession(context.Session);
+            return user?.AccountId;
         }
     }
 }
