@@ -2,6 +2,7 @@ using BusinessLayer.DTOs;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
 using DataAccessLayer.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace BusinessLayer.Services
 {
@@ -341,6 +342,83 @@ namespace BusinessLayer.Services
             {
                 return ServiceResultDto<object>.FailureResult($"Có lỗi xảy ra: {ex.Message}");
             }
+        }
+
+        /// <summary>
+        /// Tìm đơn thuê theo mã OTP
+        /// </summary>
+        public async Task<RentalRecord?> GetRentalByOtpCodeAsync(string otpCode)
+        {
+            if (string.IsNullOrWhiteSpace(otpCode))
+                return null;
+
+            var rentalRepo = _unitOfWork.GetRepository<RentalRecord>();
+            var query = rentalRepo.GetAllQueryable("Vehicle,Renter,PickupStation,ReturnStation");
+            
+            return await query
+                .FirstOrDefaultAsync(r => r.OtpCode == otpCode 
+                    && r.Status == RentalRecordStatus.Confirmed 
+                    && !r.IsDeleted);
+        }
+
+        /// <summary>
+        /// Xác minh OTP và cập nhật trạng thái đơn thuê khi khách nhận xe
+        /// Cập nhật status từ Confirmed → Active và StartTime = DateTime.Now
+        /// </summary>
+        public async Task<ServiceResultDto<RentalRecord>> VerifyOtpAndPickupVehicleAsync(string otpCode)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(otpCode))
+                {
+                    return ServiceResultDto<RentalRecord>.FailureResult("Mã OTP không được để trống.");
+                }
+
+                // Tìm đơn thuê theo OTP
+                var rental = await GetRentalByOtpCodeAsync(otpCode);
+                
+                if (rental == null)
+                {
+                    return ServiceResultDto<RentalRecord>.FailureResult("Mã OTP không hợp lệ hoặc đơn thuê không tồn tại.");
+                }
+
+                if (rental.Status != RentalRecordStatus.Confirmed)
+                {
+                    return ServiceResultDto<RentalRecord>.FailureResult($"Đơn thuê không ở trạng thái chờ nhận xe. Trạng thái hiện tại: {rental.Status}");
+                }
+
+                var rentalRepo = _unitOfWork.GetRepository<RentalRecord>();
+
+                // Cập nhật trạng thái từ Confirmed → Active
+                rental.Status = RentalRecordStatus.Active;
+                rental.StartTime = DateTime.Now; 
+                rental.UpdateDate = DateTime.Now;
+                await rentalRepo.Update(rental);
+
+                await _unitOfWork.SaveChangesAsync();
+
+                return ServiceResultDto<RentalRecord>.SuccessResult(rental, "Xác nhận nhận xe thành công!");
+            }
+            catch (Exception ex)
+            {
+                return ServiceResultDto<RentalRecord>.FailureResult($"Có lỗi xảy ra: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Lấy danh sách đơn thuê chờ nhận tại trạm (status = Confirmed)
+        /// </summary>
+        public async Task<List<RentalRecord>> GetConfirmedRentalsByStationAsync(int stationId)
+        {
+            var rentalRepo = _unitOfWork.GetRepository<RentalRecord>();
+            var query = rentalRepo.GetAllQueryable("Vehicle,Renter,PickupStation,ReturnStation");
+            
+            return await query
+                .Where(r => r.PickupStationId == stationId 
+                    && r.Status == RentalRecordStatus.Confirmed 
+                    && !r.IsDeleted)
+                .OrderByDescending(r => r.CreateDate)
+                .ToListAsync();
         }
     }
 }

@@ -14,6 +14,20 @@
 
     <div class="row mt-4">
         <div class="col-md-6">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">
+                    <i class="bi bi-key"></i> Nhận xe
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Xác minh OTP và nhận xe</h5>
+                    <p class="card-text">Khách hàng đến trạm và đọc mã OTP. Nhân viên xác minh và cho phép nhận xe.</p>
+                    <a asp-page="/Staff/PickupVehicle" class="btn btn-light">
+                        <i class="bi bi-arrow-right-circle"></i> Xác minh OTP
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
             <div class="card text-white bg-warning mb-3">
                 <div class="card-header">Kiểm tra Xe</div>
                 <div class="card-body">
@@ -23,6 +37,8 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="row mt-4">
         <div class="col-md-6">
             <div class="card text-white bg-info mb-3">
                 <div class="card-header">Cho thuê Xe</div>
@@ -30,6 +46,16 @@
                     <h5 class="card-title">Quản lý cho thuê</h5>
                     <p class="card-text">Xử lý yêu cầu thuê xe</p>
                     <a href="#" class="btn btn-light">Xem danh sách</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card text-white bg-secondary mb-3">
+                <div class="card-header">Quản lý Xe</div>
+                <div class="card-body">
+                    <h5 class="card-title">Danh sách xe</h5>
+                    <p class="card-text">Xem và quản lý danh sách xe điện</p>
+                    <a asp-page="/Staff/StaffIndex" class="btn btn-light">Xem danh sách</a>
                 </div>
             </div>
         </div>
