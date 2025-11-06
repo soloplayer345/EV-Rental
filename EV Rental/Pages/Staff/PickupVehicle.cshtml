@@ -1,0 +1,252 @@
+@page
+@model EV_Rental.Pages.Staff.PickupVehicleModel
+@{
+    ViewData["Title"] = "Nhận xe";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">🔋 Nhận xe - Xác minh OTP</h2>
+        <a asp-page="/Staff/Dashboard" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Về Dashboard
+        </a>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>✅ Thành công!</strong> @Model.SuccessMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>❌ Lỗi!</strong> @Model.ErrorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Form nhập OTP -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-key"></i> Nhập mã OTP để xác minh</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" asp-page-handler="VerifyOtp">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-8">
+                        <label class="form-label fw-bold">Mã OTP (6 chữ số)</label>
+                        <input type="text" 
+                               asp-for="OtpCode" 
+                               class="form-control form-control-lg text-center" 
+                               placeholder="Nhập mã OTP 6 chữ số"
+                               maxlength="6"
+                               pattern="[0-9]{6}"
+                               style="font-size: 24px; letter-spacing: 8px; font-weight: bold;" 
+                               required />
+                        <small class="form-text text-muted">Khách hàng sẽ đọc mã OTP từ email của họ</small>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="bi bi-search"></i> Xác minh OTP
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hiển thị thông tin đơn thuê đã xác minh -->
+    @if (Model.VerifiedRental != null)
+    {
+        var rental = Model.VerifiedRental;
+        <div class="card shadow-lg border-success mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-check-circle"></i> Đơn thuê đã xác minh</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-primary">📋 Thông tin đơn thuê</h6>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>Mã đơn:</strong></td>
+                                <td><span class="badge bg-primary">#@rental.Id</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mã OTP:</strong></td>
+                                <td><span class="badge bg-info text-dark">@rental.OtpCode</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Trạng thái:</strong></td>
+                                <td><span class="badge bg-warning text-dark">@rental.Status</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ngày tạo:</strong></td>
+                                <td>@rental.CreateDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-primary">🚗 Thông tin xe</h6>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>Tên xe:</strong></td>
+                                <td>@(rental.Vehicle?.Name ?? "N/A")</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Hãng:</strong></td>
+                                <td>@(rental.Vehicle?.Brand ?? "N/A")</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Biển số:</strong></td>
+                                <td>@(rental.Vehicle?.PlateNumber ?? "N/A")</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <h6 class="text-primary">👤 Thông tin khách hàng</h6>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>Họ tên:</strong></td>
+                                <td>@(rental.Renter?.FullName ?? "N/A")</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Email:</strong></td>
+                                <td>@(rental.Renter?.Email ?? "N/A")</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Số điện thoại:</strong></td>
+                                <td>@(rental.Renter?.Phone ?? "N/A")</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-primary">📍 Thông tin trạm</h6>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>Trạm nhận:</strong></td>
+                                <td>@(rental.PickupStation?.Name ?? "N/A")</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Địa chỉ:</strong></td>
+                                <td>@(rental.PickupStation?.Address ?? "N/A")</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Thời gian dự kiến:</strong></td>
+                                <td>@(rental.StartTime?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6 class="text-primary">💰 Thông tin thanh toán</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <tr>
+                                    <td>Giá thuê cơ bản:</td>
+                                    <td class="text-end">@rental.BasePrice.ToString("N0") đ</td>
+                                </tr>
+                                <tr>
+                                    <td>Phí giữ chỗ:</td>
+                                    <td class="text-end">@rental.ReservationFee.ToString("N0") đ</td>
+                                </tr>
+                                <tr>
+                                    <td>Phí cọc:</td>
+                                    <td class="text-end">@rental.DepositFee.ToString("N0") đ</td>
+                                </tr>
+                                <tr class="table-primary">
+                                    <td><strong>Tổng cộng:</strong></td>
+                                    <td class="text-end"><strong>@rental.TotalPrice.ToString("N0") đ</strong></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 text-center">
+                    <form method="post" asp-page-handler="ConfirmPickup" style="display: inline;">
+                        <input type="hidden" name="otpCode" value="@rental.OtpCode" />
+                        <button type="submit" class="btn btn-success btn-lg px-5">
+                            <i class="bi bi-check-circle"></i> Xác nhận cho khách nhận xe
+                        </button>
+                    </form>
+                    <a asp-page="/Staff/PickupVehicle" class="btn btn-secondary btn-lg ms-2">
+                        <i class="bi bi-x-circle"></i> Hủy
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Danh sách đơn chờ nhận -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="bi bi-list-ul"></i> Danh sách đơn chờ nhận xe (@Model.ConfirmedRentals.Count đơn)</h5>
+        </div>
+        <div class="card-body">
+            @if (Model.ConfirmedRentals.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Mã đơn</th>
+                                <th>Mã OTP</th>
+                                <th>Khách hàng</th>
+                                <th>Xe thuê</th>
+                                <th>Trạm nhận</th>
+                                <th>Thời gian dự kiến</th>
+                                <th>Tổng tiền</th>
+                                <th>Ngày tạo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var rental in Model.ConfirmedRentals)
+                            {
+                                <tr>
+                                    <td><span class="badge bg-primary">#@rental.Id</span></td>
+                                    <td><span class="badge bg-info text-dark">@rental.OtpCode</span></td>
+                                    <td>@(rental.Renter?.FullName ?? "N/A")</td>
+                                    <td>@(rental.Vehicle?.Name ?? "N/A")</td>
+                                    <td>@(rental.PickupStation?.Name ?? "N/A")</td>
+                                    <td>@(rental.StartTime?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")</td>
+                                    <td><strong>@rental.TotalPrice.ToString("N0") đ</strong></td>
+                                    <td>@rental.CreateDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center">
+                    <i class="bi bi-info-circle"></i> Hiện tại không có đơn nào chờ nhận xe.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto focus vào input OTP khi load trang
+        document.addEventListener('DOMContentLoaded', function() {
+            const otpInput = document.querySelector('input[asp-for="OtpCode"]');
+            if (otpInput && !otpInput.value) {
+                otpInput.focus();
+            }
+        });
+
+        // Chỉ cho phép nhập số
+        document.querySelector('input[asp-for="OtpCode"]')?.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+    </script>
+}
+
