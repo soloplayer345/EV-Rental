@@ -1,47 +1,338 @@
 @page
 @model EV_Rental.Pages.Admin.DashboardModel
 @{
-    ViewData["Title"] = "Admin Dashboard";
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Pages/Shared/_AdminLayout.cshtml";
 }
 
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-12">
-            <h1>Admin Dashboard</h1>
-            <p class="lead">Chào mừng Admin: @Model.UserEmail</p>
+<!-- Page Header -->
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1><i class="fas fa-tachometer-alt me-2"></i>Dashboard</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active">Trang chủ</li>
+            </ol>
+        </nav>
+    </div>
+    <div>
+        <button class="btn btn-admin-primary">
+            <i class="fas fa-download me-2"></i>Xuất báo cáo
+        </button>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-card-icon primary me-3">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-card-body flex-grow-1">
+                    <h6>Tổng người dùng</h6>
+                    <h3>1,245</h3>
+                    <small class="text-muted">
+                        <span class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> 12%
+                        </span>
+                        so với tháng trước
+                    </small>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="row mt-4">
-        <div class="col-md-4">
-            <div class="card text-white bg-primary mb-3">
-                <div class="card-header">Quản lý Users</div>
-                <div class="card-body">
-                    <h5 class="card-title">Tổng số Users</h5>
-                    <p class="card-text">Quản lý tài khoản người dùng</p>
-                    <a href="#" class="btn btn-light">Xem chi tiết</a>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-card-icon success me-3">
+                    <i class="fas fa-car"></i>
+                </div>
+                <div class="stat-card-body flex-grow-1">
+                    <h6>Tổng số xe</h6>
+                    <h3>87</h3>
+                    <small class="text-muted">
+                        <span class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> 5%
+                        </span>
+                        so với tháng trước
+                    </small>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card text-white bg-success mb-3">
-                <div class="card-header">Quản lý Xe</div>
-                <div class="card-body">
-                    <h5 class="card-title">Tổng số Xe</h5>
-                    <p class="card-text">Quản lý phương tiện</p>
-                    <a href="#" class="btn btn-light">Xem chi tiết</a>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-card-icon info me-3">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <div class="stat-card-body flex-grow-1">
+                    <h6>Lượt thuê hôm nay</h6>
+                    <h3>23</h3>
+                    <small class="text-muted">
+                        <span class="stat-change negative">
+                            <i class="fas fa-arrow-down"></i> 3%
+                        </span>
+                        so với hôm qua
+                    </small>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card text-white bg-info mb-3">
-                <div class="card-header">Quản lý Trạm</div>
-                <div class="card-body">
-                    <h5 class="card-title">Tổng số Trạm</h5>
-                    <p class="card-text">Quản lý trạm sạc</p>
-                    <a href="#" class="btn btn-light">Xem chi tiết</a>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-card-icon warning me-3">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="stat-card-body flex-grow-1">
+                    <h6>Doanh thu tháng này</h6>
+                    <h3>₫542M</h3>
+                    <small class="text-muted">
+                        <span class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> 18%
+                        </span>
+                        so với tháng trước
+                    </small>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <div class="col-xl-8 mb-4">
+        <div class="chart-card">
+            <div class="chart-card-header">
+                <h5><i class="fas fa-chart-area me-2"></i>Doanh thu theo tháng</h5>
+                <div>
+                    <select class="form-select form-select-sm" style="width: auto;">
+                        <option>2025</option>
+                        <option>2024</option>
+                        <option>2023</option>
+                    </select>
+                </div>
+            </div>
+            <div class="chart-card-body">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 mb-4">
+        <div class="chart-card">
+            <div class="chart-card-header">
+                <h5><i class="fas fa-chart-pie me-2"></i>Trạng thái xe</h5>
+            </div>
+            <div class="chart-card-body">
+                <canvas id="vehicleStatusChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activities -->
+<div class="row">
+    <div class="col-xl-8 mb-4">
+        <div class="chart-card">
+            <div class="chart-card-header">
+                <h5><i class="fas fa-history me-2"></i>Hoạt động gần đây</h5>
+                <a href="#" class="btn btn-sm btn-outline-primary">Xem tất cả</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Thời gian</th>
+                            <th>Người dùng</th>
+                            <th>Hoạt động</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><small>10:30 AM</small></td>
+                            <td>Nguyễn Văn A</td>
+                            <td>Thuê xe VinFast VF5</td>
+                            <td><span class="badge badge-custom badge-active">Hoàn thành</span></td>
+                        </tr>
+                        <tr>
+                            <td><small>10:15 AM</small></td>
+                            <td>Trần Thị B</td>
+                            <td>Đăng ký tài khoản mới</td>
+                            <td><span class="badge badge-custom badge-active">Thành công</span></td>
+                        </tr>
+                        <tr>
+                            <td><small>09:45 AM</small></td>
+                            <td>Lê Văn C</td>
+                            <td>Thanh toán đơn #12345</td>
+                            <td><span class="badge badge-custom badge-pending">Đang xử lý</span></td>
+                        </tr>
+                        <tr>
+                            <td><small>09:30 AM</small></td>
+                            <td>Phạm Thị D</td>
+                            <td>Hủy đơn thuê xe</td>
+                            <td><span class="badge badge-custom badge-inactive">Đã hủy</span></td>
+                        </tr>
+                        <tr>
+                            <td><small>09:00 AM</small></td>
+                            <td>Hoàng Văn E</td>
+                            <td>Đánh giá xe VinFast VF8</td>
+                            <td><span class="badge badge-custom badge-active">Hoàn thành</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 mb-4">
+        <div class="chart-card">
+            <div class="chart-card-header">
+                <h5><i class="fas fa-star me-2"></i>Xe được thuê nhiều nhất</h5>
+            </div>
+            <div class="p-3">
+                <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                    <div class="flex-shrink-0">
+                        <div class="bg-gradient-primary text-white rounded p-2">
+                            <i class="fas fa-car fa-lg"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="mb-0">VinFast VF8</h6>
+                        <small class="text-muted">142 lượt thuê</small>
+                    </div>
+                    <div class="text-end">
+                        <div class="badge bg-success">+15%</div>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                    <div class="flex-shrink-0">
+                        <div class="bg-gradient-success text-white rounded p-2">
+                            <i class="fas fa-car fa-lg"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="mb-0">VinFast VF5</h6>
+                        <small class="text-muted">128 lượt thuê</small>
+                    </div>
+                    <div class="text-end">
+                        <div class="badge bg-success">+12%</div>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                    <div class="flex-shrink-0">
+                        <div class="bg-gradient-info text-white rounded p-2">
+                            <i class="fas fa-car fa-lg"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="mb-0">VinFast VF9</h6>
+                        <small class="text-muted">98 lượt thuê</small>
+                    </div>
+                    <div class="text-end">
+                        <div class="badge bg-warning">+8%</div>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <div class="bg-gradient-warning text-white rounded p-2">
+                            <i class="fas fa-car fa-lg"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="mb-0">VinFast VF3</h6>
+                        <small class="text-muted">76 lượt thuê</small>
+                    </div>
+                    <div class="text-end">
+                        <div class="badge bg-danger">-2%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    const revenueChart = new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+            labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 
+                     'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+            datasets: [{
+                label: 'Doanh thu (Triệu VNĐ)',
+                data: [320, 380, 420, 390, 450, 480, 520, 510, 540, 580, 620, 542],
+                backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                borderColor: 'rgba(78, 115, 223, 1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value + 'M';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Vehicle Status Chart
+    const vehicleStatusCtx = document.getElementById('vehicleStatusChart').getContext('2d');
+    const vehicleStatusChart = new Chart(vehicleStatusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Đang cho thuê', 'Sẵn sàng', 'Bảo trì', 'Không khả dụng'],
+            datasets: [{
+                data: [23, 45, 12, 7],
+                backgroundColor: [
+                    'rgba(28, 200, 138, 0.8)',
+                    'rgba(78, 115, 223, 0.8)',
+                    'rgba(246, 194, 62, 0.8)',
+                    'rgba(231, 74, 59, 0.8)'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        usePointStyle: true
+                    }
+                }
+            }
+        }
+    });
+</script>
+}
+
