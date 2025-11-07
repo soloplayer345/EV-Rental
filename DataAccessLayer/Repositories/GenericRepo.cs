@@ -25,7 +25,12 @@ namespace DataAccessLayer.Repositories
 
             model.CreateDate = DateTime.UtcNow;
             model.UpdateDate = DateTime.UtcNow;
-            model.IsDeleted = false;
+            
+            // Only set IsDeleted if the property exists and is not ignored
+            if (!IsPropertyIgnored<TModel>("IsDeleted"))
+            {
+                model.IsDeleted = false;
+            }
 
             await _dbSet.AddAsync(model);
         }
@@ -46,9 +51,32 @@ namespace DataAccessLayer.Repositories
         /// </summary>
         public async Task<IEnumerable<TModel>> GetAllAsync()
         {
-            return await _dbSet
-                .Where(x => !x.IsDeleted)
-                .ToListAsync();
+            // Check if the entity has IsDeleted property
+            var isDeletedProperty = typeof(TModel).GetProperty("IsDeleted");
+            
+            if (isDeletedProperty != null && !IsPropertyIgnored<TModel>("IsDeleted"))
+            {
+                return await _dbSet
+                    .Where(x => !x.IsDeleted)
+                    .ToListAsync();
+            }
+            else
+            {
+                // If IsDeleted is not available or ignored, return all records
+                return await _dbSet.ToListAsync();
+            }
+        }
+
+        /// <summary>
+        /// Helper method to check if a property is ignored in EF Core
+        /// </summary>
+        private bool IsPropertyIgnored<T>(string propertyName) where T : class
+        {
+            var entityType = _dbContext.Model.FindEntityType(typeof(T));
+            if (entityType == null) return true;
+            
+            var property = entityType.FindProperty(propertyName);
+            return property == null;
         }
 
         /// <summary>
@@ -61,7 +89,13 @@ namespace DataAccessLayer.Repositories
 
             TModel? model = await _dbSet.FindAsync(id);
             
-            if (model == null || model.IsDeleted)
+            if (model == null)
+            {
+                throw new KeyNotFoundException($"{typeof(TModel).Name} with ID {id} not found");
+            }
+
+            // Check if IsDeleted exists and is not ignored
+            if (!IsPropertyIgnored<TModel>("IsDeleted") && model.IsDeleted)
             {
                 throw new KeyNotFoundException($"{typeof(TModel).Name} with ID {id} not found");
             }
@@ -76,6 +110,12 @@ namespace DataAccessLayer.Repositories
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
+
+            // Check if IsDeleted is available and not ignored
+            if (IsPropertyIgnored<TModel>("IsDeleted"))
+            {
+                throw new InvalidOperationException($"{typeof(TModel).Name} does not support soft delete");
+            }
 
             if (model.IsDeleted)
                 throw new InvalidOperationException($"{typeof(TModel).Name} is already deleted");
@@ -93,8 +133,11 @@ namespace DataAccessLayer.Repositories
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
 
-            if (model.IsDeleted)
+            // Check if IsDeleted exists and is not ignored before checking its value
+            if (!IsPropertyIgnored<TModel>("IsDeleted") && model.IsDeleted)
+            {
                 throw new InvalidOperationException($"Cannot update deleted {typeof(TModel).Name}");
+            }
 
             model.UpdateDate = DateTime.UtcNow;
             _dbSet.Update(model);
@@ -105,7 +148,17 @@ namespace DataAccessLayer.Repositories
         /// </summary>
         public virtual IQueryable<TModel> GetAllQueryable(string includeProperties = "")
         {
-            IQueryable<TModel> query = _dbSet.Where(x => !x.IsDeleted);
+            IQueryable<TModel> query;
+            
+            // Check if IsDeleted is available and not ignored
+            if (!IsPropertyIgnored<TModel>("IsDeleted"))
+            {
+                query = _dbSet.Where(x => !x.IsDeleted);
+            }
+            else
+            {
+                query = _dbSet;
+            }
 
             if (!string.IsNullOrWhiteSpace(includeProperties))
             {
@@ -128,7 +181,17 @@ namespace DataAccessLayer.Repositories
             if (predicate == null)
                 throw new ArgumentNullException(nameof(predicate));
 
-            IQueryable<TModel> query = _dbSet.Where(x => !x.IsDeleted);
+            IQueryable<TModel> query;
+            
+            // Check if IsDeleted is available and not ignored
+            if (!IsPropertyIgnored<TModel>("IsDeleted"))
+            {
+                query = _dbSet.Where(x => !x.IsDeleted);
+            }
+            else
+            {
+                query = _dbSet;
+            }
 
             if (!string.IsNullOrWhiteSpace(includeProperties))
             {
