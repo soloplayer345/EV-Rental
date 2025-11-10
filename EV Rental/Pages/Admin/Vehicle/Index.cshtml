@@ -1,0 +1,249 @@
+@page
+@model EV_Rental.Pages.Admin.Vehicle.IndexModel
+@{
+    ViewData["Title"] = "Quản lý Xe";
+    Layout = "~/Pages/Shared/_AdminLayout.cshtml";
+}
+
+<!-- Page Header -->
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1><i class="fas fa-car me-2"></i>Quản lý Xe</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Admin/Dashboard">Trang chủ</a></li>
+                <li class="breadcrumb-item active">Quản lý Xe</li>
+            </ol>
+        </nav>
+    </div>
+    <div>
+        <a href="/Admin/Vehicle/Create" class="btn btn-admin-primary">
+            <i class="fas fa-plus me-2"></i>Thêm xe mới
+        </a>
+    </div>
+</div>
+
+<!-- Alerts -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Search and Filter Section -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-5">
+                <label for="search" class="form-label">Tìm kiếm xe</label>
+                <input type="text" class="form-control" id="search" name="search" 
+                       placeholder="Tên, hãng, biển số, mẫu xe..." value="@Model.SearchQuery">
+            </div>
+            <div class="col-md-3">
+                <label for="status" class="form-label">Trạng thái</label>
+                <select class="form-select" id="status" name="status">
+                    <option value="">Tất cả</option>
+                    <option value="Available" selected="@(Model.FilterStatus == "Available")">Sẵn sàng</option>
+                    <option value="Rented" selected="@(Model.FilterStatus == "Rented")">Đang cho thuê</option>
+                    <option value="Maintenance" selected="@(Model.FilterStatus == "Maintenance")">Bảo trì</option>
+                    <option value="Charging" selected="@(Model.FilterStatus == "Charging")">Sạc pin</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="type" class="form-label">Loại xe</label>
+                <select class="form-select" id="type" name="type">
+                    <option value="">Tất cả</option>
+                    <option value="scooter" selected="@(Model.FilterType == "scooter")">Scooter</option>
+                    <option value="motorbike" selected="@(Model.FilterType == "motorbike")">Xe máy</option>
+                    <option value="car" selected="@(Model.FilterType == "car")">Ô tô</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-admin-primary flex-grow-1">
+                    <i class="fas fa-search me-1"></i>Tìm kiếm
+                </button>
+                <a href="/Admin/Vehicles" class="btn btn-outline-secondary">
+                    <i class="fas fa-redo me-1"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Vehicles Table -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-list me-2"></i>Danh sách xe (@Model.Vehicles.Count)</h5>
+    </div>
+    <div class="table-responsive">
+        @if (Model.Vehicles.Count > 0)
+        {
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên xe</th>
+                        <th>Hãng</th>
+                        <th>Biển số</th>
+                        <th>Loại</th>
+                        <th>Trạng thái</th>
+                        <th>Giá/Giờ</th>
+                        <th>Giá/Ngày</th>
+                        <th>Chỗ ngồi</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var vehicle in Model.Vehicles)
+                    {
+                        <tr>
+                            <td>
+                                <span class="badge bg-light text-dark">@vehicle.Id</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    @if (!string.IsNullOrEmpty(vehicle.ImageUrl))
+                                    {
+                                        <img src="@vehicle.ImageUrl" alt="@vehicle.Name" 
+                                             class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                    }
+                                    else
+                                    {
+                                        <div class="rounded me-2 bg-light d-flex align-items-center justify-content-center" 
+                                             style="width: 40px; height: 40px;">
+                                            <i class="fas fa-car text-muted"></i>
+                                        </div>
+                                    }
+                                    <div>
+                                        <strong>@vehicle.Name</strong>
+                                        <br>
+                                        <small class="text-muted">@vehicle.Model</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>@vehicle.Brand</td>
+                            <td>
+                                <span class="badge bg-info text-dark">@vehicle.PlateNumber</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">@vehicle.VehicleType</span>
+                            </td>
+                            <td>
+                                @{
+                                    var statusClass = vehicle.Status switch
+                                    {
+                                        DataAccessLayer.Enums.VehicleStatus.Available => "badge-active",
+                                        DataAccessLayer.Enums.VehicleStatus.Rented => "badge-pending",
+                                        DataAccessLayer.Enums.VehicleStatus.Maintenance => "badge-warning",
+                                        DataAccessLayer.Enums.VehicleStatus.Charging => "badge-info",
+                                        _ => "badge-secondary"
+                                    };
+                                    var statusText = vehicle.Status switch
+                                    {
+                                        DataAccessLayer.Enums.VehicleStatus.Available => "Sẵn sàng",
+                                        DataAccessLayer.Enums.VehicleStatus.Rented => "Đang cho thuê",
+                                        DataAccessLayer.Enums.VehicleStatus.Maintenance => "Bảo trì",
+                                        DataAccessLayer.Enums.VehicleStatus.Charging => "Sạc pin",
+                                        _ => vehicle.Status.ToString()
+                                    };
+                                }
+                                <span class="badge badge-custom @statusClass">@statusText</span>
+                            </td>
+                            <td>
+                                <strong>₫@vehicle.PricePerHour.ToString("N0")</strong>
+                            </td>
+                            <td>
+                                <strong>₫@vehicle.PricePerDay.ToString("N0")</strong>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-light text-dark">@vehicle.seartCapacity</span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="/Admin/Vehicle/Edit/@vehicle.Id" class="btn btn-outline-primary" 
+                                       title="Chỉnh sửa">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-outline-danger" 
+                                            data-bs-toggle="modal" data-bs-target="#deleteModal_@vehicle.Id"
+                                            title="Xóa">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Delete Confirmation Modal -->
+                                <div class="modal fade" id="deleteModal_@vehicle.Id" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Xác nhận xóa</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Bạn có chắc chắn muốn xóa xe <strong>@vehicle.Name</strong> không?</p>
+                                                <p class="text-muted"><small>Thao tác này không thể hoàn tác.</small></p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                                <form method="post" asp-page-handler="Delete" style="display: inline;">
+                                                    <input type="hidden" name="id" value="@vehicle.Id">
+                                                    <button type="submit" class="btn btn-danger">Xóa</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="table-empty-state p-5 text-center">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <p class="text-muted">
+                    @if (!string.IsNullOrEmpty(Model.SearchQuery) || !string.IsNullOrEmpty(Model.FilterStatus) || !string.IsNullOrEmpty(Model.FilterType))
+                    {
+                        <span>Không tìm thấy xe nào phù hợp với điều kiện tìm kiếm.</span>
+                    }
+                    else
+                    {
+                        <span>Chưa có xe nào được thêm vào hệ thống.</span>
+                    }
+                </p>
+                @if (string.IsNullOrEmpty(Model.SearchQuery) && string.IsNullOrEmpty(Model.FilterStatus) && string.IsNullOrEmpty(Model.FilterType))
+                {
+                    <a href="/Admin/Vehicle/Create" class="btn btn-admin-primary mt-3">
+                        <i class="fas fa-plus me-2"></i>Thêm xe mới
+                    </a>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto dismiss alerts after 5 seconds
+        document.querySelectorAll('.alert').forEach(alert => {
+            setTimeout(() => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 5000);
+        });
+    </script>
+}

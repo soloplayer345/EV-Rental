@@ -1,0 +1,102 @@
+using BusinessLayer.Services;
+using DataAccessLayer.Entities;
+using DataAccessLayer.Enums;
+using EV_Rental.Helpers;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace EV_Rental.Pages.Admin.Vehicle
+{
+    public class IndexModel : PageModel
+    {
+        private readonly VehicleService _vehicleService;
+        public string UserEmail { get; set; } = string.Empty;
+        public List<DataAccessLayer.Entities.Vehicle> Vehicles { get; set; } = new();
+        public string SearchQuery { get; set; } = "";
+        public string FilterStatus { get; set; } = "";
+        public string FilterType { get; set; } = "";
+
+        public IndexModel(VehicleService vehicleService)
+        {
+            _vehicleService = vehicleService;
+        }
+
+        public async Task<IActionResult> OnGetAsync(string search = "", string status = "", string type = "")
+        {
+            // Kiểm tra quyền Admin
+            if (!SessionHelper.IsAdmin(HttpContext.Session))
+            {
+                return RedirectToPage("/Account/Login");
+            }
+
+            var user = SessionHelper.GetUserSession(HttpContext.Session);
+            UserEmail = user?.Email ?? "";
+
+            SearchQuery = search;
+            FilterStatus = status;
+            FilterType = type;
+
+            try
+            {
+                // Lấy tất cả xe
+                var vehicles = await _vehicleService.GetVehiclesAsync();
+                Vehicles = vehicles.ToList();
+
+                // Lọc theo tìm kiếm
+                if (!string.IsNullOrEmpty(search))
+                {
+                    Vehicles = Vehicles.Where(v =>
+                        v.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                        v.Brand.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                        v.PlateNumber.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                        v.Model.Contains(search, StringComparison.OrdinalIgnoreCase)
+                    ).ToList();
+                }
+
+                // Lọc theo trạng thái
+                if (!string.IsNullOrEmpty(status) && Enum.TryParse<VehicleStatus>(status, out var statusEnum))
+                {
+                    Vehicles = Vehicles.Where(v => v.Status == statusEnum).ToList();
+                }
+
+                // Lọc theo loại xe
+                if (!string.IsNullOrEmpty(type))
+                {
+                    Vehicles = Vehicles.Where(v =>
+                        v.VehicleType.Equals(type, StringComparison.OrdinalIgnoreCase)
+                    ).ToList();
+                }
+
+                // Sắp xếp theo ngày tạo (mới nhất trước)
+                Vehicles = Vehicles.OrderByDescending(v => v.Id).ToList();
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Lỗi khi tải dữ liệu xe: {ex.Message}";
+            }
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostDeleteAsync(int id)
+        {
+            // Kiểm tra quyền Admin
+            if (!SessionHelper.IsAdmin(HttpContext.Session))
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                await _vehicleService.DeleteVehicleAsync(id);
+                TempData["SuccessMessage"] = "Xóa xe thành công!";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Lỗi khi xóa xe: {ex.Message}";
+            }
+
+            return RedirectToPage();
+        }
+    }
+}
