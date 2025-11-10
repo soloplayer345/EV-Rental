@@ -40,6 +40,7 @@ namespace EV_Rental
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<VehicleService>();
             builder.Services.AddScoped<StationService>();
+            builder.Services.AddScoped<RentalRecordService>();
             builder.Services.AddScoped<RentalService>();
             builder.Services.AddScoped<PaymentService>();
 
