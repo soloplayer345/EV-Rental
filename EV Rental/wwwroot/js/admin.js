@@ -69,8 +69,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Chart.js default configuration
 if (typeof Chart !== 'undefined') {
-    Chart.defaults.global.defaultFontFamily = 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif';
-    Chart.defaults.global.defaultFontColor = '#858796';
+    // For Chart.js v3.x and above
+    if (Chart.defaults) {
+        Chart.defaults.font = Chart.defaults.font || {};
+        Chart.defaults.font.family = 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif';
+        Chart.defaults.color = '#858796';
+    }
+    // For Chart.js v2.x (legacy)
+    if (Chart.defaults && Chart.defaults.global) {
+        Chart.defaults.global.defaultFontFamily = 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif';
+        Chart.defaults.global.defaultFontColor = '#858796';
+    }
 }
 
 // Utility function to format numbers

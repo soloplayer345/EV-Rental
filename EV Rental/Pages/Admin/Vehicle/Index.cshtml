@@ -42,6 +42,15 @@
     </div>
 }
 
+@if (TempData["WarningMessage"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        @TempData["WarningMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
 <!-- Search and Filter Section -->
 <div class="card mb-4">
     <div class="card-body">
@@ -55,26 +64,24 @@
                 <label for="status" class="form-label">Trạng thái</label>
                 <select class="form-select" id="status" name="status">
                     <option value="">Tất cả</option>
-                    <option value="Available" selected="@(Model.FilterStatus == "Available")">Sẵn sàng</option>
-                    <option value="Rented" selected="@(Model.FilterStatus == "Rented")">Đang cho thuê</option>
-                    <option value="Maintenance" selected="@(Model.FilterStatus == "Maintenance")">Bảo trì</option>
-                    <option value="Charging" selected="@(Model.FilterStatus == "Charging")">Sạc pin</option>
+                    @if (Model.FilterStatus == "Available") { <option value="Available" selected>Sẵn sàng</option> } else { <option value="Available">Sẵn sàng</option> }
+                    @if (Model.FilterStatus == "Rented") { <option value="Rented" selected>Đang cho thuê</option> } else { <option value="Rented">Đang cho thuê</option> }
+                    @if (Model.FilterStatus == "Maintenance") { <option value="Maintenance" selected>Bảo trì</option> } else { <option value="Maintenance">Bảo trì</option> }
+                    @if (Model.FilterStatus == "Charging") { <option value="Charging" selected>Sạc pin</option> } else { <option value="Charging">Sạc pin</option> }
                 </select>
             </div>
             <div class="col-md-2">
                 <label for="type" class="form-label">Loại xe</label>
                 <select class="form-select" id="type" name="type">
                     <option value="">Tất cả</option>
-                    <option value="scooter" selected="@(Model.FilterType == "scooter")">Scooter</option>
-                    <option value="motorbike" selected="@(Model.FilterType == "motorbike")">Xe máy</option>
-                    <option value="car" selected="@(Model.FilterType == "car")">Ô tô</option>
+                    @if (Model.FilterType == "car") { <option value="car" selected>Ô tô 4 bánh</option> } else { <option value="car">Ô tô 4 bánh</option> }
                 </select>
             </div>
             <div class="col-md-2 d-flex align-items-end gap-2">
                 <button type="submit" class="btn btn-admin-primary flex-grow-1">
                     <i class="fas fa-search me-1"></i>Tìm kiếm
                 </button>
-                <a href="/Admin/Vehicles" class="btn btn-outline-secondary">
+                <a href="/Admin/Vehicle" class="btn btn-outline-secondary">
                     <i class="fas fa-redo me-1"></i>
                 </a>
             </div>
@@ -86,6 +93,11 @@
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fas fa-list me-2"></i>Danh sách xe (@Model.Vehicles.Count)</h5>
+        <div id="bulkActionContainer" style="display: none;">
+            <button type="button" class="btn btn-sm btn-danger" id="bulkDeleteBtn">
+                <i class="fas fa-trash me-1"></i>Xóa (<span id="selectedCount">0</span>)
+            </button>
+        </div>
     </div>
     <div class="table-responsive">
         @if (Model.Vehicles.Count > 0)
@@ -93,7 +105,10 @@
             <table class="table table-hover mb-0">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th style="width: 50px;">
+                            <input type="checkbox" class="form-check-input" id="selectAllCheckbox" 
+                                   title="Chọn tất cả">
+                        </th>
                         <th>Tên xe</th>
                         <th>Hãng</th>
                         <th>Biển số</th>
@@ -110,7 +125,8 @@
                     {
                         <tr>
                             <td>
-                                <span class="badge bg-light text-dark">@vehicle.Id</span>
+                                <input type="checkbox" class="form-check-input vehicle-checkbox" 
+                                       value="@vehicle.Id" data-vehicle-name="@vehicle.Name">
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">
@@ -244,6 +260,84 @@
                 const bsAlert = new bootstrap.Alert(alert);
                 bsAlert.close();
             }, 5000);
+        });
+
+        // Bulk selection functionality
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        const vehicleCheckboxes = document.querySelectorAll('.vehicle-checkbox');
+        const bulkActionContainer = document.getElementById('bulkActionContainer');
+        const selectedCountSpan = document.getElementById('selectedCount');
+        const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+
+        function updateBulkActionUI() {
+            const selectedCount = document.querySelectorAll('.vehicle-checkbox:checked').length;
+            selectedCountSpan.textContent = selectedCount;
+            bulkActionContainer.style.display = selectedCount > 0 ? 'block' : 'none';
+        }
+
+        // Select all functionality
+        selectAllCheckbox?.addEventListener('change', function() {
+            vehicleCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            updateBulkActionUI();
+        });
+
+        // Individual checkbox functionality
+        vehicleCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateBulkActionUI();
+                
+                // Update select all checkbox state
+                const allChecked = Array.from(vehicleCheckboxes).every(cb => cb.checked);
+                const someChecked = Array.from(vehicleCheckboxes).some(cb => cb.checked);
+                
+                if (selectAllCheckbox) {
+                    selectAllCheckbox.checked = allChecked;
+                    selectAllCheckbox.indeterminate = someChecked && !allChecked;
+                }
+            });
+        });
+
+        // Bulk delete functionality
+        bulkDeleteBtn?.addEventListener('click', function() {
+            const selectedIds = Array.from(document.querySelectorAll('.vehicle-checkbox:checked'))
+                .map(checkbox => ({
+                    id: checkbox.value,
+                    name: checkbox.dataset.vehicleName
+                }));
+
+            if (selectedIds.length === 0) {
+                alert('Vui lòng chọn ít nhất một xe để xóa!');
+                return;
+            }
+
+            const vehicleNames = selectedIds.map(v => v.name).join(', ');
+            const confirmMsg = `Bạn có chắc chắn muốn xóa ${selectedIds.length} xe này không?\n\n${vehicleNames}\n\nThao tác này không thể hoàn tác.`;
+
+            if (confirm(confirmMsg)) {
+                // Submit bulk delete via form
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = window.location.href;
+
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = '__RequestVerificationToken';
+                input.value = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+                form.appendChild(input);
+
+                selectedIds.forEach((item, index) => {
+                    const idInput = document.createElement('input');
+                    idInput.type = 'hidden';
+                    idInput.name = `ids[${index}]`;
+                    idInput.value = item.id;
+                    form.appendChild(idInput);
+                });
+
+                document.body.appendChild(form);
+                form.submit();
+            }
         });
     </script>
 }

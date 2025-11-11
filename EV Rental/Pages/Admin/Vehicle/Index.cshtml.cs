@@ -98,5 +98,63 @@ namespace EV_Rental.Pages.Admin.Vehicle
 
             return RedirectToPage();
         }
+
+        public async Task<IActionResult> OnPostAsync(int[] ids)
+        {
+            // Kiểm tra quyền Admin
+            if (!SessionHelper.IsAdmin(HttpContext.Session))
+            {
+                return Unauthorized();
+            }
+
+            if (ids == null || ids.Length == 0)
+            {
+                TempData["ErrorMessage"] = "Vui lòng chọn ít nhất một xe để xóa!";
+                return RedirectToPage();
+            }
+
+            try
+            {
+                int deletedCount = 0;
+                var failedVehicles = new List<string>();
+
+                foreach (var id in ids)
+                {
+                    try
+                    {
+                        await _vehicleService.DeleteVehicleAsync(id);
+                        deletedCount++;
+                    }
+                    catch (Exception ex)
+                    {
+                        var vehicle = await _vehicleService.GetVehicleByIdAsync(id);
+                        failedVehicles.Add(vehicle?.Name ?? $"ID: {id}");
+                        System.Diagnostics.Debug.WriteLine($"Lỗi xóa xe ID {id}: {ex.Message}");
+                    }
+                }
+
+                if (deletedCount > 0)
+                {
+                    if (failedVehicles.Count > 0)
+                    {
+                        TempData["WarningMessage"] = $"Đã xóa {deletedCount} xe thành công, nhưng không thể xóa {failedVehicles.Count} xe: {string.Join(", ", failedVehicles)}";
+                    }
+                    else
+                    {
+                        TempData["SuccessMessage"] = $"Đã xóa {deletedCount} xe thành công!";
+                    }
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Không thể xóa các xe được chọn!";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Lỗi khi xóa xe: {ex.Message}";
+            }
+
+            return RedirectToPage();
+        }
     }
 }

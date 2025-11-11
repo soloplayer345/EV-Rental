@@ -29,6 +29,24 @@
     </div>
 }
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>Vui lòng kiểm tra các lỗi dưới đây:</strong>
+        <div asp-validation-summary="All" class="text-danger"></div>
+    </div>
+}
+
 <!-- Form Card -->
 <div class="card">
     <div class="card-header">
@@ -36,6 +54,9 @@
     </div>
     <div class="card-body">
         <form method="post">
+            <!-- Hidden ID field for model binding -->
+            <input type="hidden" asp-for="Vehicle.Id" />
+            
             <div class="row">
                 <!-- Tên xe -->
                 <div class="col-md-6 mb-3">
@@ -81,9 +102,7 @@
                     </label>
                     <select class="form-select" id="vehicle_type" asp-for="Vehicle.VehicleType" required>
                         <option value="">-- Chọn loại xe --</option>
-                        <option value="scooter">Scooter</option>
-                        <option value="motorbike">Xe máy</option>
-                        <option value="car">Ô tô</option>
+                        <option value="car">Ô tó 4 bánh</option>
                     </select>
                 </div>
 
@@ -92,11 +111,20 @@
                     <label for="vehicle_station" class="form-label">
                         Trạm <span class="text-danger">*</span>
                     </label>
+                    <!-- Debug: Current StationId value -->
+                    <!-- Current StationId: @Model.Vehicle.StationId -->
                     <select class="form-select" id="vehicle_station" asp-for="Vehicle.StationId" required>
                         <option value="">-- Chọn trạm --</option>
                         @foreach (var station in Model.Stations)
                         {
-                            <option value="@station.Id">@station.Name</option>
+                            if (Model.Vehicle.StationId == station.Id)
+                            {
+                                <option value="@station.Id" selected>@station.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@station.Id">@station.Name</option>
+                            }
                         }
                     </select>
                 </div>
@@ -201,6 +229,18 @@
         const currentStatus = '@Model.Vehicle.Status';
         if (currentStatus) {
             document.getElementById('vehicle_status').value = currentStatus;
+        }
+
+        // Set current vehicle type value (enum binding)
+        const currentType = '@Model.Vehicle.VehicleType';
+        if (currentType) {
+            document.getElementById('vehicle_type').value = currentType.toLowerCase();
+        }
+
+        // Set current station ID value
+        const currentStationId = '@Model.Vehicle.StationId';
+        if (currentStationId && currentStationId > 0) {
+            document.getElementById('vehicle_station').value = currentStationId;
         }
     </script>
 }
