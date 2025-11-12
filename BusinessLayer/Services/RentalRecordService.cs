@@ -28,8 +28,15 @@ namespace BusinessLayer.Services
 
         public async Task<RentalRecord> GetRentalRecordByIdAsync(int id)
         {
-            var rentalRepo = _unitOfWork.GetRepository<RentalRecord>();
-            return await rentalRepo.FindOneAsync(r => r.Id == id, "Renter,Vehicle,PickupStation,ReturnStation,Payments,InspectionProblems");
+            try
+            {
+                var rentalRepo = _unitOfWork.GetRepository<RentalRecord>();
+                return await rentalRepo.FindOneAsync(r => r.Id == id, "Renter,Vehicle,PickupStation,ReturnStation,Payments,InspectionProblems");
+            }
+            catch (KeyNotFoundException)
+            {
+                return null;
+            }
         }
 
         public async Task UpdateRentalRecordAsync(RentalRecord rentalRecord)

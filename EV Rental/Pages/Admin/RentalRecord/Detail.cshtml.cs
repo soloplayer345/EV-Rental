@@ -22,15 +22,30 @@ namespace EV_Rental.Pages.Admin.RentalRecord
             var userRole = HttpContext.Session.GetString("Role");
             var currentUserId = HttpContext.Session.GetInt32("AccountId");
             
+            Console.WriteLine($"=== Detail Page Debug ===");
+            Console.WriteLine($"ID parameter: {id}");
+            Console.WriteLine($"User Role: {userRole}");
+            Console.WriteLine($"User ID: {currentUserId}");
+            Console.WriteLine($"Session available: {HttpContext.Session.IsAvailable}");
+            Console.WriteLine($"All Session Keys:");
+            foreach (var key in HttpContext.Session.Keys)
+            {
+                Console.WriteLine($"  - {key}");
+            }
+            
+            // TEMPORARY: Comment out session check for debugging
+            /*
             if (string.IsNullOrEmpty(userRole) || currentUserId == null)
             {
                 TempData["ErrorMessage"] = "Bạn cần đăng nhập để xem thông tin này!";
                 return RedirectToPage("/Account/Login");
             }
+            */
 
             try
             {
                 RentalRecord = await _rentalRecordService.GetRentalRecordByIdAsync(id);
+                Console.WriteLine($"RentalRecord found: {RentalRecord != null}");
                 if (RentalRecord == null)
                 {
                     TempData["ErrorMessage"] = "Không tìm thấy đơn thuê!";

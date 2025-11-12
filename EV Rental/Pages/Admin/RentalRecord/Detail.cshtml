@@ -1,8 +1,18 @@
-@page "{id}"
+@page "{id:int}"
 @model EV_Rental.Pages.Admin.RentalRecord.DetailModel
 @{
     ViewData["Title"] = "Chi tiết Đơn Thuê";
     Layout = "~/Pages/Shared/_AdminLayout.cshtml";
+}
+
+<!-- Check if RentalRecord exists -->
+@if (Model.RentalRecord == null)
+{
+    <div class="alert alert-danger">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        <strong>Lỗi:</strong> Không tìm thấy thông tin đơn thuê. Hãy thử lại hoặc <a href="/Admin/RentalRecord/Index">quay lại danh sách</a>.
+    </div>
+    return;
 }
 
 <!-- Page Header -->
