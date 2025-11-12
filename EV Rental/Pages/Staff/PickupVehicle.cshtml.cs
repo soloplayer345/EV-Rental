@@ -23,8 +23,8 @@ namespace EV_Rental.Pages.Staff
             _accountRepo = accountRepo;
         }
 
-        public List<RentalRecord> ConfirmedRentals { get; set; } = new List<RentalRecord>();
-        public RentalRecord? VerifiedRental { get; set; }
+        public List<DataAccessLayer.Entities.RentalRecord> ConfirmedRentals { get; set; } = new List<DataAccessLayer.Entities.RentalRecord>();
+        public DataAccessLayer.Entities.RentalRecord? VerifiedRental { get; set; }
         public string? ErrorMessage { get; set; }
         public string? SuccessMessage { get; set; }
         
@@ -42,7 +42,7 @@ namespace EV_Rental.Pages.Staff
             // Lấy tất cả đơn chờ nhận (Confirmed status)
             // Lấy tất cả stations và đơn thuê của từng trạm
             var allStations = await _rentalService.GetAllStationsAsync();
-            var allConfirmedRentals = new List<RentalRecord>();
+            var allConfirmedRentals = new List<DataAccessLayer.Entities.RentalRecord>();
 
             foreach (var station in allStations)
             {
@@ -123,7 +123,7 @@ namespace EV_Rental.Pages.Staff
         private async Task LoadConfirmedRentals()
         {
             var allStations = await _rentalService.GetAllStationsAsync();
-            var allConfirmedRentals = new List<RentalRecord>();
+            var allConfirmedRentals = new List<DataAccessLayer.Entities.RentalRecord>();
 
             foreach (var station in allStations)
             {

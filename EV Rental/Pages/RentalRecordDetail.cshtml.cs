@@ -2,14 +2,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BusinessLayer.Services;
 using DataAccessLayer.Entities;
+using EV_Rental.Helpers;
 
-namespace EV_Rental.Pages.Admin.RentalRecord
+namespace EV_Rental.Pages
 {
-    public class DetailModel : PageModel
+    public class RentalRecordDetailModel : PageModel
     {
         private readonly RentalRecordService _rentalRecordService;
 
-        public DetailModel(RentalRecordService rentalRecordService)
+        public RentalRecordDetailModel(RentalRecordService rentalRecordService)
         {
             _rentalRecordService = rentalRecordService;
         }
@@ -18,14 +19,27 @@ namespace EV_Rental.Pages.Admin.RentalRecord
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
-            // Kiểm tra user đã đăng nhập chưa
-            var userRole = HttpContext.Session.GetString("Role");
-            var currentUserId = HttpContext.Session.GetInt32("AccountId");
+            // Debug: Log session info
+            var accountId = SessionHelper.GetAccountId(HttpContext);
+            var userRole = SessionHelper.GetUserRole(HttpContext.Session);
             
-            if (string.IsNullOrEmpty(userRole) || currentUserId == null)
+            Console.WriteLine($"=== RentalRecordDetail Debug ===");
+            Console.WriteLine($"ID parameter: {id}");
+            Console.WriteLine($"AccountId from session: {accountId}");
+            Console.WriteLine($"Role from session: {userRole}");
+            
+            // Check if user is logged in
+            if (accountId == null)
             {
-                TempData["ErrorMessage"] = "Bạn cần đăng nhập để xem thông tin này!";
+                TempData["ErrorMessage"] = "Vui lòng đăng nhập để xem chi tiết đơn thuê!";
                 return RedirectToPage("/Account/Login");
+            }
+            
+            // Check admin permission
+            if (userRole != "Admin")
+            {
+                TempData["ErrorMessage"] = "Bạn không có quyền truy cập trang này! (Role hiện tại: " + (userRole ?? "null") + ")";
+                return RedirectToPage("/Admin/RentalRecord/Index");
             }
 
             try
@@ -34,32 +48,16 @@ namespace EV_Rental.Pages.Admin.RentalRecord
                 if (RentalRecord == null)
                 {
                     TempData["ErrorMessage"] = "Không tìm thấy đơn thuê!";
-                    
-                    if (userRole == "Admin")
-                        return RedirectToPage("Index");
-                    else if (userRole == "Staff")
-                        return RedirectToPage("/Staff/Dashboard");
-                    else
-                        return RedirectToPage("/Renter/MyTrips");
+                    return RedirectToPage("/Admin/RentalRecord/Index");
                 }
-
-                // Nếu là renter thì chỉ xem được đơn của mình
-                if (userRole == "Renter" && RentalRecord.RenterId != currentUserId)
-                {
-                    TempData["ErrorMessage"] = "Bạn không có quyền xem đơn thuê này!";
-                    return RedirectToPage("/Renter/MyTrips");
-                }
+                
+                Console.WriteLine($"RentalRecord loaded successfully: ID={RentalRecord.Id}");
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Error loading rental record: {ex.Message}");
                 TempData["ErrorMessage"] = $"Lỗi: {ex.Message}";
-                
-                if (userRole == "Admin")
-                    return RedirectToPage("Index");
-                else if (userRole == "Staff")
-                    return RedirectToPage("/Staff/Dashboard");
-                else
-                    return RedirectToPage("/Renter/MyTrips");
+                return RedirectToPage("/Admin/RentalRecord/Index");
             }
 
             return Page();
@@ -68,9 +66,10 @@ namespace EV_Rental.Pages.Admin.RentalRecord
         public async Task<IActionResult> OnPostCancelAsync(int id)
         {
             // Check admin permission
-            var adminRole = HttpContext.Session.GetString("Role");
-            if (adminRole != "Admin")
+            var userRole = SessionHelper.GetUserRole(HttpContext.Session);
+            if (userRole != "Admin")
             {
+                TempData["ErrorMessage"] = "Bạn không có quyền thực hiện hành động này!";
                 return Redirect("/");
             }
 
@@ -80,7 +79,7 @@ namespace EV_Rental.Pages.Admin.RentalRecord
                 if (record == null)
                 {
                     TempData["ErrorMessage"] = "Không tìm thấy đơn thuê!";
-                    return RedirectToPage("Index");
+                    return RedirectToPage("/Admin/RentalRecord/Index");
                 }
 
                 record.Status = DataAccessLayer.Enums.RentalRecordStatus.Cancelled;
@@ -93,15 +92,16 @@ namespace EV_Rental.Pages.Admin.RentalRecord
                 TempData["ErrorMessage"] = $"Lỗi khi hủy đơn thuê: {ex.Message}";
             }
 
-            return RedirectToPage("Detail", new { id });
+            return RedirectToPage("RentalRecordDetail", new { id });
         }
 
         public async Task<IActionResult> OnPostCompleteAsync(int id)
         {
             // Check admin permission
-            var adminRole = HttpContext.Session.GetString("Role");
-            if (adminRole != "Admin")
+            var userRole = SessionHelper.GetUserRole(HttpContext.Session);
+            if (userRole != "Admin")
             {
+                TempData["ErrorMessage"] = "Bạn không có quyền thực hiện hành động này!";
                 return Redirect("/");
             }
 
@@ -111,7 +111,7 @@ namespace EV_Rental.Pages.Admin.RentalRecord
                 if (record == null)
                 {
                     TempData["ErrorMessage"] = "Không tìm thấy đơn thuê!";
-                    return RedirectToPage("Index");
+                    return RedirectToPage("/Admin/RentalRecord/Index");
                 }
 
                 record.Status = DataAccessLayer.Enums.RentalRecordStatus.Completed;
@@ -125,7 +125,7 @@ namespace EV_Rental.Pages.Admin.RentalRecord
                 TempData["ErrorMessage"] = $"Lỗi: {ex.Message}";
             }
 
-            return RedirectToPage("Detail", new { id });
+            return RedirectToPage("RentalRecordDetail", new { id });
         }
     }
 }
