@@ -1,21 +1,19 @@
-using BusinessLayer.DTOs;
+using BusinessLayer.Services;
 using DataAccessLayer.Enums;
-using DataAccessLayer.Interfaces;
 using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Text.Json;
 using AccountEntity = DataAccessLayer.Entities.Account;
 
 namespace EV_Rental.Pages.Admin
 {
     public class UsersModel : PageModel
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly AccountService _accountService;
 
-        public UsersModel(IUnitOfWork unitOfWork)
+        public UsersModel(AccountService accountService)
         {
-            _unitOfWork = unitOfWork;
+            _accountService = accountService;
         }
 
         // Properties for display
@@ -49,43 +47,20 @@ namespace EV_Rental.Pages.Admin
                 return RedirectToPage("/Index");
             }
 
-            // Get all users except Admins
-            var allUsers = (await _unitOfWork.AccountRepo.GetAllAsync())
-                .Where(u => u.Role != AccountRole.Admin)
-                .ToList();
-
-            // Apply filters
-            Users = allUsers;
-
-            if (!string.IsNullOrWhiteSpace(SearchTerm))
-            {
-                Users = Users.Where(u =>
-                    u.FullName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    u.Email.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    u.Phone.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)
-                ).ToList();
-            }
-
-            if (RoleFilter.HasValue)
-            {
-                Users = Users.Where(u => (int)u.Role == RoleFilter.Value).ToList();
-            }
-
-            if (StatusFilter.HasValue)
-            {
-                Users = Users.Where(u => u.IsActive == StatusFilter.Value).ToList();
-            }
-
-            // Order by creation date (newest first)
-            Users = Users.OrderByDescending(u => u.CreateDate).ToList();
+            // Get all users using service
+            var searchResult = await _accountService.SearchAccountsAsync(
+                SearchTerm, 
+                RoleFilter.HasValue ? (AccountRole)RoleFilter.Value : null, 
+                StatusFilter
+            );
+            Users = searchResult.ToList();
 
             // Calculate statistics
-            TotalUsers = allUsers.Count;
-            ActiveUsers = allUsers.Count(u => u.IsActive);
-            InactiveUsers = allUsers.Count(u => !u.IsActive);
-            
-            var firstDayOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-            NewUsersThisMonth = allUsers.Count(u => u.CreateDate >= firstDayOfMonth);
+            var stats = await _accountService.GetUserStatisticsAsync();
+            TotalUsers = stats.TotalUsers;
+            ActiveUsers = stats.ActiveUsers;
+            InactiveUsers = stats.InactiveUsers;
+            NewUsersThisMonth = stats.NewUsersThisMonth;
 
             return Page();
         }
@@ -94,7 +69,7 @@ namespace EV_Rental.Pages.Admin
         {
             try
             {
-                var user = await _unitOfWork.AccountRepo.GetByIdAsync(userId);
+                var user = await _accountService.GetAccountByIdAsync(userId);
                 if (user == null)
                 {
                     return new JsonResult(new { success = false, message = "Không tìm thấy user" });
@@ -143,23 +118,10 @@ namespace EV_Rental.Pages.Admin
                     return RedirectToPage();
                 }
 
-                // Check if email or phone already exists
-                if (await _unitOfWork.AccountRepo.IsEmailExistsAsync(Email))
-                {
-                    TempData["ErrorMessage"] = "Email đã tồn tại";
-                    return RedirectToPage();
-                }
-
-                if (await _unitOfWork.AccountRepo.IsPhoneExistsAsync(Phone))
-                {
-                    TempData["ErrorMessage"] = "Số điện thoại đã tồn tại";
-                    return RedirectToPage();
-                }
-
                 // Hash password
                 var passwordHash = BCrypt.Net.BCrypt.HashPassword(Password);
 
-                // Create new user
+                // Create new user using service
                 var newUser = new AccountEntity
                 {
                     FullName = FullName,
@@ -167,15 +129,17 @@ namespace EV_Rental.Pages.Admin
                     Phone = Phone,
                     PasswordHash = passwordHash,
                     Role = (AccountRole)Role,
-                    IsActive = IsActive,
-                    CreateDate = DateTime.Now,
-                    UpdateDate = DateTime.Now
+                    IsActive = IsActive
                 };
 
-                await _unitOfWork.AccountRepo.AddAsync(newUser);
-                await _unitOfWork.SaveChangesAsync();
+                await _accountService.AddAccountAsync(newUser);
 
                 TempData["SuccessMessage"] = "Thêm user mới thành công";
+                return RedirectToPage();
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
                 return RedirectToPage();
             }
             catch (Exception ex)
@@ -190,39 +154,33 @@ namespace EV_Rental.Pages.Admin
         {
             try
             {
-                var user = await _unitOfWork.AccountRepo.GetByIdAsync(UserId);
+                var user = await _accountService.GetAccountByIdAsync(UserId);
                 if (user == null)
                 {
                     TempData["ErrorMessage"] = "Không tìm thấy user";
                     return RedirectToPage();
                 }
 
-                // Check if email is changed and already exists
-                if (user.Email != Email && await _unitOfWork.AccountRepo.IsEmailExistsAsync(Email))
-                {
-                    TempData["ErrorMessage"] = "Email đã tồn tại";
-                    return RedirectToPage();
-                }
-
-                // Check if phone is changed and already exists
-                if (user.Phone != Phone && await _unitOfWork.AccountRepo.IsPhoneExistsAsync(Phone))
-                {
-                    TempData["ErrorMessage"] = "Số điện thoại đã tồn tại";
-                    return RedirectToPage();
-                }
-
-                // Update user
+                // Update user info
                 user.FullName = FullName;
                 user.Email = Email;
                 user.Phone = Phone;
                 user.Role = (AccountRole)Role;
                 user.IsActive = IsActive;
-                user.UpdateDate = DateTime.Now;
 
-                await _unitOfWork.AccountRepo.Update(user);
-                await _unitOfWork.SaveChangesAsync();
+                await _accountService.UpdateAccountAsync(user);
 
                 TempData["SuccessMessage"] = "Cập nhật user thành công";
+                return RedirectToPage();
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToPage();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
                 return RedirectToPage();
             }
             catch (Exception ex)
@@ -236,19 +194,12 @@ namespace EV_Rental.Pages.Admin
         {
             try
             {
-                var user = await _unitOfWork.AccountRepo.GetByIdAsync(userId);
-                if (user == null)
-                {
-                    return new JsonResult(new { success = false, message = "Không tìm thấy user" });
-                }
-
-                user.IsActive = isActive;
-                user.UpdateDate = DateTime.Now;
-
-                await _unitOfWork.AccountRepo.Update(user);
-                await _unitOfWork.SaveChangesAsync();
-
+                await _accountService.ToggleAccountStatusAsync(userId, isActive);
                 return new JsonResult(new { success = true, message = "Cập nhật trạng thái thành công" });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return new JsonResult(new { success = false, message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -260,17 +211,12 @@ namespace EV_Rental.Pages.Admin
         {
             try
             {
-                var user = await _unitOfWork.AccountRepo.GetByIdAsync(userId);
-                if (user == null)
-                {
-                    return new JsonResult(new { success = false, message = "Không tìm thấy user" });
-                }
-
-                // Hard delete since IsDeleted is not in database
-                await _unitOfWork.AccountRepo.Delete(user);
-                await _unitOfWork.SaveChangesAsync();
-
+                await _accountService.DeleteAccountAsync(userId);
                 return new JsonResult(new { success = true, message = "Xóa user thành công" });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return new JsonResult(new { success = false, message = ex.Message });
             }
             catch (Exception ex)
             {

@@ -2,7 +2,6 @@ using BusinessLayer.DTOs;
 using BusinessLayer.Services;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
-using DataAccessLayer.Interfaces;
 using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -12,7 +11,7 @@ namespace EV_Rental.Pages.Admin.Vehicle
     public class EditModel : PageModel
     {
         private readonly VehicleService _vehicleService;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly StationService _stationService;
 
         [BindProperty]
         public DataAccessLayer.Entities.Vehicle Vehicle { get; set; } = new();
@@ -20,10 +19,10 @@ namespace EV_Rental.Pages.Admin.Vehicle
         public List<DataAccessLayer.Entities.Station> Stations { get; set; } = new();
         public string UserEmail { get; set; } = string.Empty;
 
-        public EditModel(VehicleService vehicleService, IUnitOfWork unitOfWork)
+        public EditModel(VehicleService vehicleService, StationService stationService)
         {
             _vehicleService = vehicleService;
-            _unitOfWork = unitOfWork;
+            _stationService = stationService;
         }
 
         public async Task<IActionResult> OnGetAsync(int id)
@@ -47,8 +46,7 @@ namespace EV_Rental.Pages.Admin.Vehicle
                 }
 
                 // Lấy danh sách trạm
-                var stationRepo = _unitOfWork.GetRepository<DataAccessLayer.Entities.Station>();
-                Stations = (await stationRepo.GetAllAsync()).ToList();
+                Stations = (await _stationService.GetAllStationsAsync()).ToList();
             }
             catch (Exception ex)
             {
@@ -78,8 +76,7 @@ namespace EV_Rental.Pages.Admin.Vehicle
                 System.Diagnostics.Debug.WriteLine($"Vehicle StationId: {Vehicle.StationId}");
                 
                 // Lấy danh sách trạm cho case lỗi
-                var stationRepo = _unitOfWork.GetRepository<DataAccessLayer.Entities.Station>();
-                Stations = (await stationRepo.GetAllAsync()).ToList();
+                Stations = (await _stationService.GetAllStationsAsync()).ToList();
 
                 // If StationId is 0 (not selected in form), restore from database
                 if (Vehicle.StationId <= 0)
@@ -181,7 +178,7 @@ namespace EV_Rental.Pages.Admin.Vehicle
                 {
                     var currentImageUrl = Vehicle.ImageUrl;
                     var currentFeatures = Vehicle.Features;
-                    Stations = (await _unitOfWork.GetRepository<DataAccessLayer.Entities.Station>().GetAllAsync()).ToList();
+                    Stations = (await _stationService.GetAllStationsAsync()).ToList();
                     // Reload vehicle from database to show original data
                     Vehicle = await _vehicleService.GetVehicleByIdAsync(Vehicle.Id);
                     // Restore user-entered values

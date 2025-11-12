@@ -2,7 +2,6 @@ using BusinessLayer.DTOs;
 using BusinessLayer.Services;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
-using DataAccessLayer.Interfaces;
 using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -12,7 +11,7 @@ namespace EV_Rental.Pages.Admin.Vehicle
     public class CreateModel : PageModel
     {
         private readonly VehicleService _vehicleService;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly StationService _stationService;
 
         [BindProperty]
         public DataAccessLayer.Entities.Vehicle Vehicle { get; set; } = new();
@@ -20,10 +19,10 @@ namespace EV_Rental.Pages.Admin.Vehicle
         public List<DataAccessLayer.Entities.Station> Stations { get; set; } = new();
         public string UserEmail { get; set; } = string.Empty;
 
-        public CreateModel(VehicleService vehicleService, IUnitOfWork unitOfWork)
+        public CreateModel(VehicleService vehicleService, StationService stationService)
         {
             _vehicleService = vehicleService;
-            _unitOfWork = unitOfWork;
+            _stationService = stationService;
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -40,8 +39,7 @@ namespace EV_Rental.Pages.Admin.Vehicle
             try
             {
                 // Lấy danh sách trạm
-                var stationRepo = _unitOfWork.GetRepository<DataAccessLayer.Entities.Station>();
-                Stations = (await stationRepo.GetAllAsync()).ToList();
+                Stations = (await _stationService.GetAllStationsAsync()).ToList();
 
                 // Set default status
                 Vehicle.Status = VehicleStatus.Available;
@@ -66,8 +64,7 @@ namespace EV_Rental.Pages.Admin.Vehicle
             {
                 try
                 {
-                    var stationRepo = _unitOfWork.GetRepository<DataAccessLayer.Entities.Station>();
-                    Stations = (await stationRepo.GetAllAsync()).ToList();
+                    Stations = (await _stationService.GetAllStationsAsync()).ToList();
                 }
                 catch { }
                 return Page();
@@ -133,8 +130,7 @@ namespace EV_Rental.Pages.Admin.Vehicle
                 TempData["ErrorMessage"] = $"Lỗi khi thêm xe: {ex.Message}";
                 try
                 {
-                    var stationRepo = _unitOfWork.GetRepository<DataAccessLayer.Entities.Station>();
-                    Stations = (await stationRepo.GetAllAsync()).ToList();
+                    Stations = (await _stationService.GetAllStationsAsync()).ToList();
                 }
                 catch { }
                 return Page();
