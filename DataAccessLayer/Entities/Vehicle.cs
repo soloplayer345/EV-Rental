@@ -18,6 +18,7 @@ namespace DataAccessLayer.Entities
         public string? ImageUrl { get; set; }
         public int MaxDistance { get; set; } // Quãng đường tối đa (km)
         public int seartCapacity { get; set; } // Sức chứa chỗ ngồi
+        public decimal BatteryCapacity { get; set; } // Dung lượng pin (kWh)
 
         // Navigation properties
         [ScaffoldColumn(false)]

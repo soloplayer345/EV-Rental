@@ -25,7 +25,8 @@ namespace BusinessLayer.Mapping
                 pricePerDay = vehicle.PricePerDay,
                 features = vehicle.Features,
                 imageUrl = vehicle.ImageUrl,
-                maxDistance = vehicle.MaxDistance
+                maxDistance = vehicle.MaxDistance,
+                batteryCapacity = vehicle.BatteryCapacity
             };
             return response;
         }
@@ -45,7 +46,8 @@ namespace BusinessLayer.Mapping
                 Status = DataAccessLayer.Enums.VehicleStatus.Available,
                 Features = dto.features,
                 ImageUrl = dto.imageUrl,
-                MaxDistance = dto.maxDistance
+                MaxDistance = dto.maxDistance,
+                BatteryCapacity = dto.batteryCapacity
             };
             return response;
         }
@@ -64,6 +66,7 @@ namespace BusinessLayer.Mapping
             vehicle.Features = dto.features;
             vehicle.ImageUrl = dto.imageUrl;
             vehicle.MaxDistance = dto.maxDistance;
+            vehicle.BatteryCapacity = dto.batteryCapacity;
         }
 
     }

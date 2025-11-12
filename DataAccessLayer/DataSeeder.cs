@@ -131,6 +131,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://www.vinfastvietnam.net.vn/uploads/data/3097/imgproducts/vinfastvietnam.net.vnvfe34.jpg3.jpg",
                     MaxDistance = 285,
                     seartCapacity = 5,
+                    BatteryCapacity = 37.5m,
                     CreateDate = new DateTime(2025, 10, 21),
                     UpdateDate = new DateTime(2025, 10, 21),
                     IsDeleted = false
@@ -152,6 +153,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://giaxeoto.vn/admin/upload/images/resize/640-tesla-model-3-2024-co-gi-moi.jpg",
                     MaxDistance = 491,
                     seartCapacity = 5,
+                    BatteryCapacity = 82m,
                     CreateDate = new DateTime(2025, 10, 21),
                     UpdateDate = new DateTime(2025, 10, 21),
                     IsDeleted = false
@@ -173,6 +175,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://images.netdirector.co.uk/gforces-auto/image/upload/w_412,h_309,q_auto,c_fill,f_auto,fl_lossy/auto-titan/e9fc28a92a2bff98fdb38daeb05779d0/ix3_new_highlights.png",
                     MaxDistance = 460,
                     seartCapacity = 5,
+                    BatteryCapacity = 84m,
                     CreateDate = new DateTime(2025, 10, 21),
                     UpdateDate = new DateTime(2025, 10, 21),
                     IsDeleted = false
@@ -194,6 +197,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://i1-vnexpress.vnecdn.net/2024/11/23/DSC09878JPG-1732351567.jpg?w=750&h=450&q=100&dpr=1&fit=crop&s=UVB1kqgA08fA_pGNG7EjvA",
                     MaxDistance = 488,
                     seartCapacity = 4,
+                    BatteryCapacity = 93m,
                     CreateDate = new DateTime(2025, 10, 21),
                     UpdateDate = new DateTime(2025, 10, 21),
                     IsDeleted = false
@@ -215,6 +219,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://vinfast-cars.vn/wp-content/uploads/2025/02/vinfast-vf8-den.png",
                     MaxDistance = 420,
                     seartCapacity = 5,
+                    BatteryCapacity = 75m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -235,6 +240,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://i1-vnexpress.vnecdn.net/2023/03/29/Mercedes-EQS-2022-VnE-7034-JPG.jpg?w=2400&h=0&q=100&dpr=1&fit=crop&s=VNrfMglzD7glUa199o-N6A&t=image",
                     MaxDistance = 770,
                     seartCapacity = 5,
+                    BatteryCapacity = 107.8m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -255,6 +261,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://i1-vnexpress.vnecdn.net/2024/10/18/Porsche-Taycan-Vnexpress-net-11-JPG.jpg?w=2400&h=0&q=100&dpr=1&fit=crop&s=LoskMEDqKHzXgrHyeWd5Ag&t=image",
                     MaxDistance = 484,
                     seartCapacity = 4,
+                    BatteryCapacity = 93.2m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -275,6 +282,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://shop.vinfastauto.com/on/demandware.static/-/Sites-app_vinfast_vn-Library/default/dw1a73c862/images/PDP/vf9/202406/exterior/CE1W.webp",
                     MaxDistance = 438,
                     seartCapacity = 7,
+                    BatteryCapacity = 92m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -295,6 +303,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQuPPGwtfobtphn2JnZfRLJU_ELJXj4mEweQ&s",
                     MaxDistance = 525,
                     seartCapacity = 7,
+                    BatteryCapacity = 82m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -315,6 +324,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://i1-vnexpress.vnecdn.net/2023/07/31/Hyundai-IONIQ-5-7.jpg?w=2400&h=0&q=100&dpr=1&fit=crop&s=gqOfVmNy6EZxHps0rNBfCA&t=image",
                     MaxDistance = 481,
                     seartCapacity = 5,
+                    BatteryCapacity = 84m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -335,6 +345,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDRNkoUruCHw69jdLnwmvz09ncLCsAcLnsJA&s",
                     MaxDistance = 528,
                     seartCapacity = 5,
+                    BatteryCapacity = 84m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -355,6 +366,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFP_xRoDnlB2qUUnef4lw1c-HTf7Xnvi_hWw&s",
                     MaxDistance = 540,
                     seartCapacity = 5,
+                    BatteryCapacity = 100m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -375,6 +387,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://img1.oto.com.vn/2024/07/26/OpzfnMD2/atto-3-0f7e.webp",
                     MaxDistance = 480,
                     seartCapacity = 5,
+                    BatteryCapacity = 60.48m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -395,6 +408,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNR4feHONvrN5Y-HK13689YKvLgkYgtqWiyA&s",
                     MaxDistance = 500,
                     seartCapacity = 5,
+                    BatteryCapacity = 87m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -416,6 +430,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8Xr-6nI1VqKU3Jn7pKYqIw-8L_xK3y8T9cxo&s",
                     MaxDistance = 565,
                     seartCapacity = 5,
+                    BatteryCapacity = 112m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -436,6 +451,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQqJME5P0q8Z9p5Y5e5o5o5o5o5o5o5o5o&s",
                     MaxDistance = 470,
                     seartCapacity = 5,
+                    BatteryCapacity = 78m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -453,9 +469,10 @@ namespace DataAccessLayer
                     PricePerHour = 270000,
                     PricePerDay = 2150000,
                     Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"leatherSeats\":true,\"premiumAudio\":true,\"fastCharging\":true}",
-                    ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3_3_3_3_3_3_3_3_3&s",
+                    ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3_3_3_3_3_3_3_3&s",
                     MaxDistance = 480,
                     seartCapacity = 5,
+                    BatteryCapacity = 100m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -476,6 +493,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4_4_4_4_4_4_4_4&s",
                     MaxDistance = 417,
                     seartCapacity = 5,
+                    BatteryCapacity = 66m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -496,6 +514,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR5_5_5_5_5_5_5_5&s",
                     MaxDistance = 450,
                     seartCapacity = 7,
+                    BatteryCapacity = 82m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -516,6 +535,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6_6_6_6_6_6_6_6&s",
                     MaxDistance = 650,
                     seartCapacity = 5,
+                    BatteryCapacity = 112.5m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -536,6 +556,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7_7_7_7_7_7_7_7&s",
                     MaxDistance = 440,
                     seartCapacity = 5,
+                    BatteryCapacity = 112m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -556,6 +577,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8_8_8_8_8_8_8_8&s",
                     MaxDistance = 480,
                     seartCapacity = 5,
+                    BatteryCapacity = 99m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -576,6 +598,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9_9_9_9_9_9_9_9&s",
                     MaxDistance = 460,
                     seartCapacity = 5,
+                    BatteryCapacity = 71.4m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -596,6 +619,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0_0_0_0_0_0_0_0&s",
                     MaxDistance = 520,
                     seartCapacity = 5,
+                    BatteryCapacity = 112m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -616,6 +640,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1_1_1_1_1_1_1_1&s",
                     MaxDistance = 290,
                     seartCapacity = 5,
+                    BatteryCapacity = 35.5m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -636,6 +661,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2_2_2_2_2_2_2_2&s",
                     MaxDistance = 380,
                     seartCapacity = 4,
+                    BatteryCapacity = 52m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -656,6 +682,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3_3_3_3_3_3_3_3&s",
                     MaxDistance = 330,
                     seartCapacity = 4,
+                    BatteryCapacity = 42m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -676,6 +703,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4_4_4_4_4_4_4_4&s",
                     MaxDistance = 270,
                     seartCapacity = 4,
+                    BatteryCapacity = 54m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -696,6 +724,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5_5_5_5_5_5_5_5&s",
                     MaxDistance = 440,
                     seartCapacity = 5,
+                    BatteryCapacity = 77m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
@@ -716,6 +745,7 @@ namespace DataAccessLayer
                     ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:AnD9GcS6_6_6_6_6_6_6_6&s",
                     MaxDistance = 500,
                     seartCapacity = 5,
+                    BatteryCapacity = 82m,
                     CreateDate = new DateTime(2025, 10, 22),
                     UpdateDate = new DateTime(2025, 10, 22),
                     IsDeleted = false
