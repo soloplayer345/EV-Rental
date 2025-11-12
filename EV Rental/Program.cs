@@ -34,6 +34,7 @@ namespace EV_Rental
             // Register Repositories
             builder.Services.AddScoped<IVehicleRepo, VehicleRepo>();
             builder.Services.AddScoped<IAccountRepo, AccountRepo>();
+            builder.Services.AddScoped<IRatingReviewRepo, RatingReviewRepo>();
 
             // Register UnitOfWork and Services
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -43,6 +44,7 @@ namespace EV_Rental
             builder.Services.AddScoped<RentalRecordService>();
             builder.Services.AddScoped<RentalService>();
             builder.Services.AddScoped<PaymentService>();
+            builder.Services.AddScoped<ReviewService>();
 
             // Bind SMTP settings & register EmailSender
             builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("Smtp"));
