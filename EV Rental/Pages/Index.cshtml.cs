@@ -1,4 +1,5 @@
-using BusinessLayer.DTOs;
+﻿using BusinessLayer.DTOs;
+using BusinessLayer.Services;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
 using DataAccessLayer.Interfaces;
@@ -9,38 +10,36 @@ namespace EV_Rental.Pages
 {
     public class IndexModel : PageModel
     {
-        private readonly ILogger<IndexModel> _logger;
-        private readonly IVehicleRepo _vehicleRepo;
+        private readonly VehicleService _vehicleService;
 
-        public IndexModel(ILogger<IndexModel> logger, IVehicleRepo vehicleRepo)
+
+        public IndexModel(VehicleService vehicleService)
         {
-            _logger = logger;
-            _vehicleRepo = vehicleRepo;
+            _vehicleService = vehicleService;
         }
 
-        public IEnumerable<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
+        [BindProperty(SupportsGet = true)]
+        public string Name { get; set; }
 
         [BindProperty(SupportsGet = true)]
-        public string? SearchName { get; set; }
+        public string Brand { get; set; }
 
         [BindProperty(SupportsGet = true)]
-        public string? SearchBrand { get; set; }
+        public VehicleStatus? Status { get; set; }
 
-        [BindProperty(SupportsGet = true)]
-        public string? SearchType { get; set; }
-
-        [BindProperty(SupportsGet = true)]
-        public VehicleStatus? SearchStatus { get; set; }
+        public IEnumerable<VehicleDto> Vehicles { get; set; }
 
         public async Task OnGetAsync()
         {
-            if (string.IsNullOrEmpty(SearchName) && string.IsNullOrEmpty(SearchBrand) && string.IsNullOrEmpty(SearchType))
+            if (Status.HasValue)
             {
-                Vehicles = await _vehicleRepo.GetAllAsync();
+                // Gọi hàm search trong service (lọc theo status)
+                Vehicles = (IEnumerable<VehicleDto>)await _vehicleService.SearchVehiclesAsync(Name, Brand, Status.Value);
             }
             else
             {
-                Vehicles = await _vehicleRepo.SearchVehiclesAsync(SearchName, SearchBrand, SearchType, SearchStatus);
+                // Nếu không chọn status → lấy toàn bộ
+                Vehicles = (IEnumerable<VehicleDto>)await _vehicleService.GetVehiclesAsync();
             }
         }
     }

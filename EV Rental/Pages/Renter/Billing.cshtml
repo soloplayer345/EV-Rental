@@ -1,0 +1,73 @@
+﻿@page
+@model EV_Rental.Pages.Renter.BillingModel
+@{
+    ViewData["Title"] = "Billing Details";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+</head>
+
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <h1 class="logo">🔋 Hệ Thống Thuê Xe Điện</h1>
+                <nav class="nav">
+                    <a href="/Renter/Index" class="nav-link active">Trang Chủ</a>
+                    <a href="/Renter/MyTrips" class="nav-link">Chuyến Đi Của Tôi</a>
+                    <a href="#" class="nav-link">Trạm Xe</a>
+                    <a href="#" class="nav-link">Hồ Sơ</a>
+                    <a href="/Account/Logout" class="nav-link">Đăng Xuất</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h2 class="hero-title">Tìm Xe Điện Hoàn Hảo Của Bạn</h2>
+            <p class="hero-subtitle">Chọn, thuê và lái xe điện từ các trạm gần bạn</p>
+            <button class="btn-primary" onclick="document.getElementById('vehicles-section').scrollIntoView({behavior: 'smooth'})">Tìm Xe Ngay</button>
+        </div>
+    </section>
+
+    <!-- Billing Details Section -->
+    <section class="billing-section">
+        <div class="container">
+            <h2>Hóa đơn thuê xe</h2>
+            <p><b>Tên xe:</b> @Model.Bill.VehicleName</p>
+            <p><b>Thời gian bắt đầu:</b> @Model.Bill.StartTime</p>
+            <p><b>Thời gian kết thúc:</b> @Model.Bill.ActualEndTime</p>
+            <p><b>Phí cơ bản:</b> @Model.Bill.BasePrice.ToString("N0") VNĐ</p>
+            <p><b>Phụ phí:</b> @Model.Bill.ExtraFees.ToString("N0") VNĐ</p>
+            <p><b>Giảm giá:</b> -@Model.Bill.Discount.ToString("N0") VNĐ</p>
+            <h3>Tổng cộng: @Model.Bill.FinalAmount.ToString("N0") VNĐ</h3>
+
+            <button id="btnPay" class="btn btn-success mt-3">Thanh toán</button>
+            <p id="msg" class="mt-2 text-success"></p>
+        </div>
+    </section>
+
+    @section Scripts {
+    <script>
+        document.getElementById('btnPay').addEventListener('click', async () => {
+            const amount = @Model.Bill.FinalAmount;
+            const res = await fetch('?handler=Pay', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(amount)
+            });
+            const result = await res.json();
+            document.getElementById('msg').innerText = result.message;
+        });
+    </script>
+    }
+</body>
+</html>
+
