@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.DTOs;
 using BusinessLayer.Interfaces;
+using BusinessLayer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -8,9 +9,9 @@ namespace EV_Rental.Pages.Staff
 {
     public class CheckInModel : PageModel
     {
-        private readonly ICheckInService _checkInService;
+        private readonly CheckInService _checkInService;
 
-        public CheckInModel(ICheckInService checkInService)
+        public CheckInModel(CheckInService checkInService)
         {
             _checkInService = checkInService;
         }
