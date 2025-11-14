@@ -9,6 +9,7 @@ namespace BusinessLayer.DTOs
 {
     public class VehicleDto
     {
+        public int Id { get; set; }
         public int stationId { get; set; }
         public string name { get; set; } 
         public string brand { get; set; }
@@ -21,6 +22,7 @@ namespace BusinessLayer.DTOs
         public string features { get; set; }
         public string imageUrl { get; set; }
         public int maxDistance { get; set; }
+        public int seartCapacity { get; set; }
         public decimal batteryCapacity { get; set; }
     }
 }

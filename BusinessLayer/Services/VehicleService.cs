@@ -1,5 +1,9 @@
-﻿using DataAccessLayer.Entities;
+﻿using BusinessLayer.DTOs;
+using DataAccessLayer.Entities;
+using DataAccessLayer.Enums;
 using DataAccessLayer.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,9 +22,9 @@ namespace BusinessLayer.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<DataAccessLayer.Entities.Vehicle>> SearchVehiclesAsync(string name, string brand, string vehicleType, DataAccessLayer.Enums.VehicleStatus status)
+        public async Task<IEnumerable<Vehicle>> SearchVehiclesAsync(string name, string brand, DataAccessLayer.Enums.VehicleStatus status)
         {
-            return await _vehicleRepo.SearchVehiclesAsync(name, brand, vehicleType, status);
+            return await _vehicleRepo.SearchVehiclesAsync(name, brand, status);
         }
 
         public async Task<IEnumerable<Vehicle>> GetVehiclesAsync()

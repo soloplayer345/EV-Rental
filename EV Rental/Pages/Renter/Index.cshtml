@@ -34,6 +34,25 @@
         <div class="container">
             <h2 class="hero-title">Tìm Xe Điện Hoàn Hảo Của Bạn</h2>
             <p class="hero-subtitle">Chọn, thuê và lái xe điện từ các trạm gần bạn</p>
+
+            <form method="get" asp-page="/Vehicles/Index" class="search-form">
+                <div class="search-fields">
+                    <input type="text" name="name" placeholder="Nhập tên xe..." class="search-input" />
+
+                    <input type="text" name="brand" placeholder="Hãng xe..." class="search-input" />
+
+                    <select name="status" class="search-select">
+                        <option value="">-- Trạng thái --</option>
+                        <option value="Available">Chưa cho thuê</option>
+                        <option value="Rented">Đã cho thuê</option>
+                    </select>
+
+                    <button class="btn-outline" onclick="document.getElementById('vehicles-section').scrollIntoView({behavior: 'smooth'})">
+                        Xem tất cả xe
+                    </button>
+                </div>
+            </form>
+
             <button class="btn-primary" onclick="document.getElementById('vehicles-section').scrollIntoView({behavior: 'smooth'})">Tìm Xe Ngay</button>
         </div>
     </section>

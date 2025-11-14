@@ -1,5 +1,4 @@
 ﻿using DataAccessLayer.Entities;
-using DataAccessLayer.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer.Interfaces
 {
-    public interface IVehicleRepo : IGenericRepo<Vehicle>
+    public interface IRentalrecordRepo : IGenericRepo<RentalRecord>
     {
-        Task<IEnumerable<Vehicle>> SearchVehiclesAsync(string? name, string? brand, VehicleStatus? status);
+        Task<RentalRecord> GetWithInspectionAsync(int id);
     }
 }
