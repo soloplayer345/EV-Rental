@@ -1,7 +1,6 @@
 using BusinessLayer.DTOs;
 using BusinessLayer.Services;
 using DataAccessLayer.Entities;
-using DataAccessLayer.Interfaces;
 using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -13,10 +12,10 @@ namespace EV_Rental.Pages.Renter
         private readonly RentalService _rentalService;
         private readonly VehicleService _vehicleService;
 
-        public CancelRentalPolicyModel(IUnitOfWork unitOfWork, IVehicleRepo vehicleRepo)
+        public CancelRentalPolicyModel(RentalService rentalService, VehicleService vehicleService)
         {
-            _vehicleService = new VehicleService(vehicleRepo, unitOfWork);
-            _rentalService = new RentalService(unitOfWork, _vehicleService);
+            _rentalService = rentalService;
+            _vehicleService = vehicleService;
         }
 
         public RentalRecord? Rental { get; set; }

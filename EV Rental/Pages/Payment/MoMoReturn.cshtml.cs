@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 using BusinessLayer.Services;
 using BusinessLayer.DTOs;
-using DataAccessLayer.Interfaces;
 using EV_Rental.Helpers;
 
 namespace EV_Rental.Pages.Payment
@@ -16,23 +15,23 @@ namespace EV_Rental.Pages.Payment
         private readonly PaymentService _paymentService;
         private readonly RentalService _rentalService;
         private readonly VehicleService _vehicleService;
+        private readonly AccountService _accountService;
         private readonly IEmailSender _emailSender;
-        private readonly IAccountRepo _accountRepo;
 
         public MoMoReturnModel(
             IOptions<MoMoSettings> momoSettings,
             PaymentService paymentService,
             RentalService rentalService,
             VehicleService vehicleService,
-            IEmailSender emailSender,
-            IAccountRepo accountRepo)
+            AccountService accountService,
+            IEmailSender emailSender)
         {
             _momoSettings = momoSettings.Value;
             _paymentService = paymentService;
             _rentalService = rentalService;
             _vehicleService = vehicleService;
+            _accountService = accountService;
             _emailSender = emailSender;
-            _accountRepo = accountRepo;
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -90,7 +89,7 @@ namespace EV_Rental.Pages.Payment
                         // Send OTP email
                         try
                         {
-                            var renterAccount = await _accountRepo.GetAccountByIdAsync(rental.RenterId);
+                            var renterAccount = await _accountService.GetAccountByIdAsync(rental.RenterId);
                             if (renterAccount != null && !string.IsNullOrEmpty(renterAccount.Email))
                             {
                                 await SendOtpEmailAsync(renterAccount.Email, renterAccount.FullName, rental);

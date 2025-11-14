@@ -11,16 +11,13 @@ namespace EV_Rental.Pages.Staff
     {
         private readonly RentalService _rentalService;
         private readonly VehicleService _vehicleService;
-        private readonly DataAccessLayer.Interfaces.IAccountRepo _accountRepo;
 
         public PickupVehicleModel(
             RentalService rentalService,
-            VehicleService vehicleService,
-            DataAccessLayer.Interfaces.IAccountRepo accountRepo)
+            VehicleService vehicleService)
         {
             _rentalService = rentalService;
             _vehicleService = vehicleService;
-            _accountRepo = accountRepo;
         }
 
         public List<DataAccessLayer.Entities.RentalRecord> ConfirmedRentals { get; set; } = new List<DataAccessLayer.Entities.RentalRecord>();

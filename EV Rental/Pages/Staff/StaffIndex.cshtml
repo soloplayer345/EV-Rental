@@ -55,12 +55,12 @@
                     @foreach (var vehicle in Model.Vehicles)
                     {
                         <div class="vehicle-card">
-                            <img src="@vehicle.imageUrl" alt="@vehicle.name" class="vehicle-image" />
+                            <img src="@vehicle.ImageUrl" alt="@vehicle.Name" class="vehicle-image" />
                             <div class="vehicle-info">
-                                <h3>@vehicle.name</h3>
-                                <p><b>Hãng:</b> @vehicle.brand</p>
+                                <h3>@vehicle.Name</h3>
+                                <p><b>Hãng:</b> @vehicle.Brand</p>
                                 <p><b>Trạng thái:</b>
-                                    @if (vehicle.status == DataAccessLayer.Enums.VehicleStatus.Available)
+                                    @if (vehicle.Status == DataAccessLayer.Enums.VehicleStatus.Available)
                                     {
                                         <span class="badge bg-success">Chưa cho thuê</span>
                                     }

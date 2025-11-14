@@ -1,5 +1,5 @@
+using BusinessLayer.Services;
 using DataAccessLayer.Entities;
-using DataAccessLayer.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -7,11 +7,11 @@ namespace EV_Rental.Pages.Staff
 {
     public class UpdateVehicleModel : PageModel
     {
-        private readonly IVehicleRepo _vehicleRepo;
+        private readonly VehicleService _vehicleService;
 
-        public UpdateVehicleModel(IVehicleRepo vehicleRepo)
+        public UpdateVehicleModel(VehicleService vehicleService)
         {
-            _vehicleRepo = vehicleRepo;
+            _vehicleService = vehicleService;
         }
 
         [BindProperty]
@@ -19,7 +19,7 @@ namespace EV_Rental.Pages.Staff
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
-            var existing = await _vehicleRepo.GetByIdAsync(id);
+            var existing = await _vehicleService.GetVehicleByIdAsync(id);
             if (existing == null)
                 return NotFound();
 
@@ -32,7 +32,7 @@ namespace EV_Rental.Pages.Staff
             if (!ModelState.IsValid)
                 return Page();
 
-            await _vehicleRepo.Update(Vehicle);
+            await _vehicleService.UpdateVehicleAsync(Vehicle);
             return RedirectToPage("Index");
         }
     }

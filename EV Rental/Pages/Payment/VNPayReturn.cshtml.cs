@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 using BusinessLayer.Services;
 using BusinessLayer.DTOs;
 using DataAccessLayer.Entities;
-using DataAccessLayer.Interfaces;
 using EV_Rental.Helpers;
 
 namespace EV_Rental.Pages.Payment
@@ -17,23 +16,23 @@ namespace EV_Rental.Pages.Payment
         private readonly PaymentService _paymentService;
         private readonly RentalService _rentalService;
         private readonly VehicleService _vehicleService;
+        private readonly AccountService _accountService;
         private readonly IEmailSender _emailSender;
-        private readonly IAccountRepo _accountRepo;
 
         public VNPayReturnModel(
             IOptions<VNPaySettings> vnPaySettings, 
             PaymentService paymentService,
             RentalService rentalService,
             VehicleService vehicleService,
-            IEmailSender emailSender,
-            IAccountRepo accountRepo)
+            AccountService accountService,
+            IEmailSender emailSender)
         {
             _vnPaySettings = vnPaySettings.Value;
             _paymentService = paymentService;
             _rentalService = rentalService;
             _vehicleService = vehicleService;
+            _accountService = accountService;
             _emailSender = emailSender;
-            _accountRepo = accountRepo;
         }
 
         public bool Success { get; set; }
@@ -98,7 +97,7 @@ namespace EV_Rental.Pages.Payment
                             // Send OTP email to renter
                             try
                             {
-                                var renterAccount = await _accountRepo.GetByIdAsync(rental.RenterId);
+                                var renterAccount = await _accountService.GetByIdAsync(rental.RenterId);
                                 if (renterAccount != null)
                                 {
                                     await SendOtpEmailAsync(renterAccount.Email, renterAccount.FullName, rental);

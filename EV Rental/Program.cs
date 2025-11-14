@@ -6,6 +6,7 @@ using DataAccessLayer.Repositories;
 using EV_Rental.Middlewares;
 using Microsoft.EntityFrameworkCore;
 using EV_Rental.Helpers;
+using EV_Rental.Hubs;
 
 namespace EV_Rental
 {
@@ -17,6 +18,9 @@ namespace EV_Rental
 
             // Add services to the container.
             builder.Services.AddRazorPages();
+
+            // Add SignalR
+            builder.Services.AddSignalR();
 
             // Add Session
             builder.Services.AddSession(options =>
@@ -47,6 +51,9 @@ namespace EV_Rental
             builder.Services.AddScoped<ReviewService>();
             builder.Services.AddScoped<ReportService>();
             builder.Services.AddScoped<AccountService>();
+            
+            // Register SignalR wrapper service
+            builder.Services.AddScoped<EV_Rental.Services.VehicleHubService>();
 
             // Bind SMTP settings & register EmailSender
             builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("Smtp"));
@@ -78,6 +85,7 @@ namespace EV_Rental
             app.UseAuthorization();
 
             app.MapRazorPages();
+            app.MapHub<VehicleHub>("/vehicleHub"); // Map SignalR Hub
 
             app.Run();
         }

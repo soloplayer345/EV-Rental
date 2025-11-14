@@ -31,10 +31,7 @@ namespace EV_Rental.Pages.Renter
         public string Brand { get; set; }
 
         [BindProperty(SupportsGet = true)]
-        public VehicleStatus? Status { get; set; }
-
-        public IEnumerable<VehicleDto> Vehicles { get; set; } = new List<VehicleDto>();
-
+        public string Status { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int pageNumber = 1)
         {
@@ -47,34 +44,57 @@ namespace EV_Rental.Pages.Renter
             var user = SessionHelper.GetUserSession(HttpContext.Session);
             UserEmail = user?.Email ?? "";
 
-            // Lấy danh sách xe có sẵn
-            var vehicles = await _vehicleService.GetVehiclesAsync();
-            var availableVehicles = vehicles.Where(v => v.Status == VehicleStatus.Available).ToList();
+            // Lấy danh sách xe
+            IEnumerable<Vehicle> vehicles;
+
+            // Áp dụng filter nếu có
+            bool hasFilter = !string.IsNullOrWhiteSpace(Name) || 
+                           !string.IsNullOrWhiteSpace(Brand) || 
+                           !string.IsNullOrWhiteSpace(Status);
+
+            if (hasFilter)
+            {
+                // Nếu có filter, sử dụng search
+                VehicleStatus? statusEnum = null;
+                if (!string.IsNullOrWhiteSpace(Status) && Enum.TryParse<VehicleStatus>(Status, out var parsedStatus))
+                {
+                    statusEnum = parsedStatus;
+                }
+
+                if (statusEnum.HasValue)
+                {
+                    vehicles = await _vehicleService.SearchVehiclesAsync(Name ?? "", Brand ?? "", statusEnum.Value);
+                }
+                else
+                {
+                    // Lấy tất cả xe và filter theo name và brand
+                    var allVehicles = await _vehicleService.GetVehiclesAsync();
+                    vehicles = allVehicles.Where(v => 
+                        (string.IsNullOrWhiteSpace(Name) || v.Name.Contains(Name, StringComparison.OrdinalIgnoreCase)) &&
+                        (string.IsNullOrWhiteSpace(Brand) || v.Brand.Contains(Brand, StringComparison.OrdinalIgnoreCase))
+                    );
+                }
+            }
+            else
+            {
+                // Không có filter, lấy tất cả xe
+                vehicles = await _vehicleService.GetVehiclesAsync();
+            }
+
+            var vehicleList = vehicles.ToList();
 
             // Tính toán paging
-            TotalVehicles = availableVehicles.Count;
+            TotalVehicles = vehicleList.Count;
             TotalPages = (int)Math.Ceiling(TotalVehicles / (double)PageSize);
-            CurrentPage = pageNumber < 1 ? 1 : (pageNumber > TotalPages ? TotalPages : pageNumber);
+            CurrentPage = pageNumber < 1 ? 1 : (pageNumber > TotalPages && TotalPages > 0 ? TotalPages : pageNumber);
 
             // Lấy xe cho trang hiện tại
-            AvailableVehicles = availableVehicles
+            AvailableVehicles = vehicleList
                 .Skip((CurrentPage - 1) * PageSize)
                 .Take(PageSize)
                 .ToList();
 
             return Page();
-        }
-
-        public async Task OnGetAsync()
-        {
-            if (Status.HasValue)
-            {
-                var result = await _vehicleService.SearchVehiclesAsync(Name, Brand, Status.Value);
-            }
-            else
-            {
-                var result = await _vehicleService.GetVehiclesAsync();
-            }
         }
     }
 }

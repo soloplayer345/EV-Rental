@@ -5,7 +5,6 @@ using BusinessLayer.Services;
 using BusinessLayer.DTOs;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
-using DataAccessLayer.Interfaces;
 using EV_Rental.Helpers;
 using AccountEntity = DataAccessLayer.Entities.Account;
 
@@ -16,27 +15,27 @@ namespace EV_Rental.Pages.Renter
         private readonly VehicleService _vehicleService;
         private readonly RentalService _rentalService;
         private readonly PaymentService _paymentService;
+        private readonly AccountService _accountService;
         private readonly VNPaySettings _vnPaySettings;
         private readonly MoMoSettings _momoSettings;
         private readonly IEmailSender _emailSender;
-        private readonly IAccountRepo _accountRepo;
 
         public ConfirmRentalModel(
             VehicleService vehicleService, 
             RentalService rentalService,
             PaymentService paymentService,
+            AccountService accountService,
             IOptions<VNPaySettings> vnPaySettings,
             IOptions<MoMoSettings> momoSettings,
-            IEmailSender emailSender,
-            IAccountRepo accountRepo)
+            IEmailSender emailSender)
         {
             _vehicleService = vehicleService;
             _rentalService = rentalService;
             _paymentService = paymentService;
+            _accountService = accountService;
             _vnPaySettings = vnPaySettings.Value;
             _momoSettings = momoSettings.Value;
             _emailSender = emailSender;
-            _accountRepo = accountRepo;
         }
 
         public Vehicle? Vehicle { get; set; }
@@ -314,7 +313,7 @@ namespace EV_Rental.Pages.Renter
                 var rentalRecord = rentalResult.Data;
 
                 // Get renter account to send email
-                var renterAccount = await _accountRepo.GetAccountByIdAsync(accountId.Value);
+                var renterAccount = await _accountService.GetAccountByIdAsync(accountId.Value);
 
                 if (renterAccount != null && !string.IsNullOrEmpty(renterAccount.Email) && rentalRecord != null)
                 {

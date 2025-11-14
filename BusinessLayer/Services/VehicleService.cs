@@ -16,6 +16,7 @@ namespace BusinessLayer.Services
     {
         private readonly IVehicleRepo _vehicleRepo;
         private readonly IUnitOfWork _unitOfWork;
+
         public VehicleService(IVehicleRepo vehicleRepo, IUnitOfWork unitOfWork)
         {
             _vehicleRepo = vehicleRepo;

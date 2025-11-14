@@ -35,6 +35,13 @@ namespace BusinessLayer.Services
             return await accountRepo.GetByIdAsync(id);
         }
 
+        // Get account by ID using Account interface method
+        public async Task<Account?> GetByIdAsync(int id)
+        {
+            var accountRepo = _unitOfWork.AccountRepo;
+            return await accountRepo.GetByIdAsync(id);
+        }
+
         // Get account by email
         public async Task<Account?> GetAccountByEmailAsync(string email)
         {
