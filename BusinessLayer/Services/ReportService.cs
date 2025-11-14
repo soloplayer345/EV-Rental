@@ -159,6 +159,138 @@ namespace BusinessLayer.Services
                 VehicleRevenues = topVehicles.Select(v => Math.Round(v.Revenue / 1000000, 2)).ToList()
             };
         }
+
+        // NEW: Revenue by Station
+        public async Task<List<StationRevenueDto>> GetRevenueByStationAsync(DateTime? startDate = null, DateTime? endDate = null)
+        {
+            var rentalRepo = _unitOfWork.GetRepository<RentalRecord>();
+            var rentals = rentalRepo.GetAllQueryable("PickupStation");
+
+            var query = rentals.Where(r => r.Status == RentalRecordStatus.Completed);
+
+            if (startDate.HasValue)
+                query = query.Where(r => r.CreateDate >= startDate.Value);
+
+            if (endDate.HasValue)
+                query = query.Where(r => r.CreateDate <= endDate.Value);
+
+            var stationRevenue = await query
+                .GroupBy(r => new { r.PickupStationId, r.PickupStation.Name })
+                .Select(g => new StationRevenueDto
+                {
+                    StationId = g.Key.PickupStationId,
+                    StationName = g.Key.Name,
+                    TotalRevenue = g.Sum(r => r.TotalPrice),
+                    TotalRentals = g.Count()
+                })
+                .OrderByDescending(s => s.TotalRevenue)
+                .ToListAsync();
+
+            return stationRevenue;
+        }
+
+        // NEW: Daily Rental Frequency
+        public async Task<List<DailyFrequencyDto>> GetDailyRentalFrequencyAsync(DateTime startDate, DateTime endDate)
+        {
+            var rentalRepo = _unitOfWork.GetRepository<RentalRecord>();
+            var allRentals = await rentalRepo.GetAllAsync();
+
+            var dailyData = allRentals
+                .Where(r => r.CreateDate >= startDate && r.CreateDate <= endDate)
+                .GroupBy(r => r.CreateDate.Date)
+                .Select(g => new DailyFrequencyDto
+                {
+                    Date = g.Key,
+                    RentalCount = g.Count(),
+                    Revenue = g.Where(r => r.Status == RentalRecordStatus.Completed).Sum(r => r.TotalPrice)
+                })
+                .OrderBy(d => d.Date)
+                .ToList();
+
+            return dailyData;
+        }
+
+        // NEW: Top Vehicle Types by Rental Count
+        public async Task<List<VehicleTypeStatsDto>> GetTopVehicleTypesByRentalCountAsync()
+        {
+            var rentalRepo = _unitOfWork.GetRepository<RentalRecord>();
+            var rentals = rentalRepo.GetAllQueryable("Vehicle");
+
+            var completedRentals = await rentals
+                .Where(r => r.Status == RentalRecordStatus.Completed)
+                .ToListAsync();
+
+            var typeStats = completedRentals
+                .GroupBy(r => r.Vehicle.VehicleType ?? "Unknown")
+                .Select(g => new VehicleTypeStatsDto
+                {
+                    VehicleType = g.Key,
+                    RentalCount = g.Count(),
+                    TotalRevenue = g.Sum(r => r.TotalPrice),
+                    AveragePrice = g.Average(r => r.TotalPrice)
+                })
+                .OrderByDescending(v => v.RentalCount)
+                .ToList();
+
+            return typeStats;
+        }
+
+        // NEW: Most Rented Vehicles by Count
+        public async Task<List<VehicleRentalStatsDto>> GetMostRentedVehiclesAsync(int count = 10)
+        {
+            var rentalRepo = _unitOfWork.GetRepository<RentalRecord>();
+            var rentals = rentalRepo.GetAllQueryable("Vehicle");
+
+            var rentalStats = await rentals
+                .GroupBy(r => new { r.VehicleId, r.Vehicle.Name, r.Vehicle.VehicleType })
+                .Select(g => new VehicleRentalStatsDto
+                {
+                    VehicleId = g.Key.VehicleId,
+                    VehicleName = g.Key.Name ?? "Unknown",
+                    VehicleType = g.Key.VehicleType ?? "Unknown",
+                    RentalCount = g.Count(),
+                    CompletedCount = g.Count(r => r.Status == RentalRecordStatus.Completed),
+                    TotalRevenue = g.Where(r => r.Status == RentalRecordStatus.Completed).Sum(r => r.TotalPrice)
+                })
+                .OrderByDescending(v => v.RentalCount)
+                .Take(count)
+                .ToListAsync();
+
+            return rentalStats;
+        }
+
+        // NEW: Get All Inspection Problems
+        public async Task<List<InspectionProblemDto>> GetAllInspectionProblemsAsync(string? incidentType = null, int? rentalId = null)
+        {
+            var problemRepo = _unitOfWork.GetRepository<InspectionProblem>();
+            var problems = problemRepo.GetAllQueryable("RentalRecord,RentalRecord.Renter,RentalRecord.Vehicle");
+
+            var query = problems.AsQueryable();
+
+            if (!string.IsNullOrEmpty(incidentType))
+                query = query.Where(p => p.IncidentType == incidentType);
+
+            if (rentalId.HasValue)
+                query = query.Where(p => p.RentalId == rentalId.Value);
+
+            var result = await query
+                .OrderByDescending(p => p.CreateDate)
+                .Select(p => new InspectionProblemDto
+                {
+                    Id = p.Id,
+                    RentalId = p.RentalId,
+                    RenterName = p.RentalRecord.Renter.FullName,
+                    VehicleName = p.RentalRecord.Vehicle.Name ?? "Unknown",
+                    IncidentType = p.IncidentType,
+                    Description = p.Description,
+                    PenaltyAmount = p.PenaltyAmount,
+                    CreateDate = p.CreateDate,
+                    CreatedBy = p.CreatedBy
+                })
+                .ToListAsync();
+
+            return result;
+        }
     }
 
     // DTOs
@@ -194,5 +326,51 @@ namespace BusinessLayer.Services
     {
         public List<string> VehicleNames { get; set; } = new();
         public List<decimal> VehicleRevenues { get; set; } = new();
+    }
+
+    public class StationRevenueDto
+    {
+        public int StationId { get; set; }
+        public string StationName { get; set; } = string.Empty;
+        public decimal TotalRevenue { get; set; }
+        public int TotalRentals { get; set; }
+    }
+
+    public class DailyFrequencyDto
+    {
+        public DateTime Date { get; set; }
+        public int RentalCount { get; set; }
+        public decimal Revenue { get; set; }
+    }
+
+    public class VehicleTypeStatsDto
+    {
+        public string VehicleType { get; set; } = string.Empty;
+        public int RentalCount { get; set; }
+        public decimal TotalRevenue { get; set; }
+        public decimal AveragePrice { get; set; }
+    }
+
+    public class VehicleRentalStatsDto
+    {
+        public int VehicleId { get; set; }
+        public string VehicleName { get; set; } = string.Empty;
+        public string VehicleType { get; set; } = string.Empty;
+        public int RentalCount { get; set; }
+        public int CompletedCount { get; set; }
+        public decimal TotalRevenue { get; set; }
+    }
+
+    public class InspectionProblemDto
+    {
+        public int Id { get; set; }
+        public int RentalId { get; set; }
+        public string RenterName { get; set; } = string.Empty;
+        public string VehicleName { get; set; } = string.Empty;
+        public string IncidentType { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public decimal PenaltyAmount { get; set; }
+        public DateTime CreateDate { get; set; }
+        public int? CreatedBy { get; set; }
     }
 }

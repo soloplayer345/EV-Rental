@@ -28,6 +28,17 @@ namespace BusinessLayer.Services
             return await _vehicleRepo.GetAllAsync();
         }
 
+        public async Task<IEnumerable<Vehicle>> GetAllVehiclesAsync()
+        {
+            return await _vehicleRepo.GetAllAsync();
+        }
+
+        public async Task<IEnumerable<Vehicle>> GetVehiclesByStationIdAsync(int stationId)
+        {
+            var allVehicles = await _vehicleRepo.GetAllAsync();
+            return allVehicles.Where(v => v.StationId == stationId);
+        }
+
         public async Task<Vehicle> GetVehicleByIdAsync(int id)
         {
             return await _vehicleRepo.GetByIdAsync(id);

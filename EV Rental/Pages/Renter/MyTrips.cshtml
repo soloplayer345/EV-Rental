@@ -248,12 +248,9 @@
                                                 <i class="fas fa-credit-card"></i> Thanh Toán
                                             </button>
                                         }
-                                        <form method="post" asp-page-handler="CancelRental" style="display: inline;">
-                                            <input type="hidden" name="rentalId" value="@rental.Id" />
-                                            <button type="submit" class="btn btn-danger" onclick="return confirm('Bạn có chắc chắn muốn hủy đơn thuê này không?')">
-                                                <i class="fas fa-times"></i> Hủy Đơn
-                                            </button>
-                                        </form>
+                                        <a href="/Renter/CancelRentalPolicy?rentalId=@rental.Id" class="btn btn-danger">
+                                            <i class="fas fa-times"></i> Hủy Đơn
+                                        </a>
                                     }
                                     else if (rental.Status == DataAccessLayer.Enums.RentalRecordStatus.Completed)
                                     {

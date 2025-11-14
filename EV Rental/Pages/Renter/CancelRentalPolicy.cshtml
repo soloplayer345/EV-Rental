@@ -1,0 +1,217 @@
+@page
+@model EV_Rental.Pages.Renter.CancelRentalPolicyModel
+@{
+    ViewData["Title"] = "Hủy đơn thuê xe";
+}
+
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/Renter/MyTrips">Chuyến đi của tôi</a></li>
+        <li class="breadcrumb-item active">Hủy đơn thuê</li>
+    </ol>
+</nav>
+
+<div class="container mt-4">
+    <h2>Hủy đơn thuê xe</h2>
+    
+    <!-- Thông tin đơn thuê -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h5>📋 THÔNG TIN ĐƠN THUÊ</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Mã đơn:</strong> #@Model.Rental?.Id</p>
+                    <p><strong>Xe:</strong> @Model.Vehicle?.Brand @Model.Vehicle?.Model</p>
+                    <p><strong>Biển số:</strong> @Model.Vehicle?.PlateNumber</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Thời gian nhận xe:</strong> @Model.Rental?.StartTime?.ToString("dd/MM/yyyy HH:mm")</p>
+                    <p><strong>Thời gian trả xe:</strong> @Model.Rental?.ExpectedEndTime?.ToString("dd/MM/yyyy HH:mm")</p>
+                    <p><strong>Trạng thái:</strong> <span class="badge badge-warning">@Model.Rental?.Status</span></p>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Giá thuê cơ bản:</strong> @Model.Rental?.BasePrice.ToString("N0") VNĐ</p>
+                    <p><strong>Phí giữ chỗ:</strong> @Model.Rental?.ReservationFee.ToString("N0") VNĐ</p>
+                    <p><strong>Phí cọc:</strong> @Model.Rental?.DepositFee.ToString("N0") VNĐ</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Tổng tiền:</strong> <span class="text-primary font-weight-bold">@Model.Rental?.TotalPrice.ToString("N0") VNĐ</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chính sách hủy đơn -->
+    <div class="card mb-4">
+        <div class="card-header bg-warning">
+            <h5>📜 CHÍNH SÁCH HỦY ĐƠN</h5>
+        </div>
+        <div class="card-body">
+            <h6>1. Điều kiện hủy đơn:</h6>
+            <ul>
+                <li>Chỉ được hủy đơn có trạng thái: <strong>Chờ Thanh Toán (Pending)</strong> hoặc <strong>Đã Xác Nhận (Confirmed)</strong></li>
+                <li>Không thể hủy đơn đang thuê (Active) hoặc đã hoàn thành (Completed)</li>
+            </ul>
+            
+            <h6>2. Chính sách hoàn tiền:</h6>
+            <table class="table table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Thời gian hủy</th>
+                        <th>Số tiền hoàn lại</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Hủy trước <strong>24 giờ</strong></td>
+                        <td><span class="text-success">✅ Hoàn 100% tiền thuê</span></td>
+                    </tr>
+                    <tr>
+                        <td>Hủy từ <strong>12-24 giờ</strong> trước</td>
+                        <td><span class="text-warning">⚠️ Hoàn 50% tiền thuê (phí hủy 50%)</span></td>
+                    </tr>
+                    <tr>
+                        <td>Hủy dưới <strong>12 giờ</strong></td>
+                        <td><span class="text-danger">❌ Không hoàn tiền thuê</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="alert alert-warning">
+                <h6>⚠️ LƯU Ý QUAN TRỌNG:</h6>
+                <ul class="mb-0">
+                    <li><strong>Phí giữ chỗ (ReservationFee):</strong> KHÔNG được hoàn lại</li>
+                    <li><strong>Phí cọc (DepositFee):</strong> KHÔNG được hoàn lại</li>
+                    <li><strong>Chỉ hoàn lại:</strong> Tiền thuê cơ bản (BasePrice) theo chính sách trên</li>
+                </ul>
+            </div>
+            
+            <h6>3. Thời gian xử lý:</h6>
+            <ul>
+                <li>Tiền sẽ được hoàn về tài khoản thanh toán ban đầu trong <strong>3-5 ngày làm việc</strong></li>
+                <li>Bạn sẽ nhận được thông báo khi refund được xử lý</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Tính toán tiền hoàn lại -->
+    <div class="card mb-4 @(Model.Policy?.CanCancel == true ? "border-success" : "border-danger")">
+        <div class="card-header @(Model.Policy?.CanCancel == true ? "bg-success" : "bg-danger") text-white">
+            <h5>💰 TÍNH TOÁN TIỀN HOÀN LẠI</h5>
+        </div>
+        <div class="card-body">
+            @if (Model.Policy?.CanCancel == true)
+            {
+                <p><strong>Thời gian còn lại đến giờ nhận xe:</strong> 
+                    @((int)Model.Policy.TimeUntilStart.TotalHours) giờ @Model.Policy.TimeUntilStart.Minutes phút
+                </p>
+                <p><strong>Tỷ lệ hoàn tiền:</strong> <span class="badge badge-info">@Model.Policy.RefundPercentage</span></p>
+                <p>@Model.Policy.PolicyText</p>
+                
+                <hr>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Chi tiết hoàn tiền:</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <td>Tiền thuê cơ bản:</td>
+                                <td class="text-right">@Model.Rental?.BasePrice.ToString("N0") VNĐ</td>
+                            </tr>
+                            <tr>
+                                <td>Tỷ lệ hoàn:</td>
+                                <td class="text-right">@Model.Policy?.RefundPercentage</td>
+                            </tr>
+                            <tr class="font-weight-bold text-success">
+                                <td>Số tiền được hoàn:</td>
+                                <td class="text-right">@Model.Policy?.RefundAmount.ToString("N0") VNĐ</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Không được hoàn lại:</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <td>Phí giữ chỗ:</td>
+                                <td class="text-right text-muted">@Model.Rental?.ReservationFee.ToString("N0") VNĐ</td>
+                            </tr>
+                            <tr>
+                                <td>Phí cọc:</td>
+                                <td class="text-right text-muted">@Model.Rental?.DepositFee.ToString("N0") VNĐ</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="alert alert-success mt-3">
+                    <h5 class="mb-0">
+                        <strong>Tổng tiền bạn sẽ nhận lại: @Model.Policy?.RefundAmount.ToString("N0") VNĐ</strong>
+                    </h5>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-danger">
+                    <p class="mb-0">@Model.Policy?.PolicyText</p>
+                </div>
+            }
+        </div>
+    </div>
+    
+    <!-- Form xác nhận -->
+    @if (Model.Policy?.CanCancel == true)
+    {
+        <form method="post" id="cancelForm">
+            <input type="hidden" name="rentalId" value="@Model.Rental?.Id" />
+            
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="agreeCheckbox" name="agreedToPolicy" value="true" required>
+                <label class="form-check-label" for="agreeCheckbox">
+                    <strong>Tôi đã đọc và đồng ý với chính sách hủy đơn</strong>
+                </label>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                <a href="/Renter/MyTrips" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Quay lại
+                </a>
+                <button type="submit" class="btn btn-danger" id="cancelBtn" disabled>
+                    <i class="fas fa-times-circle"></i> Đồng ý và Hủy đơn
+                </button>
+            </div>
+        </form>
+    }
+    else
+    {
+        <div class="text-center">
+            <a href="/Renter/MyTrips" class="btn btn-primary">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Enable/disable cancel button based on checkbox
+            $('#agreeCheckbox').change(function() {
+                $('#cancelBtn').prop('disabled', !this.checked);
+            });
+            
+            // Confirm before submit
+            $('#cancelForm').submit(function(e) {
+                if (!confirm('Bạn có chắc chắn muốn hủy đơn thuê này không? Hành động này không thể hoàn tác.')) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        });
+    </script>
+}
