@@ -3,7 +3,7 @@ using DataAccessLayer.Enums;
 using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using AccountEntity = DataAccessLayer.Entities.Account;
+using BusinessLayer.DTOs;
 
 namespace EV_Rental.Pages.Admin
 {
@@ -17,7 +17,7 @@ namespace EV_Rental.Pages.Admin
         }
 
         // Properties for display
-        public List<AccountEntity> Users { get; set; } = new List<AccountEntity>();
+        public List<AccountDto> Users { get; set; } = new List<AccountDto>();
         public int TotalUsers { get; set; }
         public int ActiveUsers { get; set; }
         public int InactiveUsers { get; set; }
@@ -87,8 +87,7 @@ namespace EV_Rental.Pages.Admin
                         role = (int)user.Role,
                         isActive = user.IsActive,
                         createdAt = user.CreateDate,
-                        updatedAt = user.UpdateDate ?? user.CreateDate,
-                        rentalRecords = user.RentalRecords
+                        updatedAt = user.UpdateDate ?? user.CreateDate
                     }
                 });
             }
@@ -123,7 +122,7 @@ namespace EV_Rental.Pages.Admin
 
                 // Create new user using service
                 // Admin tạo user sẽ tự động active, không cần chờ duyệt
-                var newUser = new AccountEntity
+                var newUser = new
                 {
                     FullName = FullName,
                     Email = Email,
@@ -133,7 +132,7 @@ namespace EV_Rental.Pages.Admin
                     IsActive = true // Admin thêm user tự động active
                 };
 
-                await _accountService.AddAccountAsync(newUser);
+                await _accountService.AddAccountAsync((dynamic)newUser);
 
                 TempData["SuccessMessage"] = "Thêm user mới thành công";
                 return RedirectToPage();
@@ -162,14 +161,21 @@ namespace EV_Rental.Pages.Admin
                     return RedirectToPage();
                 }
 
-                // Update user info
-                user.FullName = FullName;
-                user.Email = Email;
-                user.Phone = Phone;
-                user.Role = (AccountRole)Role;
-                user.IsActive = IsActive;
+                // Update user info - convert DTO to entity for update
+                var accountEntity = new DataAccessLayer.Entities.Account
+                {
+                    Id = user.Id,
+                    FullName = FullName,
+                    Email = Email,
+                    Phone = Phone,
+                    PasswordHash = "", // Keep existing password
+                    Role = (AccountRole)Role,
+                    IsActive = IsActive,
+                    CreateDate = user.CreateDate,
+                    UpdateDate = DateTime.Now
+                };
 
-                await _accountService.UpdateAccountAsync(user);
+                await _accountService.UpdateAccountAsync(accountEntity);
 
                 TempData["SuccessMessage"] = "Cập nhật user thành công";
                 return RedirectToPage();
@@ -226,3 +232,4 @@ namespace EV_Rental.Pages.Admin
         }
     }
 }
+

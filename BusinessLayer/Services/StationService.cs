@@ -1,3 +1,5 @@
+using BusinessLayer.DTOs;
+using BusinessLayer.Mapping;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Interfaces;
 using System;
@@ -18,29 +20,33 @@ namespace BusinessLayer.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<Station>> GetAllStationsAsync()
+        public async Task<IEnumerable<StationDto>> GetAllStationsAsync()
         {
             var stationRepo = _unitOfWork.GetRepository<Station>();
             var stations = stationRepo.GetAllQueryable("Vehicles");
-            return await stations.ToListAsync();
+            var stationList = await stations.ToListAsync();
+            return StationMapper.ToDtoList(stationList);
         }
 
-        public async Task<Station> GetStationByIdAsync(int id)
+        public async Task<StationDto> GetStationByIdAsync(int id)
         {
             var stationRepo = _unitOfWork.GetRepository<Station>();
-            return await stationRepo.FindOneAsync(s => s.Id == id, "Vehicles");
+            var station = await stationRepo.FindOneAsync(s => s.Id == id, "Vehicles");
+            return StationMapper.ToDto(station);
         }
 
-        public async Task AddStationAsync(Station station)
+        public async Task AddStationAsync(StationDto stationDto)
         {
             var stationRepo = _unitOfWork.GetRepository<Station>();
+            var station = StationMapper.ToEntity(stationDto);
             await stationRepo.AddAsync(station);
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task UpdateStationAsync(Station station)
+        public async Task UpdateStationAsync(StationDto stationDto)
         {
             var stationRepo = _unitOfWork.GetRepository<Station>();
+            var station = StationMapper.ToEntity(stationDto);
             stationRepo.Update(station);
             await _unitOfWork.SaveChangesAsync();
         }
@@ -56,7 +62,7 @@ namespace BusinessLayer.Services
             }
         }
 
-        public async Task<IEnumerable<Station>> SearchStationsAsync(string name, string state)
+        public async Task<IEnumerable<StationDto>> SearchStationsAsync(string name, string state)
         {
             var stationRepo = _unitOfWork.GetRepository<Station>();
             var stations = await stationRepo.GetAllAsync();
@@ -76,7 +82,7 @@ namespace BusinessLayer.Services
                 ).ToList();
             }
 
-            return stations;
+            return StationMapper.ToDtoList(stations);
         }
     }
 }

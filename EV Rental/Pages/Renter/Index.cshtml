@@ -140,7 +140,7 @@
                                         }
                                         else if (vehicle.VehicleType.ToLower().Contains("bike"))
                                         {
-                                            <span>�</span>
+                                            <span>🏍️</span>
                                         }
                                         else
                                         {
@@ -271,7 +271,7 @@
             console.log(`Vehicle ${action}:`, vehicle);
             
             // Hiển thị thông báo
-            showNotification(`Xe ${vehicle.name} đã được ${action === 'added' ? 'thêm mới' : 'cập nhật'}!`);
+            showNotification(`Xe ${vehicle.Name} đã được ${action === 'added' ? 'thêm mới' : 'cập nhật'}!`);
             
             // Tự động reload trang sau 2 giây để hiển thị dữ liệu mới
             setTimeout(() => {
@@ -541,7 +541,7 @@
             margin: 0.75rem 0;
         }
 
-        .status-badge {
+        .Status-badge {
             display: inline-block;
             padding: 0.4rem 0.8rem;
             border-radius: 20px;
@@ -549,17 +549,17 @@
             font-weight: 600;
         }
 
-        .status-available {
+        .Status-available {
             background-color: #d1fae5;
             color: #065f46;
         }
 
-        .status-rented {
+        .Status-rented {
             background-color: #fee2e2;
             color: #991b1b;
         }
 
-        .status-maintenance {
+        .Status-maintenance {
             background-color: #fef3c7;
             color: #92400e;
         }
@@ -815,3 +815,4 @@
     </style>
 </body>
 </html>
+

@@ -1,3 +1,4 @@
+using BusinessLayer.DTOs;
 using BusinessLayer.Services;
 using DataAccessLayer.Enums;
 using EV_Rental.Helpers;
@@ -10,7 +11,7 @@ namespace EV_Rental.Pages.Admin.RentalRecord
     {
         private readonly RentalRecordService _rentalRecordService;
         public string UserEmail { get; set; } = string.Empty;
-        public List<DataAccessLayer.Entities.RentalRecord> RentalRecords { get; set; } = new();
+        public List<RentalRecordDto> RentalRecords { get; set; } = new();
         public string SearchQuery { get; set; } = "";
         public string FilterStatus { get; set; } = "";
         public string StartDate { get; set; } = "";
@@ -60,3 +61,4 @@ namespace EV_Rental.Pages.Admin.RentalRecord
         }
     }
 }
+

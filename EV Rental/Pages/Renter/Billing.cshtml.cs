@@ -1,4 +1,4 @@
-﻿using BusinessLayer.DTOs;
+using BusinessLayer.DTOs;
 using BusinessLayer.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -13,24 +13,26 @@ namespace EV_Rental.Pages.Renter
         {
             _checkinService = checkinService;
         }
-        public void OnGet()
-        {
-        }
 
         [BindProperty(SupportsGet = true)]
         public int RentalRecordId { get; set; }
 
         public RentalRecordDto Bill { get; set; }
 
-        public async Task OnGetAsync(int rentalRecordId)
+        public async Task OnGetAsync(int? rentalRecordId = null)
         {
-            Bill = await _checkinService.GetBillingAsync(rentalRecordId);
+            if (rentalRecordId.HasValue)
+            {
+                RentalRecordId = rentalRecordId.Value;
+                Bill = await _checkinService.GetBillingAsync(rentalRecordId.Value);
+            }
         }
 
         public async Task<IActionResult> OnPostPayAsync([FromBody] decimal amount)
         {
             var success = await _checkinService.ConfirmPaymentAsync(RentalRecordId, amount);
-            return new JsonResult(new { success, message = success ? "Thanh toán thành công!" : "Thanh toán thất bại!" });
+            return new JsonResult(new { success, message = success ? "Thanh to�n th�nh c�ng!" : "Thanh to�n th?t b?i!" });
         }
     }
 }
+

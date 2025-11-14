@@ -1,24 +1,25 @@
-Ôªø@page "{id:int}"
+@page "{id:int}"
 @model DeleteVehicleModel
 @{
-    ViewData["Title"] = "X√≥a Xe ƒêi·ªán";
+    ViewData["Title"] = "XÛa Xe –i?n";
 }
 
-<h2 class="text-danger mb-4">X√≥a Xe ƒêi·ªán</h2>
+<h2 class="text-danger mb-4">XÛa Xe –i?n</h2>
 
 <div class="card p-4 shadow-sm">
-    <h4>B·∫°n c√≥ ch·∫Øc mu·ªën x√≥a xe n√†y?</h4>
+    <h4>B?n cÛ ch?c mu?n xÛa xe n‡y?</h4>
 
     <div class="mt-3">
-        <strong>T√™n xe:</strong> @Model.Vehicle.Name <br />
-        <strong>H√£ng:</strong> @Model.Vehicle.Brand <br />
-        <strong>Lo·∫°i:</strong> @Model.Vehicle.VehicleType <br />
+        <strong>TÍn xe:</strong> @Model.Vehicle.Name <br />
+        <strong>H„ng:</strong> @Model.Vehicle.Brand <br />
+        <strong>Lo?i:</strong> @Model.Vehicle.VehicleType <br />
         <img src="@Model.Vehicle.ImageUrl" width="200" class="rounded mt-2" />
     </div>
 
     <form method="post" class="mt-4">
         <input type="hidden" asp-for="Vehicle.Id" />
-        <button type="submit" class="btn btn-danger">X√≥a</button>
-        <a asp-page="Index" class="btn btn-secondary ms-2">H·ªßy</a>
+        <button type="submit" class="btn btn-danger">XÛa</button>
+        <a asp-page="Index" class="btn btn-secondary ms-2">H?y</a>
     </form>
 </div>
+

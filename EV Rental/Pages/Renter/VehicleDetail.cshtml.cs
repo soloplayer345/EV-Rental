@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BusinessLayer.Services;
-using DataAccessLayer.Entities;
 using BusinessLayer.DTOs;
 
 namespace EV_Rental.Pages.Renter
@@ -17,7 +16,7 @@ namespace EV_Rental.Pages.Renter
             _reviewService = reviewService;
         }
 
-        public Vehicle? Vehicle { get; set; }
+        public VehicleDto? Vehicle { get; set; }
         public IEnumerable<RatingReviewDto> Reviews { get; set; } = new List<RatingReviewDto>();
         public double AverageRating { get; set; } = 0;
         public int TotalReviews { get; set; } = 0;
@@ -57,3 +56,4 @@ namespace EV_Rental.Pages.Renter
         }
     }
 }
+

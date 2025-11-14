@@ -1,4 +1,4 @@
-﻿@page
+@page
 @using DataAccessLayer.Enums
 @model IndexModel
 @{
@@ -12,7 +12,7 @@
 
     <h2 class="mb-4">Danh sách xe điện</h2>
 
-    <!-- Thanh tìm kiếm -->
+    <!-- Thanh t�m ki?m -->
     <section class="hero bg-light py-5">
         <div class="container text-center">
             <h2 class="hero-title mb-3">🔋 Tìm Xe Điện Hoàn Hảo Của Bạn</h2>
@@ -36,7 +36,7 @@
         </div>
     </section>
 
-    <!-- Kết quả tìm kiếm -->
+    <!-- K?t qu? t�m ki?m -->
     <section class="vehicle-results py-5">
         <div class="container">
             <h3 class="mb-4">Kết quả tìm kiếm</h3>
@@ -48,14 +48,14 @@
                     {
                         <div class="col-md-4 mb-4">
                             <div class="card shadow-sm">
-                                <img src="@vehicle.imageUrl" class="card-img-top" alt="@vehicle.name" />
+                                <img src="@vehicle.ImageUrl" class="card-img-top" alt="@vehicle.Name" />
                                 <div class="card-body">
-                                    <h5 class="card-title">@vehicle.name</h5>
+                                    <h5 class="card-title">@vehicle.Name</h5>
                                     <p class="card-text">
-                                        <strong>Hãng:</strong> @vehicle.brand <br />
+                                        <strong>Hãng:</strong> @vehicle.Brand <br />
                                         <strong>Trạng thái:</strong>
-                                        <span class="badge @(vehicle.status == VehicleStatus.Available ? "bg-success" : "bg-danger")">
-                                            @vehicle.status
+                                        <span class="badge @(vehicle.Status == VehicleStatus.Available ? "bg-success" : "bg-danger")">
+                                            @vehicle.Status
                                         </span>
                                     </p>
                                     <a href="/Vehicles/Details?id=@vehicle.Id" class="btn btn-outline-primary btn-sm">Chi tiết</a>
@@ -73,3 +73,4 @@
     </section>
 
 </div>
+

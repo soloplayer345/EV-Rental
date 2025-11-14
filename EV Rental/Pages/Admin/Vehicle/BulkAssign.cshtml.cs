@@ -1,5 +1,5 @@
+using BusinessLayer.DTOs;
 using BusinessLayer.Services;
-using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -17,8 +17,8 @@ namespace EV_Rental.Pages.Admin.Vehicle
             _stationService = stationService;
         }
 
-        public List<DataAccessLayer.Entities.Vehicle> Vehicles { get; set; } = new();
-        public List<DataAccessLayer.Entities.Station> Stations { get; set; } = new();
+        public List<VehicleDto> Vehicles { get; set; } = new();
+        public List<StationDto> Stations { get; set; } = new();
         public int? CurrentStationFilter { get; set; }
         public string? StatusFilter { get; set; }
 
@@ -99,3 +99,4 @@ namespace EV_Rental.Pages.Admin.Vehicle
         }
     }
 }
+

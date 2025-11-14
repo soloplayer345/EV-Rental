@@ -1,4 +1,6 @@
 using BusinessLayer.Services;
+using BusinessLayer.DTOs;
+using BusinessLayer.Mapping;
 using DataAccessLayer.Entities;
 using EV_Rental.Hubs;
 using Microsoft.AspNetCore.SignalR;
@@ -16,16 +18,19 @@ namespace EV_Rental.Services
             _hubContext = hubContext;
         }
 
-        public async Task AddVehicleWithNotificationAsync(Vehicle vehicle)
+        public async Task AddVehicleWithNotificationAsync(VehicleCreateDto vehicleDto)
         {
-            await _vehicleService.AddVehicleAsync(vehicle);
+            await _vehicleService.AddVehicleAsync(vehicleDto);
+            var vehicle = VehicleMapper.ToVehicleEntity(vehicleDto);
             await _hubContext.Clients.All.SendAsync("ReceiveVehicleUpdate", "added", vehicle);
         }
 
-        public async Task UpdateVehicleWithNotificationAsync(Vehicle vehicle)
+        public async Task UpdateVehicleWithNotificationAsync(VehicleUpdateDto vehicleDto)
         {
-            await _vehicleService.UpdateVehicleAsync(vehicle);
-            await _hubContext.Clients.All.SendAsync("ReceiveVehicleUpdate", "updated", vehicle);
+            await _vehicleService.UpdateVehicleAsync(vehicleDto);
+            // Get the updated vehicle from service
+            var vehicleData = await _vehicleService.GetVehicleByIdAsync(vehicleDto.Id);
+            await _hubContext.Clients.All.SendAsync("ReceiveVehicleUpdate", "updated", vehicleData);
         }
 
         public async Task DeleteVehicleWithNotificationAsync(int vehicleId)

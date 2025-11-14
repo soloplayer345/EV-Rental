@@ -272,17 +272,17 @@
                     
                     let html = '<div class="list-group">';
                     data.forEach(vehicle => {
-                        const statusBadge = getStatusBadge(vehicle.status);
+                        const statusBadge = getStatusBadge(vehicle.Status);
                         html += `
                             <div class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
-                                    <strong>${vehicle.name}</strong><br>
-                                    <small class="text-muted">${vehicle.plateNumber} - ${vehicle.vehicleType}</small>
+                                    <strong>${vehicle.Name}</strong><br>
+                                    <small class="text-muted">${vehicle.PlateNumber} - ${vehicle.VehicleType}</small>
                                 </div>
                                 <div>
                                     ${statusBadge}
-                                    ${vehicle.status === 'Available' || vehicle.status === 'Maintenance' ? 
-                                        `<button class="btn btn-sm btn-outline-danger ms-2" onclick="moveVehicleOut(${vehicle.id}, '${vehicle.name}')" title="Chuyển đi">
+                                    ${vehicle.Status === 'Available' || vehicle.Status === 'Maintenance' ? 
+                                        `<button class="btn btn-sm btn-outline-danger ms-2" onclick="moveVehicleOut(${vehicle.id}, '${vehicle.Name}')" title="Chuyển đi">
                                             <i class="fas fa-arrow-right"></i>
                                         </button>` : ''}
                                 </div>
@@ -317,17 +317,17 @@
                     
                     let html = '<div class="list-group">';
                     data.forEach(vehicle => {
-                        const statusBadge = getStatusBadge(vehicle.status);
+                        const statusBadge = getStatusBadge(vehicle.Status);
                         html += `
                             <div class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
-                                    <strong>${vehicle.name}</strong><br>
-                                    <small class="text-muted">${vehicle.plateNumber} - ${vehicle.vehicleType}</small><br>
+                                    <strong>${vehicle.Name}</strong><br>
+                                    <small class="text-muted">${vehicle.PlateNumber} - ${vehicle.VehicleType}</small><br>
                                     <small class="badge bg-secondary mt-1">${vehicle.stationName}</small>
                                 </div>
                                 <div>
                                     ${statusBadge}
-                                    <button class="btn btn-sm btn-outline-success ms-2" onclick="moveVehicleIn(${vehicle.id}, '${vehicle.name}')" title="Chuyển đến">
+                                    <button class="btn btn-sm btn-outline-success ms-2" onclick="moveVehicleIn(${vehicle.id}, '${vehicle.Name}')" title="Chuyển đến">
                                         <i class="fas fa-arrow-left"></i>
                                     </button>
                                 </div>
@@ -353,7 +353,7 @@
                     
                     data.forEach(station => {
                         if (station.id !== currentStationId) {
-                            select.innerHTML += `<option value="${station.id}">${station.name} (${station.vehicleCount} xe)</option>`;
+                            select.innerHTML += `<option value="${station.id}">${station.Name} (${station.vehicleCount} xe)</option>`;
                         }
                     });
                     
@@ -371,7 +371,7 @@
                 .then(response => response.json())
                 .then(data => {
                     const stations = data.filter(s => s.id !== currentStationId);
-                    let options = stations.map((s, i) => `${i+1}. ${s.name} (${s.vehicleCount} xe)\n`).join('');
+                    let options = stations.map((s, i) => `${i+1}. ${s.Name} (${s.vehicleCount} xe)\n`).join('');
                     const choice = prompt(`Chọn trạm đích:\n${options}\nNhập số thứ tự (1-${stations.length}):`);
                     
                     if (choice) {
@@ -440,3 +440,4 @@
         }
     </style>
 }
+

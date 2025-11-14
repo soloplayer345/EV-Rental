@@ -260,7 +260,7 @@ namespace BusinessLayer.Services
         }
 
         // NEW: Get All Inspection Problems
-        public async Task<List<InspectionProblemDto>> GetAllInspectionProblemsAsync(string? incidentType = null, int? rentalId = null)
+        public async Task<List<InspectionProblemReportDto>> GetAllInspectionProblemsAsync(string? incidentType = null, int? rentalId = null)
         {
             var problemRepo = _unitOfWork.GetRepository<InspectionProblem>();
             var problems = problemRepo.GetAllQueryable("RentalRecord,RentalRecord.Renter,RentalRecord.Vehicle");
@@ -275,7 +275,7 @@ namespace BusinessLayer.Services
 
             var result = await query
                 .OrderByDescending(p => p.CreateDate)
-                .Select(p => new InspectionProblemDto
+                .Select(p => new InspectionProblemReportDto
                 {
                     Id = p.Id,
                     RentalId = p.RentalId,
@@ -379,7 +379,7 @@ namespace BusinessLayer.Services
         public decimal TotalRevenue { get; set; }
     }
 
-    public class InspectionProblemDto
+    public class InspectionProblemReportDto
     {
         public int Id { get; set; }
         public int RentalId { get; set; }

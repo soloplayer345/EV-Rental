@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BusinessLayer.Services;
 using BusinessLayer.DTOs;
-using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
 using EV_Rental.Helpers;
 
@@ -19,7 +18,7 @@ namespace EV_Rental.Pages.Renter
             _rentalService = rentalService;
         }
 
-        public Vehicle? Vehicle { get; set; }
+        public VehicleDto? Vehicle { get; set; }
         public List<StationDto> AllStations { get; set; } = new List<StationDto>();
         public string? ErrorMessage { get; set; }
 
@@ -97,3 +96,4 @@ namespace EV_Rental.Pages.Renter
         }
     }
 }
+

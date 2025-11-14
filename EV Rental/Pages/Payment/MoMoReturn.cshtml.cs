@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 using BusinessLayer.Services;
 using BusinessLayer.DTOs;
 using EV_Rental.Helpers;
+using DataAccessLayer.Enums;
 
 namespace EV_Rental.Pages.Payment
 {
@@ -125,7 +126,7 @@ namespace EV_Rental.Pages.Payment
                     {
                         return RedirectToPage("/Payment/PaymentFailure", new
                         {
-                            message = "Thanh toán thành công nhưng không thể xác nhận đơn thuê: " + confirmResult.Message,
+                            message = "Thanh to�n th�nh c�ng nhung kh�ng th? x�c nh?n don thu�: " + confirmResult.Message,
                             transactionId = transId,
                             orderId = orderId,
                             paymentMethod = "MoMo",
@@ -139,7 +140,7 @@ namespace EV_Rental.Pages.Payment
                 
                 return RedirectToPage("/Payment/PaymentFailure", new
                 {
-                    message = "Không tìm thấy thông tin đơn thuê chờ thanh toán",
+                    message = "Kh�ng t�m th?y th�ng tin don thu� ch? thanh to�n",
                     transactionId = transId,
                     orderId = orderId,
                     paymentMethod = "MoMo",
@@ -193,19 +194,19 @@ namespace EV_Rental.Pages.Payment
         {
             return resultCode switch
             {
-                "0" => "Giao dịch thành công",
-                "9000" => "Giao dịch được khởi tạo, chờ xác nhận",
-                "7000" => "Giao dịch bị từ chối",
-                "7001" => "Tài khoản không đủ tiền",
-                "1000" => "Lỗi hệ thống",
-                "4100" => "Giao dịch bị từ chối",
-                _ => $"Giao dịch thất bại. Mã: {resultCode}"
+                "0" => "Giao d?ch th�nh c�ng",
+                "9000" => "Giao d?ch du?c kh?i t?o, ch? x�c nh?n",
+                "7000" => "Giao d?ch b? t? ch?i",
+                "7001" => "T�i kho?n kh�ng d? ti?n",
+                "1000" => "L?i h? th?ng",
+                "4100" => "Giao d?ch b? t? ch?i",
+                _ => $"Giao d?ch th?t b?i. M�: {resultCode}"
             };
         }
 
         private async Task SendOtpEmailAsync(string toEmail, string customerName, DataAccessLayer.Entities.RentalRecord rentalRecord)
         {
-            var subject = $"🔋 Mã OTP #{rentalRecord.Id} - Thanh Toán Thành Công - EV Rental";
+            var subject = $"?? M� OTP #{rentalRecord.Id} - Thanh To�n Th�nh C�ng - EV Rental";
             
             // Get vehicle info
             var vehicle = await _vehicleService.GetVehicleByIdAsync(rentalRecord.VehicleId);
@@ -252,92 +253,92 @@ namespace EV_Rental.Pages.Payment
         .footer {{ background: #1f2937; color: #9ca3af; text-align: center; padding: 25px; font-size: 13px; }}
         .footer p {{ margin: 5px 0; }}
         .divider {{ height: 1px; background: linear-gradient(to right, transparent, #e5e7eb, transparent); margin: 20px 0; }}
-        .status-badge {{ display: inline-block; padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 600; }}
+        .Status-badge {{ display: inline-block; padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 600; }}
     </style>
 </head>
 <body>
     <div class='container'>
         <div class='header'>
-            <h1>✅ THANH TOÁN THÀNH CÔNG</h1>
-            <p>Đơn Thuê Xe Đã Được Xác Nhận</p>
+            <h1>? THANH TO�N TH�NH C�NG</h1>
+            <p>�on Thu� Xe �� �u?c X�c Nh?n</p>
         </div>
         
         <div class='content'>
-            <p class='greeting'>Xin chào <strong>{customerName}</strong>,</p>
-            <p>Chúc mừng! Thanh toán của bạn đã được xử lý thành công. Đơn thuê xe của bạn đã được xác nhận! 🎉</p>
+            <p class='greeting'>Xin ch�o <strong>{customerName}</strong>,</p>
+            <p>Ch�c m?ng! Thanh to�n c?a b?n d� du?c x? l� th�nh c�ng. �on thu� xe c?a b?n d� du?c x�c nh?n! ??</p>
             
-            <div class='success-badge'>✓ ĐÃ THANH TOÁN THÀNH CÔNG</div>
+            <div class='success-badge'>? �� THANH TO�N TH�NH C�NG</div>
             
             <div class='otp-section'>
-                <p class='otp-label'>🔐 MÃ OTP XÁC NHẬN NHẬN XE</p>
+                <p class='otp-label'>?? M� OTP X�C NH?N NH?N XE</p>
                 <div class='otp-code'>{rentalRecord.OtpCode}</div>
-                <p style='margin: 10px 0 0 0; font-size: 13px; color: #6b7280;'>Vui lòng xuất trình mã này khi nhận xe</p>
+                <p style='margin: 10px 0 0 0; font-size: 13px; color: #6b7280;'>Vui l�ng xu?t tr�nh m� n�y khi nh?n xe</p>
             </div>
 
             <div class='info-box'>
-                <h3>📋 Thông Tin Chi Tiết Đơn Thuê</h3>
+                <h3>?? Th�ng Tin Chi Ti?t �on Thu�</h3>
                 <div class='info-row'>
-                    <span class='info-label'>Mã đơn hàng:</span>
+                    <span class='info-label'>M� don h�ng:</span>
                     <span class='info-value'><strong>#{rentalRecord.Id}</strong></span>
                 </div>
                 <div class='info-row'>
-                    <span class='info-label'>Xe thuê:</span>
+                    <span class='info-label'>Xe thu�:</span>
                     <span class='info-value'>{vehicleName}</span>
                 </div>
                 <div class='info-row'>
-                    <span class='info-label'>Trạm nhận xe:</span>
+                    <span class='info-label'>Tr?m nh?n xe:</span>
                     <span class='info-value'>{pickupStation}</span>
                 </div>
                 <div class='info-row'>
-                    <span class='info-label'>Trạm trả xe:</span>
+                    <span class='info-label'>Tr?m tr? xe:</span>
                     <span class='info-value'>{returnStation}</span>
                 </div>
                 <div class='info-row'>
-                    <span class='info-label'>Thời gian nhận:</span>
+                    <span class='info-label'>Th?i gian nh?n:</span>
                     <span class='info-value'><strong>{rentalRecord.StartTime:dd/MM/yyyy HH:mm}</strong></span>
                 </div>
                 <div class='info-row'>
-                    <span class='info-label'>Thời gian trả:</span>
+                    <span class='info-label'>Th?i gian tr?:</span>
                     <span class='info-value'><strong>{rentalRecord.ExpectedEndTime:dd/MM/yyyy HH:mm}</strong></span>
                 </div>
                 <div class='info-row'>
-                    <span class='info-label'>Trạng thái:</span>
-                    <span class='info-value'><span class='status-badge'>✓ Đã xác nhận</span></span>
+                    <span class='info-label'>Tr?ng th�i:</span>
+                    <span class='info-value'><span class='status-badge'>? �� x�c nh?n</span></span>
                 </div>
             </div>
 
             <div class='cost-box'>
-                <p class='cost-label'>💰 Đã Thanh Toán</p>
-                <div class='cost-amount'>{rentalRecord.TotalPrice:N0} VNĐ</div>
-                <p style='margin: 0; font-size: 13px; opacity: 0.9;'>Thanh toán qua MoMo</p>
+                <p class='cost-label'>?? �� Thanh To�n</p>
+                <div class='cost-amount'>{rentalRecord.TotalPrice:N0} VN�</div>
+                <p style='margin: 0; font-size: 13px; opacity: 0.9;'>Thanh to�n qua MoMo</p>
             </div>
 
             <div class='warning-box'>
-                <p style='margin: 0 0 8px 0;'><strong>📌 LƯU Ý QUAN TRỌNG</strong></p>
+                <p style='margin: 0 0 8px 0;'><strong>?? LUU � QUAN TR?NG</strong></p>
                 <ul>
-                    <li><strong>Mang theo mã OTP</strong> khi đến nhận xe tại trạm</li>
-                    <li>Xuất trình mã OTP cho nhân viên để xác nhận danh tính</li>
-                    <li>Đến đúng giờ nhận xe: <strong>{rentalRecord.StartTime:dd/MM/yyyy HH:mm}</strong></li>
-                    <li>Mang theo <strong>CMND/CCCD và Giấy phép lái xe</strong> (bản gốc)</li>
-                    <li>Kiểm tra kỹ xe trước khi nhận</li>
+                    <li><strong>Mang theo m� OTP</strong> khi d?n nh?n xe t?i tr?m</li>
+                    <li>Xu?t tr�nh m� OTP cho nh�n vi�n d? x�c nh?n danh t�nh</li>
+                    <li>�?n d�ng gi? nh?n xe: <strong>{rentalRecord.StartTime:dd/MM/yyyy HH:mm}</strong></li>
+                    <li>Mang theo <strong>CMND/CCCD v� Gi?y ph�p l�i xe</strong> (b?n g?c)</li>
+                    <li>Ki?m tra k? xe tru?c khi nh?n</li>
                 </ul>
             </div>
 
             <div class='divider'></div>
 
             <p style='text-align: center; margin: 25px 0;'>
-                <a href='https://localhost:7158/Renter/MyTrips' class='btn'>👉 Xem Chi Tiết Đơn Thuê</a>
+                <a href='https://localhost:7158/Renter/MyTrips' class='btn'>?? Xem Chi Ti?t �on Thu�</a>
             </p>
 
             <p style='color: #6b7280; font-size: 13px; text-align: center; margin: 20px 0 0 0;'>
-                Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ hotline: <strong style='color: #2563eb;'>1900-xxxx</strong>
+                N?u b?n c� b?t k? th?c m?c n�o, vui l�ng li�n h? hotline: <strong style='color: #2563eb;'>1900-xxxx</strong>
             </p>
         </div>
         
         <div class='footer'>
-            <p style='font-weight: 600; color: white; margin-bottom: 10px;'>🔋 EV RENTAL SYSTEM</p>
-            <p>Email này được gửi tự động từ hệ thống</p>
-            <p>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
+            <p style='font-weight: 600; color: white; margin-bottom: 10px;'>?? EV RENTAL SYSTEM</p>
+            <p>Email n�y du?c g?i t? d?ng t? h? th?ng</p>
+            <p>C?m on b?n d� s? d?ng d?ch v? c?a ch�ng t�i!</p>
             <p style='margin-top: 15px;'>&copy; 2025 EV Rental System. All rights reserved.</p>
         </div>
     </div>
@@ -348,3 +349,4 @@ namespace EV_Rental.Pages.Payment
         }
     }
 }
+

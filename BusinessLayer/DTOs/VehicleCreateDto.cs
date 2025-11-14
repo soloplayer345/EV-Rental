@@ -9,17 +9,19 @@ namespace BusinessLayer.DTOs
 {
     public class VehicleCreateDto
     {
-        public int stationId { get; set; }
-        public string name { get; set; } 
-        public string brand { get; set; }
-        public string plateNumber { get; set; }
-        public string model { get; set; }
-        public string vehicleType { get; set; }
-        public decimal pricePerHour { get; set; }
-        public decimal pricePerDay { get; set; }
-        public string features { get; set; }
-        public string imageUrl { get; set; }
-        public int maxDistance { get; set; }
-        public decimal batteryCapacity { get; set; }
+        public int StationId { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Brand { get; set; } = string.Empty;
+        public string PlateNumber { get; set; } = string.Empty;
+        public string Model { get; set; } = string.Empty;
+        public string VehicleType { get; set; } = string.Empty;
+        public VehicleStatus Status { get; set; }
+        public decimal PricePerHour { get; set; }
+        public decimal PricePerDay { get; set; }
+        public string Features { get; set; } = string.Empty;
+        public string ImageUrl { get; set; } = string.Empty;
+        public int MaxDistance { get; set; }
+        public int seartCapacity { get; set; }
+        public decimal BatteryCapacity { get; set; }
     }
 }

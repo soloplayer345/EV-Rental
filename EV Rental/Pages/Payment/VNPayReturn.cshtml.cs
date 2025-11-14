@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 using BusinessLayer.Services;
 using BusinessLayer.DTOs;
-using DataAccessLayer.Entities;
 using EV_Rental.Helpers;
+using DataAccessLayer.Enums;
 
 namespace EV_Rental.Pages.Payment
 {
@@ -171,7 +171,7 @@ namespace EV_Rental.Pages.Payment
                         try
                         {
                             var rental = await _rentalService.GetRentalByIdAsync(rentalId);
-                            if (rental != null && rental.Status == DataAccessLayer.Enums.RentalRecordStatus.Pending)
+                            if (rental != null && rental.Status == RentalRecordStatus.Pending)
                             {
                                 await _rentalService.CancelRentalAsync(rentalId, rental.RenterId);
                             }
@@ -331,7 +331,7 @@ namespace EV_Rental.Pages.Payment
         .footer {{ background: #1f2937; color: #9ca3af; text-align: center; padding: 25px; font-size: 13px; }}
         .footer p {{ margin: 5px 0; }}
         .divider {{ height: 1px; background: linear-gradient(to right, transparent, #e5e7eb, transparent); margin: 20px 0; }}
-        .status-badge {{ display: inline-block; padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 600; }}
+        .Status-badge {{ display: inline-block; padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 600; }}
     </style>
 </head>
 <body>
@@ -427,3 +427,4 @@ namespace EV_Rental.Pages.Payment
         }
     }
 }
+

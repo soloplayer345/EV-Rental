@@ -1,5 +1,5 @@
-﻿using BusinessLayer.Services;
-using DataAccessLayer.Entities;
+using BusinessLayer.DTOs;
+using BusinessLayer.Services;
 using DataAccessLayer.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -24,20 +24,21 @@ namespace EV_Rental.Pages.Staff
         [BindProperty(SupportsGet = true)]
         public VehicleStatus? Status { get; set; }
 
-        public IEnumerable<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
+        public IEnumerable<VehicleDto> Vehicles { get; set; } = new List<VehicleDto>();
 
         public async Task OnGetAsync()
         {
             if (Status.HasValue)
             {
-                // Gọi hàm search trong service (lọc theo status)
+                // G?i h�m search trong service (l?c theo status)
                 Vehicles = await _vehicleService.SearchVehiclesAsync(Name ?? "", Brand ?? "", Status.Value);
             }
             else
             {
-                // Nếu không chọn status → lấy toàn bộ
+                // N?u kh�ng ch?n status ? l?y to�n b?
                 Vehicles = await _vehicleService.GetVehiclesAsync();
             }
         }
     }
 }
+

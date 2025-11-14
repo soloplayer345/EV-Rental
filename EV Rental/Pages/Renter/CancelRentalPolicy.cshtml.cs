@@ -1,6 +1,6 @@
 using BusinessLayer.DTOs;
 using BusinessLayer.Services;
-using DataAccessLayer.Entities;
+using BusinessLayer.Mapping;
 using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -18,8 +18,8 @@ namespace EV_Rental.Pages.Renter
             _vehicleService = vehicleService;
         }
 
-        public RentalRecord? Rental { get; set; }
-        public Vehicle? Vehicle { get; set; }
+        public RentalRecordDto? Rental { get; set; }
+        public VehicleDto? Vehicle { get; set; }
         public CancellationPolicyDto? Policy { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int rentalId)
@@ -53,12 +53,14 @@ namespace EV_Rental.Pages.Renter
             Policy = result.Data;
 
             // Lấy thông tin rental và vehicle
-            Rental = await _rentalService.GetRentalByIdAsync(rentalId);
-            if (Rental == null)
+            var rentalEntity = await _rentalService.GetRentalByIdAsync(rentalId);
+            if (rentalEntity == null)
             {
                 TempData["ErrorMessage"] = "Không tìm thấy đơn thuê.";
                 return RedirectToPage("/Renter/MyTrips");
             }
+
+            Rental = RentalRecordMapper.ToDto(rentalEntity);
 
             Vehicle = await _vehicleService.GetVehicleByIdAsync(Rental.VehicleId);
             if (Vehicle == null)
@@ -112,3 +114,4 @@ namespace EV_Rental.Pages.Renter
         }
     }
 }
+

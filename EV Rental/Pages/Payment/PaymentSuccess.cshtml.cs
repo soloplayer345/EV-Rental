@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using DataAccessLayer.Entities;
+using BusinessLayer.DTOs;
 
 namespace EV_Rental.Pages.Payment
 {
@@ -12,7 +12,7 @@ namespace EV_Rental.Pages.Payment
         public string OrderDescription { get; set; } = string.Empty;
         public decimal Amount { get; set; }
         public DateTime PaymentTime { get; set; }
-        public RentalRecord? RentalRecord { get; set; }
+        public RentalRecordDto? RentalRecord { get; set; }
 
         public IActionResult OnGet(
             string transactionId,
@@ -45,7 +45,7 @@ namespace EV_Rental.Pages.Payment
             // Load rental record if available
             if (rentalId.HasValue)
             {
-                RentalRecord = new RentalRecord
+                RentalRecord = new RentalRecordDto
                 {
                     Id = rentalId.Value,
                     OtpCode = otpCode ?? "N/A",
@@ -58,3 +58,4 @@ namespace EV_Rental.Pages.Payment
         }
     }
 }
+

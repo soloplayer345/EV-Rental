@@ -1,136 +1,249 @@
 ﻿using BusinessLayer.DTOs;
 using BusinessLayer.Interfaces;
-using DataAccessLayer;
+using BusinessLayer.Mapping;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
 using DataAccessLayer.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace BusinessLayer.Services
 {
     public class CheckInService : ICheckInService
     {
-        private readonly IUnitOfWork _unitOfWord;
+        private readonly IUnitOfWork _unitOfWork;
 
         public CheckInService(IUnitOfWork unitOfWork)
         {
-            _unitOfWord = unitOfWork;
+            _unitOfWork = unitOfWork;
         }
 
-        public async Task<bool> ConfirmPaymentAsync(int rentalRecordId, decimal amount)
+        public async Task<CheckInResultDto> ProcessCheckInAsync(CheckInDto checkInDto)
         {
-            var rentalRepo = _unitOfWord.GetRepository<RentalRecord>();
-            var rental = await rentalRepo.GetByIdAsync(rentalRecordId);
-
-            if (rental == null) return false;
-
-            var paymentRepo = _unitOfWord.GetRepository<Payment>();
-            await paymentRepo.AddAsync(new Payment
+            try
             {
-                RentalId = rentalRecordId,
-                Amount = amount,
-                Status = "paid",
-                PaidAt = DateTime.Now,
-                TransactionRef = Guid.NewGuid().ToString()
-            });
+                var rentalRepo = _unitOfWork.GetRepository<RentalRecord>();
+                var rental = await rentalRepo.GetAllQueryable("Vehicle,Renter,InspectionProblems")
+                    .FirstOrDefaultAsync(r => r.Id == checkInDto.RentalRecordId);
 
-            await _unitOfWord.SaveChangesAsync();
-            return true;
+                if (rental == null)
+                {
+                    return new CheckInResultDto
+                    {
+                        Success = false,
+                        Message = "Không tìm thấy bản ghi thuê xe"
+                    };
+                }
+
+                if (rental.Status != RentalRecordStatus.Active)
+                {
+                    return new CheckInResultDto
+                    {
+                        Success = false,
+                        Message = $"Trạng thái thuê xe không hợp lệ: {rental.Status}"
+                    };
+                }
+
+                if (rental.StartTime == null)
+                {
+                    return new CheckInResultDto
+                    {
+                        Success = false,
+                        Message = "Thời gian bắt đầu thuê xe chưa được ghi nhận"
+                    };
+                }
+
+                // 1. Tính toán chi phí sử dụng
+                var actualEndTime = checkInDto.ActualReturnTime;
+                var totalHours = (decimal)(actualEndTime - rental.StartTime.Value).TotalHours;
+                var roundedHours = Math.Ceiling(totalHours);
+                decimal usageCost = rental.BasePrice * roundedHours;
+
+                // 2. Tính phí trả chậm (20% của giá cơ bản cho mỗi giờ trễ)
+                decimal lateFee = 0;
+                if (rental.ExpectedEndTime.HasValue && actualEndTime > rental.ExpectedEndTime.Value)
+                {
+                    var lateHours = (decimal)(actualEndTime - rental.ExpectedEndTime.Value).TotalHours;
+                    lateFee = Math.Ceiling(lateHours) * rental.BasePrice * 0.2m;
+                }
+
+                // 3. Xử lý inspection problems và tính tổng tiền phạt
+                decimal totalPenalty = 0;
+                var inspectionProblems = new List<InspectionProblem>();
+                
+                if (checkInDto.InspectionProblems != null && checkInDto.InspectionProblems.Any())
+                {
+                    var problemRepo = _unitOfWork.GetRepository<InspectionProblem>();
+                    
+                    foreach (var problemDto in checkInDto.InspectionProblems)
+                    {
+                        var problem = new InspectionProblem
+                        {
+                            RentalId = rental.Id,
+                            IncidentType = problemDto.IncidentType,
+                            Description = problemDto.Description,
+                            Evidence = problemDto.Evidence ?? string.Empty,
+                            PenaltyAmount = problemDto.PenaltyAmount,
+                            CreatedBy = checkInDto.CreatedBy,
+                            CreateDate = DateTime.Now,
+                            UpdateDate = DateTime.Now
+                        };
+                        
+                        await problemRepo.AddAsync(problem);
+                        inspectionProblems.Add(problem);
+                        totalPenalty += problemDto.PenaltyAmount;
+                    }
+                }
+
+                // 4. Tính tổng chi phí
+                decimal totalAmount = usageCost + lateFee + totalPenalty + checkInDto.ExtraFees - checkInDto.Discount;
+
+                // 5. Xử lý tiền cọc
+                decimal depositRefund = 0;
+                decimal finalPayment = totalAmount;
+
+                if (rental.DepositFee > 0)
+                {
+                    // Nếu tổng chi phí < tiền cọc → hoàn lại phần dư
+                    if (totalAmount < rental.DepositFee)
+                    {
+                        depositRefund = rental.DepositFee - totalAmount;
+                        finalPayment = 0;
+                    }
+                    else
+                    {
+                        // Nếu tổng chi phí >= tiền cọc → trừ vào cọc, thu thêm phần chênh lệch
+                        finalPayment = totalAmount - rental.DepositFee;
+                        depositRefund = 0;
+                    }
+                }
+
+                // 6. Cập nhật rental record
+                rental.ActualEndTime = actualEndTime;
+                rental.ReturnStationId = checkInDto.ReturnStationId ?? rental.PickupStationId;
+                rental.ExtraFees = checkInDto.ExtraFees;
+                rental.Discount = checkInDto.Discount;
+                rental.TotalPrice = totalAmount;
+                rental.Status = RentalRecordStatus.Completed;
+                rental.UpdateDate = DateTime.Now;
+
+                // 7. Cập nhật trạng thái xe về Available
+                if (rental.Vehicle != null)
+                {
+                    rental.Vehicle.Status = VehicleStatus.Available;
+                    rental.Vehicle.UpdateDate = DateTime.Now;
+                }
+
+                // 8. Lưu thay đổi
+                rentalRepo.Update(rental);
+                await _unitOfWork.SaveChangesAsync();
+
+                return new CheckInResultDto
+                {
+                    Success = true,
+                    Message = "Check-in thành công",
+                    RentalRecordId = rental.Id,
+                    UsageCost = usageCost,
+                    LateFee = lateFee,
+                    TotalPenalty = totalPenalty,
+                    ExtraFees = checkInDto.ExtraFees,
+                    Discount = checkInDto.Discount,
+                    TotalAmount = totalAmount,
+                    DepositFee = rental.DepositFee,
+                    DepositRefund = depositRefund,
+                    FinalPayment = finalPayment,
+                    InspectionProblems = inspectionProblems.Select(p => new InspectionProblemDto
+                    {
+                        Id = p.Id,
+                        RentalId = p.RentalId,
+                        IncidentType = p.IncidentType,
+                        Description = p.Description,
+                        Evidence = p.Evidence,
+                        PenaltyAmount = p.PenaltyAmount,
+                        CreatedBy = p.CreatedBy,
+                        CreateDate = p.CreateDate
+                    }).ToList()
+                };
+            }
+            catch (Exception ex)
+            {
+                return new CheckInResultDto
+                {
+                    Success = false,
+                    Message = $"Lỗi khi xử lý check-in: {ex.Message}"
+                };
+            }
         }
 
         public async Task<RentalRecordDto> GetBillingAsync(int rentalRecordId)
         {
-            var rentalRepo = _unitOfWord.GetRepository<RentalRecord>();
-            var rental = await rentalRepo.GetByIdAsync(rentalRecordId);
-
-            if (rental == null)
+            try
             {
-                throw new ArgumentException("Không tìm thấy bản ghi thuê xe");
+                var rentalRepo = _unitOfWork.GetRepository<RentalRecord>();
+                var rental = await rentalRepo.GetAllQueryable("Vehicle,Renter,PickupStation,ReturnStation,InspectionProblems")
+                    .FirstOrDefaultAsync(r => r.Id == rentalRecordId);
+
+                if (rental == null)
+                {
+                    throw new ArgumentException("Không tìm thấy bản ghi thuê xe");
+                }
+
+                return rental.ToDto();
             }
-
-            var actualEnd = rental.ActualEndTime ?? DateTime.Now;
-            var totalHours = (decimal)(actualEnd - rental.StartTime!.Value).TotalHours;
-            var roundedHours = Math.Ceiling(totalHours);
-
-            decimal usageCost = rental.BasePrice * (decimal)roundedHours;
-
-            decimal lateFee = 0;
-            if (rental.ExpectedEndTime.HasValue && actualEnd > rental.ExpectedEndTime.Value)
+            catch (Exception ex)
             {
-                var lateHours = (decimal)(actualEnd - rental.ExpectedEndTime.Value).TotalHours;
-                lateFee = Math.Ceiling(lateHours) * rental.BasePrice * 0.2m;
+                throw new Exception($"Lỗi khi lấy thông tin billing: {ex.Message}");
             }
-
-            decimal finalAmount = usageCost + lateFee + rental.ExtraFees + rental.ReservationFee - rental.Discount;
-
-            return new RentalRecordDto
-            {
-                Id = rental.Id,
-                VehicleId = rental.VehicleId,
-                RenterId = rental.RenterId,
-                StartTime = rental.StartTime,
-                ExpectedEndTime = rental.ExpectedEndTime,
-                ActualEndTime = rental.ActualEndTime,
-                Status = rental.Status,
-                BasePrice = rental.BasePrice,
-                DepositFee = rental.DepositFee,
-                ReservationFee = rental.ReservationFee,
-                ExtraFees = rental.ExtraFees,
-                Discount = rental.Discount,
-                TotalPrice = rental.TotalPrice,
-                UsageTotal = usageCost,
-                LateFee = lateFee,
-                FinalAmount = finalAmount
-            };
         }
 
-        public async Task<bool> ProcessCheckInAsync(CheckInDto checkInDto)
+        public async Task<List<RentalRecordDto>> GetActiveRentalsAsync()
         {
-            var rentalRepo = _unitOfWord.GetRepository<RentalRecord>();
-            var rental = await rentalRepo.GetByIdAsync(checkInDto.RentalRecordId);
-
-            if (rental == null)
+            try
             {
-                throw new ArgumentException("Không tìm thấy bản ghi thuê xe");
+                var rentalRepo = _unitOfWork.GetRepository<RentalRecord>();
+                var activeRentals = await rentalRepo.GetAllQueryable("Vehicle,Renter,PickupStation")
+                    .Where(r => r.Status == RentalRecordStatus.Active)
+                    .OrderByDescending(r => r.StartTime)
+                    .ToListAsync();
+
+                return activeRentals.Select(r => r.ToDto()).ToList();
             }
-
-            // update rental record
-            rental.ActualEndTime = checkInDto.ActualReturnTime;
-
-            if(rental.StartTime == null)
+            catch (Exception ex)
             {
-                throw new InvalidOperationException("Thời gian thuê bắt đầu chưa được nhập");
+                throw new Exception($"Lỗi khi lấy danh sách thuê xe: {ex.Message}");
             }
+        }
 
-            var actualEnd = rental.ActualEndTime.Value;
-            var totalHours = (decimal)(actualEnd - rental.StartTime.Value).TotalHours;
-            var roundedHours = Math.Ceiling(totalHours);
-
-            decimal usageCost = rental.BasePrice * (decimal)roundedHours;
-
-            decimal lateFee = 0;
-            if(rental.ExpectedEndTime.HasValue && actualEnd > rental.ExpectedEndTime.Value)
+        public async Task<bool> ConfirmPaymentAsync(int rentalRecordId, decimal amount)
+        {
+            try
             {
-                var lateHours = (decimal)(actualEnd - rental.ExpectedEndTime.Value).TotalHours;
-                lateFee = (decimal)Math.Ceiling(lateHours) * rental.BasePrice * 0.2m; // 20% late fee
+                var rentalRepo = _unitOfWork.GetRepository<RentalRecord>();
+                var rental = await rentalRepo.GetByIdAsync(rentalRecordId);
+
+                if (rental == null)
+                {
+                    return false;
+                }
+
+                var paymentRepo = _unitOfWork.GetRepository<Payment>();
+                await paymentRepo.AddAsync(new Payment
+                {
+                    RentalId = rentalRecordId,
+                    Amount = amount,
+                    Status = "paid",
+                    PaidAt = DateTime.Now,
+                    TransactionRef = Guid.NewGuid().ToString(),
+                    CreateDate = DateTime.Now,
+                    UpdateDate = DateTime.Now
+                });
+
+                await _unitOfWork.SaveChangesAsync();
+                return true;
             }
-
-            decimal damageCost = checkInDto.HasDamage ? checkInDto.DamageCost : 0;
-
-            decimal total = usageCost + lateFee + checkInDto.ExtraFees + damageCost + rental.ReservationFee - checkInDto.Discount;
-
-            rental.TotalPrice = total;
-            rental.ExtraFees = checkInDto.ExtraFees;
-            rental.Discount = checkInDto.Discount;
-            rental.Status = RentalRecordStatus.Completed;
-
-            rentalRepo.Update(rental);
-            await _unitOfWord.SaveChangesAsync();
-            return true;
-        }        
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

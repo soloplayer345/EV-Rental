@@ -1,5 +1,5 @@
+using BusinessLayer.DTOs;
 using BusinessLayer.Services;
-using DataAccessLayer.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -15,7 +15,7 @@ namespace EV_Rental.Pages.Staff
         }
 
         [BindProperty]
-        public Vehicle Vehicle { get; set; } = new();
+        public VehicleUpdateDto? Vehicle { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
@@ -23,7 +23,24 @@ namespace EV_Rental.Pages.Staff
             if (existing == null)
                 return NotFound();
 
-            Vehicle = existing;
+            // Map VehicleDto to VehicleUpdateDto
+            Vehicle = new VehicleUpdateDto
+            {
+                Id = existing.Id,
+                StationId = existing.StationId,
+                Name = existing.Name,
+                Brand = existing.Brand,
+                PlateNumber = existing.PlateNumber,
+                Model = existing.Model,
+                VehicleType = existing.VehicleType,
+                Status = existing.Status,
+                PricePerHour = existing.PricePerHour,
+                PricePerDay = existing.PricePerDay,
+                Features = existing.Features,
+                ImageUrl = existing.ImageUrl,
+                MaxDistance = existing.MaxDistance,
+                BatteryCapacity = existing.BatteryCapacity
+            };
             return Page();
         }
 
@@ -37,3 +54,5 @@ namespace EV_Rental.Pages.Staff
         }
     }
 }
+
+

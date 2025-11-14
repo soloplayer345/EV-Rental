@@ -1,6 +1,5 @@
 using BusinessLayer.DTOs;
 using BusinessLayer.Services;
-using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
 using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +18,7 @@ namespace EV_Rental.Pages.Renter
         }
 
         public string UserEmail { get; set; } = string.Empty;
-        public List<Vehicle> AvailableVehicles { get; set; } = new List<Vehicle>();
+        public List<VehicleDto> AvailableVehicles { get; set; } = new List<VehicleDto>();
         public int CurrentPage { get; set; } = 1;
         public int TotalPages { get; set; }
         public int TotalVehicles { get; set; }
@@ -45,7 +44,7 @@ namespace EV_Rental.Pages.Renter
             UserEmail = user?.Email ?? "";
 
             // Lấy danh sách xe
-            IEnumerable<Vehicle> vehicles;
+            IEnumerable<VehicleDto> vehicles;
 
             // Áp dụng filter nếu có
             bool hasFilter = !string.IsNullOrWhiteSpace(Name) || 
@@ -98,3 +97,4 @@ namespace EV_Rental.Pages.Renter
         }
     }
 }
+

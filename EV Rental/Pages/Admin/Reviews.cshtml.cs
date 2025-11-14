@@ -82,3 +82,4 @@ namespace EV_Rental.Pages.Admin
         }
     }
 }
+

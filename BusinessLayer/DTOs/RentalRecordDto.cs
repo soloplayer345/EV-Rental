@@ -13,6 +13,8 @@ namespace BusinessLayer.DTOs
         public int VehicleId { get; set; }
         public string? VehicleName { get; set; }
         public int RenterId { get; set; }
+        public int PickupStationId { get; set; }
+        public int? ReturnStationId { get; set; }
         public DateTime? StartTime { get; set; }
         public DateTime? ExpectedEndTime { get; set; }
         public DateTime? ActualEndTime { get; set; }
@@ -26,8 +28,18 @@ namespace BusinessLayer.DTOs
         public decimal UsageTotal { get; set; }
         public decimal LateFee { get; set; }
         public decimal FinalAmount { get; set; }
+        public string OtpCode { get; set; } = string.Empty;
+        public DateTime CreateDate { get; set; }
+        public DateTime? UpdateDate { get; set; }
 
         public string? StationNane { get; set; }
 
+        // Navigation properties
+        public AccountDto? Renter { get; set; }
+        public VehicleDto? Vehicle { get; set; }
+        public StationDto? PickupStation { get; set; }
+        public StationDto? ReturnStation { get; set; }
+        public ICollection<PaymentDto> Payments { get; set; } = new List<PaymentDto>();
+        public ICollection<InspectionProblemDto> InspectionProblems { get; set; } = new List<InspectionProblemDto>();
     }
 }

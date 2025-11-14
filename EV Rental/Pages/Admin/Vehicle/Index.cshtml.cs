@@ -1,5 +1,5 @@
+using BusinessLayer.DTOs;
 using BusinessLayer.Services;
-using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
 using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +11,7 @@ namespace EV_Rental.Pages.Admin.Vehicle
     {
         private readonly VehicleService _vehicleService;
         public string UserEmail { get; set; } = string.Empty;
-        public List<DataAccessLayer.Entities.Vehicle> Vehicles { get; set; } = new();
+        public List<VehicleDto> Vehicles { get; set; } = new();
         public string SearchQuery { get; set; } = "";
         public string FilterStatus { get; set; } = "";
         public string FilterType { get; set; } = "";
@@ -158,3 +158,4 @@ namespace EV_Rental.Pages.Admin.Vehicle
         }
     }
 }
+

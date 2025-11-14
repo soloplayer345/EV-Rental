@@ -3,10 +3,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 using BusinessLayer.Services;
 using BusinessLayer.DTOs;
-using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
 using EV_Rental.Helpers;
-using AccountEntity = DataAccessLayer.Entities.Account;
 
 namespace EV_Rental.Pages.Renter
 {
@@ -38,7 +36,7 @@ namespace EV_Rental.Pages.Renter
             _emailSender = emailSender;
         }
 
-        public Vehicle? Vehicle { get; set; }
+        public VehicleDto? Vehicle { get; set; }
         public int VehicleId { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
@@ -452,7 +450,7 @@ namespace EV_Rental.Pages.Renter
             return ipAddress;
         }
 
-        private async Task SendOtpEmailAsync(string toEmail, string customerName, RentalRecord rentalRecord)
+        private async Task SendOtpEmailAsync(string toEmail, string customerName, dynamic rentalRecord)
         {
             var subject = $"🔋 Mã OTP #{rentalRecord.Id} - Xác Nhận Thuê Xe EV Rental";
             
@@ -501,7 +499,7 @@ namespace EV_Rental.Pages.Renter
         .footer {{ background: #1f2937; color: #9ca3af; text-align: center; padding: 25px; font-size: 13px; }}
         .footer p {{ margin: 5px 0; }}
         .divider {{ height: 1px; background: linear-gradient(to right, transparent, #e5e7eb, transparent); margin: 20px 0; }}
-        .status-badge {{ display: inline-block; padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 600; }}
+        .Status-badge {{ display: inline-block; padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 600; }}
     </style>
 </head>
 <body>
@@ -636,3 +634,4 @@ namespace EV_Rental.Pages.Renter
         }
     }
 }
+

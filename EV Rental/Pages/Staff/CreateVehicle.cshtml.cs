@@ -1,5 +1,5 @@
-﻿using BusinessLayer.Services;
-using DataAccessLayer.Entities;
+using BusinessLayer.DTOs;
+using BusinessLayer.Services;
 using DataAccessLayer.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -16,7 +16,7 @@ namespace EV_Rental.Pages.Staff
         }
 
         [BindProperty]
-        public Vehicle Vehicle { get; set; } = new();
+        public VehicleCreateDto NewVehicle { get; set; } = new();
 
         public void OnGet()
         {
@@ -27,10 +27,11 @@ namespace EV_Rental.Pages.Staff
             if (!ModelState.IsValid)
                 return Page();
 
-            Vehicle.Status = VehicleStatus.Available;
+            NewVehicle.Status = VehicleStatus.Available;
 
-            await _vehicleService.AddVehicleAsync(Vehicle);
+            await _vehicleService.AddVehicleAsync(NewVehicle);
             return RedirectToPage("Index");
         }
     }
 }
+

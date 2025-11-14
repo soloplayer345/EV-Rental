@@ -1,5 +1,6 @@
 using BusinessLayer.Services;
-using DataAccessLayer.Entities;
+using BusinessLayer.DTOs;
+using BusinessLayer.Mapping;
 using DataAccessLayer.Enums;
 using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -20,8 +21,8 @@ namespace EV_Rental.Pages.Staff
             _vehicleService = vehicleService;
         }
 
-        public List<DataAccessLayer.Entities.RentalRecord> ConfirmedRentals { get; set; } = new List<DataAccessLayer.Entities.RentalRecord>();
-        public DataAccessLayer.Entities.RentalRecord? VerifiedRental { get; set; }
+        public List<RentalRecordDto> ConfirmedRentals { get; set; } = new List<RentalRecordDto>();
+        public RentalRecordDto? VerifiedRental { get; set; }
         public string? ErrorMessage { get; set; }
         public string? SuccessMessage { get; set; }
         
@@ -47,7 +48,7 @@ namespace EV_Rental.Pages.Staff
                 allConfirmedRentals.AddRange(rentals);
             }
 
-            ConfirmedRentals = allConfirmedRentals.OrderByDescending(r => r.CreateDate).ToList();
+            ConfirmedRentals = RentalRecordMapper.ToDtoList(allConfirmedRentals).OrderByDescending(r => r.CreateDate).ToList();
 
             return Page();
         }
@@ -78,7 +79,7 @@ namespace EV_Rental.Pages.Staff
             }
 
             // Hiển thị thông tin đơn thuê đã xác minh
-            VerifiedRental = rental;
+            VerifiedRental = RentalRecordMapper.ToDto(rental);
             await LoadConfirmedRentals();
 
             return Page();
@@ -128,8 +129,9 @@ namespace EV_Rental.Pages.Staff
                 allConfirmedRentals.AddRange(rentals);
             }
 
-            ConfirmedRentals = allConfirmedRentals.OrderByDescending(r => r.CreateDate).ToList();
+            ConfirmedRentals = RentalRecordMapper.ToDtoList(allConfirmedRentals).OrderByDescending(r => r.CreateDate).ToList();
         }
     }
 }
+
 

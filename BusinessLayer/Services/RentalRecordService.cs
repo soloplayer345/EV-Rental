@@ -1,3 +1,5 @@
+using BusinessLayer.DTOs;
+using BusinessLayer.Mapping;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
 using DataAccessLayer.Interfaces;
@@ -19,19 +21,21 @@ namespace BusinessLayer.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<RentalRecord>> GetAllRentalRecordsAsync()
+        public async Task<IEnumerable<RentalRecordDto>> GetAllRentalRecordsAsync()
         {
             var rentalRepo = _unitOfWork.GetRepository<RentalRecord>();
             var records = rentalRepo.GetAllQueryable("Renter,Vehicle,PickupStation,ReturnStation,Payments");
-            return await records.OrderByDescending(r => r.Id).ToListAsync();
+            var recordList = await records.OrderByDescending(r => r.Id).ToListAsync();
+            return RentalRecordMapper.ToDtoList(recordList);
         }
 
-        public async Task<RentalRecord> GetRentalRecordByIdAsync(int id)
+        public async Task<RentalRecordDto> GetRentalRecordByIdAsync(int id)
         {
             try
             {
                 var rentalRepo = _unitOfWork.GetRepository<RentalRecord>();
-                return await rentalRepo.FindOneAsync(r => r.Id == id, "Renter,Vehicle,PickupStation,ReturnStation,Payments,InspectionProblems");
+                var record = await rentalRepo.FindOneAsync(r => r.Id == id, "Renter,Vehicle,PickupStation,ReturnStation,Payments,InspectionProblems");
+                return RentalRecordMapper.ToDto(record);
             }
             catch (KeyNotFoundException)
             {
@@ -46,7 +50,7 @@ namespace BusinessLayer.Services
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<RentalRecord>> SearchRentalRecordsAsync(
+        public async Task<IEnumerable<RentalRecordDto>> SearchRentalRecordsAsync(
             string searchQuery, 
             RentalRecordStatus? status, 
             DateTime? startDate, 
@@ -86,7 +90,7 @@ namespace BusinessLayer.Services
                 result = result.Where(r => r.StartTime <= endDate.Value).ToList();
             }
 
-            return result.OrderByDescending(r => r.Id).ToList();
+            return RentalRecordMapper.ToDtoList(result.OrderByDescending(r => r.Id).ToList());
         }
 
         public decimal CalculateTotalPrice(RentalRecord record)

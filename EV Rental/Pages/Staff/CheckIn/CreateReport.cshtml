@@ -1,0 +1,491 @@
+@page "{id:int}"
+@model EV_Rental.Pages.Staff.CheckIn.CreateReportModel
+@{
+    ViewData["Title"] = "Tạo Báo Cáo Kiểm Tra Trả Xe";
+}
+
+<div class="container-fluid mt-4">
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (Model.RentalRecord != null)
+    {
+        <div class="row mb-3">
+            <div class="col">
+                <a href="/Staff/CheckIn/Detail/@Model.RentalRecord.Id" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Quay Lại
+                </a>
+                <button type="button" class="btn btn-primary" onclick="window.print()">
+                    <i class="bi bi-printer"></i> In Báo Cáo
+                </button>
+            </div>
+        </div>
+
+        <!-- Báo cáo -->
+        <div class="card shadow" id="reportContent">
+            <div class="card-body p-5">
+                <div class="row mb-4">
+                    <div class="col-12 text-center">
+                        <h2 class="text-primary fw-bold">BÁO CÁO KIỂM TRA TRẢ XE</h2>
+                        <p class="text-muted mb-1">Mã đơn thuê: <strong>#@Model.RentalRecord.Id</strong></p>
+                        <p class="text-muted">Ngày tạo: <strong>@DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</strong></p>
+                        <hr class="my-3" />
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5 class="border-bottom pb-2 mb-3"><i class="bi bi-person"></i> Thông Tin Khách Hàng</h5>
+                        <table class="table table-sm table-borderless">
+                            <tr>
+                                <td class="fw-bold" style="width: 40%">Họ tên:</td>
+                                <td>@Model.RentalRecord.Renter?.FullName</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Email:</td>
+                                <td>@Model.RentalRecord.Renter?.Email</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Số điện thoại:</td>
+                                <td>@Model.RentalRecord.Renter?.Phone</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="border-bottom pb-2 mb-3"><i class="bi bi-car-front"></i> Thông Tin Xe</h5>
+                        <table class="table table-sm table-borderless">
+                            <tr>
+                                <td class="fw-bold" style="width: 40%">Xe:</td>
+                                <td>@Model.RentalRecord.Vehicle?.Name - @Model.RentalRecord.Vehicle?.Brand</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Biển số:</td>
+                                <td><span class="badge bg-secondary">@Model.RentalRecord.Vehicle?.PlateNumber</span></td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Trạm lấy:</td>
+                                <td>@Model.RentalRecord.PickupStation?.Name</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5 class="border-bottom pb-2 mb-3"><i class="bi bi-clock-history"></i> Thời Gian Thuê</h5>
+                        <table class="table table-sm table-bordered">
+                            <tr>
+                                <td class="fw-bold bg-light" style="width: 30%">Thời gian bắt đầu:</td>
+                                <td>@Model.RentalRecord.StartTime?.ToString("dd/MM/yyyy HH:mm")</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold bg-light">Thời gian dự kiến trả:</td>
+                                <td class="text-warning">@Model.RentalRecord.ExpectedEndTime?.ToString("dd/MM/yyyy HH:mm")</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold bg-light">Thời gian trả thực tế:</td>
+                                <td>
+                                    <input type="datetime-local" id="actualReturnTime" class="form-control" 
+                                           value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" 
+                                           onchange="updateReport()" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold bg-light">Tổng giờ thuê:</td>
+                                <td id="totalHoursDisplay">-</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Kiểm tra vấn đề -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5 class="border-bottom pb-2 mb-3"><i class="bi bi-exclamation-triangle"></i> Kiểm Tra Tình Trạng Xe</h5>
+                        <div id="problemsContainer">
+                            <!-- Danh sách vấn đề -->
+                        </div>
+                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="addProblem()">
+                            <i class="bi bi-plus-circle"></i> Thêm Vấn Đề
+                        </button>
+                    </div>
+                </div>
+
+                <div id="problemsReport" class="row mb-4" style="display: none;">
+                    <div class="col-12">
+                        <h5 class="border-bottom pb-2 mb-3 text-danger"><i class="bi bi-tools"></i> Vấn Đề Phát Hiện</h5>
+                        <table class="table table-bordered table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 10%">STT</th>
+                                    <th style="width: 25%">Loại vấn đề</th>
+                                    <th style="width: 40%">Mô tả</th>
+                                    <th class="text-end" style="width: 25%">Tiền phạt</th>
+                                </tr>
+                            </thead>
+                            <tbody id="problemsTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Chi phí -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5 class="border-bottom pb-2 mb-3"><i class="bi bi-calculator"></i> Chi Phí Chi Tiết</h5>
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <td class="fw-bold bg-light" style="width: 50%">Giá thuê cơ bản (giờ):</td>
+                                    <td class="text-end">@Model.RentalRecord.BasePrice.ToString("N0") VNĐ</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold bg-light">Phí sử dụng (<span id="hoursUsed">0</span> giờ):</td>
+                                    <td class="text-end" id="usageCostDisplay">0 VNĐ</td>
+                                </tr>
+                                <tr class="table-warning" id="lateFeeRow" style="display: none;">
+                                    <td class="fw-bold">Phí trả chậm (20%/giờ):</td>
+                                    <td class="text-end text-danger fw-bold" id="lateFeeDisplay">0 VNĐ</td>
+                                </tr>
+                                <tr class="table-danger" id="penaltyRow" style="display: none;">
+                                    <td class="fw-bold">Tổng tiền phạt thiệt hại:</td>
+                                    <td class="text-end text-danger fw-bold" id="totalPenaltyDisplay">0 VNĐ</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold bg-light">Phụ phí khác:</td>
+                                    <td class="text-end">
+                                        <input type="number" id="extraFees" class="form-control text-end" 
+                                               min="0" value="0" step="1000" onchange="updateReport()" 
+                                               style="max-width: 200px; display: inline-block;" /> VNĐ
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold bg-light">Giảm giá:</td>
+                                    <td class="text-end">
+                                        <input type="number" id="discount" class="form-control text-end" 
+                                               min="0" value="0" step="1000" onchange="updateReport()" 
+                                               style="max-width: 200px; display: inline-block;" /> VNĐ
+                                    </td>
+                                </tr>
+                                <tr class="table-primary">
+                                    <td class="fw-bold fs-5">TỔNG CHI PHÍ:</td>
+                                    <td class="text-end fw-bold fs-5" id="totalAmountDisplay">0 VNĐ</td>
+                                </tr>
+                                <tr class="table-success">
+                                    <td class="fw-bold">Tiền cọc đã đặt:</td>
+                                    <td class="text-end fw-bold">@Model.RentalRecord.DepositFee.ToString("N0") VNĐ</td>
+                                </tr>
+                                <tr class="table-info" id="refundRow" style="display: none;">
+                                    <td class="fw-bold text-success">Hoàn trả cọc:</td>
+                                    <td class="text-end text-success fw-bold" id="depositRefundDisplay">0 VNĐ</td>
+                                </tr>
+                                <tr class="table-warning">
+                                    <td class="fw-bold fs-4"><i class="bi bi-cash-stack"></i> KHÁCH HÀNG CẦN THANH TOÁN:</td>
+                                    <td class="text-end text-primary fw-bold fs-4" id="finalPaymentDisplay">0 VNĐ</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Ghi chú -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5 class="border-bottom pb-2 mb-3"><i class="bi bi-pencil"></i> Ghi Chú</h5>
+                        <textarea id="notes" class="form-control" rows="3" 
+                                  placeholder="Ghi chú về tình trạng xe, khách hàng hoặc bất kỳ thông tin quan trọng nào..."></textarea>
+                    </div>
+                </div>
+
+                <div id="notesReport" class="row mb-4" style="display: none;">
+                    <div class="col-12">
+                        <h5 class="border-bottom pb-2 mb-3"><i class="bi bi-pencil"></i> Ghi Chú</h5>
+                        <p id="notesContent"></p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="row mt-3 mb-5 no-print">
+            <div class="col-12 text-center">
+                <button type="button" class="btn btn-success btn-lg px-5 me-2" onclick="saveReport()">
+                    <i class="bi bi-check-circle"></i> Xác Nhận & Lưu Báo Cáo
+                </button>
+                <a href="/Staff/CheckIn/Detail/@Model.RentalRecord.Id" class="btn btn-secondary btn-lg">
+                    <i class="bi bi-x-circle"></i> Hủy
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle"></i> Không tìm thấy thông tin đơn thuê.
+        </div>
+        <a href="/Staff/CheckIn" class="btn btn-primary">Quay Lại Danh Sách</a>
+    }
+</div>
+
+@section Scripts {
+<script>
+@if (Model.RentalRecord != null)
+{
+    @:const rentalRecordId = @Model.RentalRecord.Id;
+    @:const basePrice = @Model.RentalRecord.BasePrice;
+    @:const startTime = new Date('@(Model.RentalRecord.StartTime?.ToString("yyyy-MM-ddTHH:mm:ss") ?? DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"))');
+    @:const expectedEndTime = new Date('@(Model.RentalRecord.ExpectedEndTime?.ToString("yyyy-MM-ddTHH:mm:ss") ?? DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"))');
+    @:const depositFee = @Model.RentalRecord.DepositFee;
+}
+    let problemCount = 0;
+    const problems = [];
+
+    // Thêm vấn đề
+    function addProblem() {
+        problemCount++;
+        const problemHtml = `
+            <div class="card mb-3 border-danger" id="problem-${problemCount}">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <label class="form-label fw-bold small">Loại vấn đề <span class="text-danger">*</span></label>
+                            <select class="form-select form-select-sm" id="incidentType-${problemCount}" required onchange="updateReport()">
+                                <option value="">-- Chọn loại --</option>
+                                <option value="damage">Hư hỏng</option>
+                                <option value="missing_items">Thiếu phụ kiện</option>
+                                <option value="dirty">Không vệ sinh</option>
+                                <option value="fuel_shortage">Pin yếu</option>
+                                <option value="scratch">Trầy xước</option>
+                                <option value="other">Khác</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label class="form-label fw-bold small">Mô tả chi tiết <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-sm" 
+                                   id="description-${problemCount}" 
+                                   placeholder="Mô tả cụ thể vấn đề" required onchange="updateReport()" />
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <label class="form-label fw-bold small">Tiền phạt (VNĐ)</label>
+                            <input type="number" class="form-control form-control-sm" 
+                                   id="penaltyAmount-${problemCount}" 
+                                   placeholder="0" min="0" step="10000" value="0" onchange="updateReport()" />
+                        </div>
+                        <div class="col-md-2 mb-2 d-flex align-items-end">
+                            <button type="button" class="btn btn-danger btn-sm w-100" onclick="removeProblem(${problemCount})">
+                                <i class="bi bi-trash"></i> Xóa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.getElementById('problemsContainer').insertAdjacentHTML('beforeend', problemHtml);
+    }
+
+    // Xóa vấn đề
+    function removeProblem(id) {
+        document.getElementById(`problem-${id}`).remove();
+        updateReport();
+    }
+
+    // Lấy danh sách vấn đề
+    function getProblems() {
+        const problemsList = [];
+        for (let i = 1; i <= problemCount; i++) {
+            const problemDiv = document.getElementById(`problem-${i}`);
+            if (problemDiv) {
+                const incidentType = document.getElementById(`incidentType-${i}`)?.value;
+                const description = document.getElementById(`description-${i}`)?.value;
+                const penaltyAmount = parseFloat(document.getElementById(`penaltyAmount-${i}`)?.value) || 0;
+                
+                if (incidentType && description) {
+                    problemsList.push({
+                        incidentType: incidentType,
+                        incidentTypeName: getIncidentTypeName(incidentType),
+                        description: description,
+                        penaltyAmount: penaltyAmount
+                    });
+                }
+            }
+        }
+        return problemsList;
+    }
+
+    // Tên loại vấn đề
+    function getIncidentTypeName(type) {
+        const types = {
+            'damage': 'Hư hỏng',
+            'missing_items': 'Thiếu phụ kiện',
+            'dirty': 'Không vệ sinh',
+            'fuel_shortage': 'Pin yếu',
+            'scratch': 'Trầy xước',
+            'other': 'Khác'
+        };
+        return types[type] || type;
+    }
+
+    // Cập nhật báo cáo
+    function updateReport() {
+        const actualReturnTime = new Date(document.getElementById('actualReturnTime').value);
+        
+        if (!actualReturnTime || isNaN(actualReturnTime.getTime())) {
+            return;
+        }
+
+        // Tính toán
+        const totalHours = Math.ceil((actualReturnTime - startTime) / (1000 * 60 * 60));
+        const usageCost = basePrice * totalHours;
+
+        let lateFee = 0;
+        if (actualReturnTime > expectedEndTime) {
+            const lateHours = Math.ceil((actualReturnTime - expectedEndTime) / (1000 * 60 * 60));
+            lateFee = lateHours * basePrice * 0.2;
+        }
+
+        const problemsList = getProblems();
+        let totalPenalty = 0;
+        problemsList.forEach(p => totalPenalty += p.penaltyAmount);
+
+        const extraFees = parseFloat(document.getElementById('extraFees').value) || 0;
+        const discount = parseFloat(document.getElementById('discount').value) || 0;
+        
+        // Logic: Khách đã trả phí thuê trước (usageCost)
+        // Chỉ tính các khoản phát sinh: phí trả chậm, phạt, phụ phí
+        const additionalCosts = lateFee + totalPenalty + extraFees - discount;
+        const totalAmount = usageCost + additionalCosts;
+        
+        let depositRefund = 0;
+        let finalPayment = 0;
+        
+        if (additionalCosts <= 0) {
+            // Không có phí phát sinh: hoàn toàn bộ cọc
+            depositRefund = depositFee;
+            finalPayment = 0;
+        } else if (additionalCosts >= depositFee) {
+            // Phí phát sinh >= cọc: mất hết cọc + trả thêm
+            depositRefund = 0;
+            finalPayment = additionalCosts - depositFee;
+        } else {
+            // Phí phát sinh < cọc: trừ vào cọc, hoàn lại phần dư
+            depositRefund = depositFee - additionalCosts;
+            finalPayment = 0;
+        }
+
+        // Hiển thị
+        document.getElementById('totalHoursDisplay').textContent = totalHours + ' giờ';
+        document.getElementById('hoursUsed').textContent = totalHours;
+        document.getElementById('usageCostDisplay').textContent = usageCost.toLocaleString('vi-VN') + ' VNĐ';
+        
+        if (lateFee > 0) {
+            document.getElementById('lateFeeRow').style.display = '';
+            document.getElementById('lateFeeDisplay').textContent = lateFee.toLocaleString('vi-VN') + ' VNĐ';
+        } else {
+            document.getElementById('lateFeeRow').style.display = 'none';
+        }
+
+        if (totalPenalty > 0) {
+            document.getElementById('penaltyRow').style.display = '';
+            document.getElementById('totalPenaltyDisplay').textContent = totalPenalty.toLocaleString('vi-VN') + ' VNĐ';
+            
+            // Hiển thị bảng vấn đề
+            document.getElementById('problemsReport').style.display = '';
+            let tableHtml = '';
+            problemsList.forEach((p, index) => {
+                tableHtml += `
+                    <tr>
+                        <td class="text-center">${index + 1}</td>
+                        <td>${p.incidentTypeName}</td>
+                        <td>${p.description}</td>
+                        <td class="text-end text-danger fw-bold">${p.penaltyAmount.toLocaleString('vi-VN')} VNĐ</td>
+                    </tr>
+                `;
+            });
+            document.getElementById('problemsTableBody').innerHTML = tableHtml;
+        } else {
+            document.getElementById('penaltyRow').style.display = 'none';
+            document.getElementById('problemsReport').style.display = 'none';
+        }
+
+        document.getElementById('totalAmountDisplay').textContent = totalAmount.toLocaleString('vi-VN') + ' VNĐ';
+        
+        if (depositRefund > 0) {
+            document.getElementById('refundRow').style.display = '';
+            document.getElementById('depositRefundDisplay').textContent = depositRefund.toLocaleString('vi-VN') + ' VNĐ';
+        } else {
+            document.getElementById('refundRow').style.display = 'none';
+        }
+
+        document.getElementById('finalPaymentDisplay').textContent = finalPayment.toLocaleString('vi-VN') + ' VNĐ';
+
+        // Hiển thị ghi chú nếu có
+        const notes = document.getElementById('notes').value;
+        if (notes) {
+            document.getElementById('notesReport').style.display = '';
+            document.getElementById('notesContent').textContent = notes;
+        } else {
+            document.getElementById('notesReport').style.display = 'none';
+        }
+    }
+
+    // Lưu báo cáo
+    async function saveReport() {
+        const actualReturnTime = document.getElementById('actualReturnTime').value;
+        
+        if (!actualReturnTime) {
+            alert('Vui lòng nhập thời gian trả xe!');
+            return;
+        }
+
+        const problemsList = getProblems();
+        
+        if (confirm('Xác nhận lưu báo cáo và chuyển sang bước thanh toán?')) {
+            // Chuyển về trang Detail với dữ liệu
+            sessionStorage.setItem('reportData', JSON.stringify({
+                actualReturnTime: actualReturnTime,
+                extraFees: parseFloat(document.getElementById('extraFees').value) || 0,
+                discount: parseFloat(document.getElementById('discount').value) || 0,
+                notes: document.getElementById('notes').value,
+                problems: problemsList
+            }));
+            
+            window.location.href = '/Staff/CheckIn/Detail/' + rentalRecordId;
+        }
+    }
+
+    // Khởi tạo
+    document.addEventListener('DOMContentLoaded', function() {
+        updateReport();
+        document.getElementById('actualReturnTime').addEventListener('change', updateReport);
+        document.getElementById('notes').addEventListener('input', updateReport);
+    });
+</script>
+}
+
+<style>
+    @@media print {
+        .no-print {
+            display: none !important;
+        }
+        .card {
+            border: none !important;
+            box-shadow: none !important;
+        }
+        body {
+            background: white !important;
+        }
+        input, textarea, select, button {
+            border: none !important;
+            background: transparent !important;
+        }
+        #problemsContainer {
+            display: none !important;
+        }
+    }
+</style>

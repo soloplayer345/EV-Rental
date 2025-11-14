@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BusinessLayer.Services;
+using BusinessLayer.DTOs;
 using EV_Rental.Helpers;
 
 namespace EV_Rental.Pages.Renter
@@ -14,7 +15,7 @@ namespace EV_Rental.Pages.Renter
             _rentalRecordService = rentalRecordService;
         }
 
-        public DataAccessLayer.Entities.RentalRecord? RentalRecord { get; set; }
+        public RentalRecordDto? RentalRecord { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
@@ -60,3 +61,4 @@ namespace EV_Rental.Pages.Renter
         }
     }
 }
+

@@ -1,5 +1,5 @@
 using BusinessLayer.Services;
-using DataAccessLayer.Entities;
+using BusinessLayer.DTOs;
 using DataAccessLayer.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -22,7 +22,7 @@ namespace EV_Rental.Pages.Admin.Problems
             _rentalRecordService = rentalRecordService;
         }
 
-        public List<InspectionProblemDto> Problems { get; set; } = new();
+        public List<BusinessLayer.Services.InspectionProblemReportDto> Problems { get; set; } = new();
         public string? IncidentType { get; set; }
         public string? SearchTerm { get; set; }
 
@@ -148,3 +148,4 @@ namespace EV_Rental.Pages.Admin.Problems
         }
     }
 }
+

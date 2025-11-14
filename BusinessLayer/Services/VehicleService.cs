@@ -1,4 +1,5 @@
-﻿using BusinessLayer.DTOs;
+using BusinessLayer.DTOs;
+using BusinessLayer.Mapping;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
 using DataAccessLayer.Interfaces;
@@ -23,42 +24,78 @@ namespace BusinessLayer.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<Vehicle>> SearchVehiclesAsync(string name, string brand, DataAccessLayer.Enums.VehicleStatus status)
+        public async Task<IEnumerable<VehicleDto>> SearchVehiclesAsync(string name, string brand, DataAccessLayer.Enums.VehicleStatus status)
         {
-            return await _vehicleRepo.SearchVehiclesAsync(name, brand, status);
+            var vehicles = await _vehicleRepo.SearchVehiclesAsync(name, brand, status);
+            return vehicles.Select(VehicleMapper.ToVehicleDto);
         }
 
-        public async Task<IEnumerable<Vehicle>> GetVehiclesAsync()
+        public async Task<IEnumerable<VehicleDto>> GetVehiclesAsync()
         {
-            return await _vehicleRepo.GetAllAsync();
+            var vehicles = await _vehicleRepo.GetAllAsync();
+            return vehicles.Select(VehicleMapper.ToVehicleDto);
         }
 
-        public async Task<IEnumerable<Vehicle>> GetAllVehiclesAsync()
+        public async Task<IEnumerable<VehicleDto>> GetAllVehiclesAsync()
         {
-            return await _vehicleRepo.GetAllAsync();
+            var vehicles = await _vehicleRepo.GetAllAsync();
+            return vehicles.Select(VehicleMapper.ToVehicleDto);
         }
 
-        public async Task<IEnumerable<Vehicle>> GetVehiclesByStationIdAsync(int stationId)
+        public async Task<IEnumerable<VehicleDto>> GetVehiclesByStationIdAsync(int stationId)
         {
             var allVehicles = await _vehicleRepo.GetAllAsync();
-            return allVehicles.Where(v => v.StationId == stationId);
+            var filtered = allVehicles.Where(v => v.StationId == stationId);
+            return filtered.Select(VehicleMapper.ToVehicleDto);
         }
 
-        public async Task<Vehicle> GetVehicleByIdAsync(int id)
+        public async Task<VehicleDto> GetVehicleByIdAsync(int id)
         {
-            return await _vehicleRepo.GetByIdAsync(id);
+            var vehicle = await _vehicleRepo.GetByIdAsync(id);
+            return vehicle != null ? VehicleMapper.ToVehicleDto(vehicle) : null;
         }
 
-        public async Task AddVehicleAsync(Vehicle vehicle)
+        public async Task AddVehicleAsync(VehicleCreateDto vehicleDto)
         {
+            var vehicle = VehicleMapper.ToVehicleEntity(vehicleDto);
             await _vehicleRepo.AddAsync(vehicle);
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task UpdateVehicleAsync(Vehicle vehicle)
+        public async Task UpdateVehicleAsync(VehicleUpdateDto vehicleDto)
         {
-            await _vehicleRepo.Update(vehicle);
-            await _unitOfWork.SaveChangesAsync();
+            var existingVehicle = await _vehicleRepo.GetByIdAsync(vehicleDto.Id);
+            if (existingVehicle != null)
+            {
+                VehicleMapper.UpdateVehicleEntity(existingVehicle, vehicleDto);
+                await _vehicleRepo.Update(existingVehicle);
+                await _unitOfWork.SaveChangesAsync();
+            }
+        }
+
+        public async Task UpdateVehicleAsync(VehicleDto vehicleDto)
+        {
+            var existingVehicle = await _vehicleRepo.GetByIdAsync(vehicleDto.Id);
+            if (existingVehicle != null)
+            {
+                // Map VehicleDto to entity
+                existingVehicle.StationId = vehicleDto.StationId;
+                existingVehicle.Name = vehicleDto.Name;
+                existingVehicle.Brand = vehicleDto.Brand;
+                existingVehicle.PlateNumber = vehicleDto.PlateNumber;
+                existingVehicle.Model = vehicleDto.Model;
+                existingVehicle.VehicleType = vehicleDto.VehicleType;
+                existingVehicle.Status = vehicleDto.Status;
+                existingVehicle.PricePerHour = vehicleDto.PricePerHour;
+                existingVehicle.PricePerDay = vehicleDto.PricePerDay;
+                existingVehicle.Features = vehicleDto.Features;
+                existingVehicle.ImageUrl = vehicleDto.ImageUrl;
+                existingVehicle.MaxDistance = vehicleDto.MaxDistance;
+                existingVehicle.BatteryCapacity = vehicleDto.BatteryCapacity;
+
+                await _vehicleRepo.Update(existingVehicle);
+                await _unitOfWork.SaveChangesAsync();
+            }
         }
 
         public async Task DeleteVehicleAsync(int id)
@@ -120,4 +157,5 @@ namespace BusinessLayer.Services
 
     }
 }
+
 

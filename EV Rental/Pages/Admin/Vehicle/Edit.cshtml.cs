@@ -1,6 +1,5 @@
 using BusinessLayer.DTOs;
 using BusinessLayer.Services;
-using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
 using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -14,9 +13,9 @@ namespace EV_Rental.Pages.Admin.Vehicle
         private readonly StationService _stationService;
 
         [BindProperty]
-        public DataAccessLayer.Entities.Vehicle Vehicle { get; set; } = new();
+        public VehicleUpdateDto Vehicle { get; set; } = new();
 
-        public List<DataAccessLayer.Entities.Station> Stations { get; set; } = new();
+        public List<StationDto> Stations { get; set; } = new();
         public string UserEmail { get; set; } = string.Empty;
 
         public EditModel(VehicleService vehicleService, StationService stationService)
@@ -38,12 +37,31 @@ namespace EV_Rental.Pages.Admin.Vehicle
 
             try
             {
-                Vehicle = await _vehicleService.GetVehicleByIdAsync(id);
-                if (Vehicle == null)
+                var vehicleDto = await _vehicleService.GetVehicleByIdAsync(id);
+                if (vehicleDto == null)
                 {
                     TempData["ErrorMessage"] = "Không tìm thấy xe";
                     return RedirectToPage("/Admin/Vehicle/Index");
                 }
+
+                // Convert VehicleDto to VehicleUpdateDto
+                Vehicle = new VehicleUpdateDto
+                {
+                    Id = vehicleDto.Id,
+                    StationId = vehicleDto.StationId,
+                    Name = vehicleDto.Name,
+                    Brand = vehicleDto.Brand,
+                    PlateNumber = vehicleDto.PlateNumber,
+                    Model = vehicleDto.Model,
+                    VehicleType = vehicleDto.VehicleType,
+                    Status = vehicleDto.Status,
+                    PricePerHour = vehicleDto.PricePerHour,
+                    PricePerDay = vehicleDto.PricePerDay,
+                    Features = vehicleDto.Features,
+                    ImageUrl = vehicleDto.ImageUrl,
+                    MaxDistance = vehicleDto.MaxDistance,
+                    BatteryCapacity = vehicleDto.BatteryCapacity
+                };
 
                 // Lấy danh sách trạm
                 Stations = (await _stationService.GetAllStationsAsync()).ToList();
@@ -153,10 +171,25 @@ namespace EV_Rental.Pages.Admin.Vehicle
                     // Reload vehicle from database but preserve user-entered values for editable fields
                     var currentImageUrl = Vehicle.ImageUrl;
                     var currentFeatures = Vehicle.Features;
-                    Vehicle = await _vehicleService.GetVehicleByIdAsync(Vehicle.Id);
-                    // Restore user-entered values
-                    Vehicle.ImageUrl = currentImageUrl;
-                    Vehicle.Features = currentFeatures;
+                    var vehicleDto = await _vehicleService.GetVehicleByIdAsync(Vehicle.Id);
+                    // Convert and restore user-entered values
+                    Vehicle = new VehicleUpdateDto
+                    {
+                        Id = vehicleDto.Id,
+                        StationId = vehicleDto.StationId,
+                        Name = vehicleDto.Name,
+                        Brand = vehicleDto.Brand,
+                        PlateNumber = vehicleDto.PlateNumber,
+                        Model = vehicleDto.Model,
+                        VehicleType = vehicleDto.VehicleType,
+                        Status = vehicleDto.Status,
+                        PricePerHour = vehicleDto.PricePerHour,
+                        PricePerDay = vehicleDto.PricePerDay,
+                        Features = currentFeatures,
+                        ImageUrl = currentImageUrl,
+                        MaxDistance = vehicleDto.MaxDistance,
+                        BatteryCapacity = vehicleDto.BatteryCapacity
+                    };
                     return Page();
                 }
 
@@ -180,10 +213,25 @@ namespace EV_Rental.Pages.Admin.Vehicle
                     var currentFeatures = Vehicle.Features;
                     Stations = (await _stationService.GetAllStationsAsync()).ToList();
                     // Reload vehicle from database to show original data
-                    Vehicle = await _vehicleService.GetVehicleByIdAsync(Vehicle.Id);
-                    // Restore user-entered values
-                    Vehicle.ImageUrl = currentImageUrl;
-                    Vehicle.Features = currentFeatures;
+                    var vehicleDto = await _vehicleService.GetVehicleByIdAsync(Vehicle.Id);
+                    // Convert and restore user-entered values
+                    Vehicle = new VehicleUpdateDto
+                    {
+                        Id = vehicleDto.Id,
+                        StationId = vehicleDto.StationId,
+                        Name = vehicleDto.Name,
+                        Brand = vehicleDto.Brand,
+                        PlateNumber = vehicleDto.PlateNumber,
+                        Model = vehicleDto.Model,
+                        VehicleType = vehicleDto.VehicleType,
+                        Status = vehicleDto.Status,
+                        PricePerHour = vehicleDto.PricePerHour,
+                        PricePerDay = vehicleDto.PricePerDay,
+                        Features = currentFeatures,
+                        ImageUrl = currentImageUrl,
+                        MaxDistance = vehicleDto.MaxDistance,
+                        BatteryCapacity = vehicleDto.BatteryCapacity
+                    };
                 }
                 catch { }
                 return Page();
@@ -191,3 +239,4 @@ namespace EV_Rental.Pages.Admin.Vehicle
         }
     }
 }
+

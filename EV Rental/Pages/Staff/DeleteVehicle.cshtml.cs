@@ -1,5 +1,5 @@
+using BusinessLayer.DTOs;
 using BusinessLayer.Services;
-using DataAccessLayer.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -15,7 +15,7 @@ namespace EV_Rental.Pages.Staff
         }
 
         [BindProperty]
-        public Vehicle Vehicle { get; set; } = new();
+        public VehicleDto Vehicle { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
@@ -31,3 +31,4 @@ namespace EV_Rental.Pages.Staff
         }
     }
 }
+

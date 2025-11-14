@@ -30,9 +30,18 @@ namespace EV_Rental
                 options.Cookie.IsEssential = true;
             });
 
-            //add connection String
+            // Add connection String with Fallback mechanism
+            var connectionString = DatabaseConnectionHelper.GetConnectionStringWithFallback(builder.Configuration);
             builder.Services.AddDbContext<EVRentalDBContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+                options.UseSqlServer(connectionString, sqlOptions =>
+                {
+                    sqlOptions.EnableRetryOnFailure(
+                        maxRetryCount: 3,
+                        maxRetryDelay: TimeSpan.FromSeconds(5),
+                        errorNumbersToAdd: null
+                    );
+                    sqlOptions.CommandTimeout(30);
+                })
             );
 
             // Register Repositories
@@ -51,6 +60,7 @@ namespace EV_Rental
             builder.Services.AddScoped<ReviewService>();
             builder.Services.AddScoped<ReportService>();
             builder.Services.AddScoped<AccountService>();
+            builder.Services.AddScoped<ICheckInService, CheckInService>();
             
             // Register SignalR wrapper service
             builder.Services.AddScoped<EV_Rental.Services.VehicleHubService>();

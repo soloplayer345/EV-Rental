@@ -315,7 +315,7 @@
                 return;
             }
 
-            const vehicleNames = selectedIds.map(v => v.name).join(', ');
+            const vehicleNames = selectedIds.map(v => v.Name).join(', ');
             const confirmMsg = `Bạn có chắc chắn muốn xóa ${selectedIds.length} xe này không?\n\n${vehicleNames}\n\nThao tác này không thể hoàn tác.`;
 
             if (confirm(confirmMsg)) {
@@ -326,14 +326,14 @@
 
                 const input = document.createElement('input');
                 input.type = 'hidden';
-                input.name = '__RequestVerificationToken';
+                input.Name = '__RequestVerificationToken';
                 input.value = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
                 form.appendChild(input);
 
                 selectedIds.forEach((item, index) => {
                     const idInput = document.createElement('input');
                     idInput.type = 'hidden';
-                    idInput.name = `ids[${index}]`;
+                    idInput.Name = `ids[${index}]`;
                     idInput.value = item.id;
                     form.appendChild(idInput);
                 });
@@ -344,3 +344,4 @@
         });
     </script>
 }
+

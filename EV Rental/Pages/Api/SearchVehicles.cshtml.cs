@@ -32,15 +32,15 @@ namespace EV_Rental.Pages.Api
                 ).Select(v => new
                 {
                     v.Id,
-                    v.Name,
-                    v.Brand,
-                    v.VehicleType,
-                    v.PricePerDay,
-                    v.MaxDistance,
-                    v.BatteryCapacity,
-                    v.seartCapacity,
+                    Name = v.Name,
+                    Brand = v.Brand,
+                    VehicleType = v.VehicleType,
+                    PricePerDay = v.PricePerDay,
+                    MaxDistance = v.MaxDistance,
+                    BatteryCapacity = v.BatteryCapacity,
+                    SeartCapacity = v.seartCapacity,
                     Status = v.Status.ToString(),
-                    v.ImageUrl
+                    ImageUrl = v.ImageUrl
                 });
 
                 return new JsonResult(new
@@ -61,3 +61,4 @@ namespace EV_Rental.Pages.Api
         }
     }
 }
+

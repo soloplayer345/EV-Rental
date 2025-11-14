@@ -1,6 +1,5 @@
 using BusinessLayer.DTOs;
 using BusinessLayer.Services;
-using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
 using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -14,9 +13,9 @@ namespace EV_Rental.Pages.Admin.Vehicle
         private readonly StationService _stationService;
 
         [BindProperty]
-        public DataAccessLayer.Entities.Vehicle Vehicle { get; set; } = new();
+        public VehicleCreateDto Vehicle { get; set; } = new();
 
-        public List<DataAccessLayer.Entities.Station> Stations { get; set; } = new();
+        public List<StationDto> Stations { get; set; } = new();
         public string UserEmail { get; set; } = string.Empty;
 
         public CreateModel(VehicleService vehicleService, StationService stationService)
@@ -138,3 +137,4 @@ namespace EV_Rental.Pages.Admin.Vehicle
         }
     }
 }
+

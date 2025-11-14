@@ -1,6 +1,5 @@
-﻿using BusinessLayer.DTOs;
+using BusinessLayer.DTOs;
 using BusinessLayer.Services;
-using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
 using DataAccessLayer.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -42,3 +41,4 @@ namespace EV_Rental.Pages
         }
     }
 }
+

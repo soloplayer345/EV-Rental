@@ -1,3 +1,5 @@
+using BusinessLayer.DTOs;
+using BusinessLayer.Mapping;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
 using DataAccessLayer.Interfaces;
@@ -15,7 +17,7 @@ namespace BusinessLayer.Services
         }
 
         // Get all accounts (exclude admins for user management)
-        public async Task<IEnumerable<Account>> GetAllAccountsAsync(bool excludeAdmins = false)
+        public async Task<IEnumerable<AccountDto>> GetAllAccountsAsync(bool excludeAdmins = false)
         {
             var accountRepo = _unitOfWork.AccountRepo;
             var accounts = await accountRepo.GetAllAsync();
@@ -25,35 +27,49 @@ namespace BusinessLayer.Services
                 accounts = accounts.Where(a => a.Role != AccountRole.Admin).ToList();
             }
 
-            return accounts;
+            return AccountMapper.ToDtoList(accounts);
         }
 
         // Get account by ID
-        public async Task<Account?> GetAccountByIdAsync(int id)
+        public async Task<AccountDto?> GetAccountByIdAsync(int id)
         {
             var accountRepo = _unitOfWork.AccountRepo;
-            return await accountRepo.GetByIdAsync(id);
+            var account = await accountRepo.GetByIdAsync(id);
+            return AccountMapper.ToDto(account);
         }
 
         // Get account by ID using Account interface method
-        public async Task<Account?> GetByIdAsync(int id)
+        public async Task<AccountDto?> GetByIdAsync(int id)
         {
             var accountRepo = _unitOfWork.AccountRepo;
-            return await accountRepo.GetByIdAsync(id);
+            var account = await accountRepo.GetByIdAsync(id);
+            return AccountMapper.ToDto(account);
         }
 
         // Get account by email
-        public async Task<Account?> GetAccountByEmailAsync(string email)
+        public async Task<AccountDto?> GetAccountByEmailAsync(string email)
         {
             var accountRepo = _unitOfWork.AccountRepo;
             var accounts = await accountRepo.GetAllAsync();
-            return accounts.FirstOrDefault(a => a.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+            var account = accounts.FirstOrDefault(a => a.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+            return AccountMapper.ToDto(account);
         }
 
-        // Add new account
-        public async Task<Account> AddAccountAsync(Account account)
+        // Add new account - accepts dynamic to support anonymous objects from Pages
+        public async Task<AccountDto> AddAccountAsync(dynamic accountData)
         {
             var accountRepo = _unitOfWork.AccountRepo;
+            
+            // Convert dynamic to Account entity
+            var account = new Account
+            {
+                FullName = accountData.FullName,
+                Email = accountData.Email,
+                Phone = accountData.Phone,
+                PasswordHash = accountData.PasswordHash,
+                Role = accountData.Role,
+                IsActive = accountData.IsActive
+            };
             
             // Check if email already exists
             if (await accountRepo.IsEmailExistsAsync(account.Email))
@@ -73,7 +89,7 @@ namespace BusinessLayer.Services
             await accountRepo.AddAsync(account);
             await _unitOfWork.SaveChangesAsync();
 
-            return account;
+            return AccountMapper.ToDto(account);
         }
 
         // Update account
@@ -158,7 +174,7 @@ namespace BusinessLayer.Services
         }
 
         // Search accounts
-        public async Task<IEnumerable<Account>> SearchAccountsAsync(
+        public async Task<IEnumerable<AccountDto>> SearchAccountsAsync(
             string? searchTerm = null,
             AccountRole? roleFilter = null,
             bool? statusFilter = null)
@@ -190,7 +206,7 @@ namespace BusinessLayer.Services
                 accounts = accounts.Where(a => a.IsActive == statusFilter.Value);
             }
 
-            return accounts.OrderByDescending(a => a.CreateDate).ToList();
+            return AccountMapper.ToDtoList(accounts.OrderByDescending(a => a.CreateDate).ToList());
         }
     }
 

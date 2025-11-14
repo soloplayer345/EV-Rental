@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BusinessLayer.Services;
-using DataAccessLayer.Entities;
+using BusinessLayer.DTOs;
+using BusinessLayer.Mapping;
+using DataAccessLayer.Enums;
 
 namespace EV_Rental.Pages.Admin.RentalRecord
 {
@@ -14,7 +16,7 @@ namespace EV_Rental.Pages.Admin.RentalRecord
             _rentalRecordService = rentalRecordService;
         }
 
-        public DataAccessLayer.Entities.RentalRecord? RentalRecord { get; set; }
+        public RentalRecordDto? RentalRecord { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
@@ -99,7 +101,7 @@ namespace EV_Rental.Pages.Admin.RentalRecord
                 }
 
                 record.Status = DataAccessLayer.Enums.RentalRecordStatus.Cancelled;
-                await _rentalRecordService.UpdateRentalRecordAsync(record);
+                await _rentalRecordService.UpdateRentalRecordAsync(RentalRecordMapper.ToEntity(record));
 
                 TempData["SuccessMessage"] = "Hủy đơn thuê thành công!";
             }
@@ -131,7 +133,7 @@ namespace EV_Rental.Pages.Admin.RentalRecord
 
                 record.Status = DataAccessLayer.Enums.RentalRecordStatus.Completed;
                 record.ActualEndTime = DateTime.Now;
-                await _rentalRecordService.UpdateRentalRecordAsync(record);
+                await _rentalRecordService.UpdateRentalRecordAsync(RentalRecordMapper.ToEntity(record));
 
                 TempData["SuccessMessage"] = "Đánh dấu đơn thuê hoàn thành!";
             }
@@ -144,3 +146,8 @@ namespace EV_Rental.Pages.Admin.RentalRecord
         }
     }
 }
+
+
+
+
+
