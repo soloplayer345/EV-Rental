@@ -1,4 +1,5 @@
 using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using BusinessLayer.DTOs;
 using BusinessLayer.Mapping;
 using DataAccessLayer.Entities;
@@ -9,10 +10,10 @@ namespace EV_Rental.Services
 {
     public class VehicleHubService
     {
-        private readonly VehicleService _vehicleService;
+        private readonly IVehicleService _vehicleService;
         private readonly IHubContext<VehicleHub> _hubContext;
 
-        public VehicleHubService(VehicleService vehicleService, IHubContext<VehicleHub> hubContext)
+        public VehicleHubService(IVehicleService vehicleService, IHubContext<VehicleHub> hubContext)
         {
             _vehicleService = vehicleService;
             _hubContext = hubContext;

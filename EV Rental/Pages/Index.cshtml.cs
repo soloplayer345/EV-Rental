@@ -1,5 +1,5 @@
 using BusinessLayer.DTOs;
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using DataAccessLayer.Enums;
 using DataAccessLayer.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -9,10 +9,10 @@ namespace EV_Rental.Pages
 {
     public class IndexModel : PageModel
     {
-        private readonly VehicleService _vehicleService;
+        private readonly IVehicleService _vehicleService;
 
 
-        public IndexModel(VehicleService vehicleService)
+        public IndexModel(IVehicleService vehicleService)
         {
             _vehicleService = vehicleService;
         }
@@ -26,17 +26,17 @@ namespace EV_Rental.Pages
         [BindProperty(SupportsGet = true)]
         public VehicleStatus? Status { get; set; }
 
-        public IEnumerable<VehicleDto> Vehicles { get; set; }
+        public IEnumerable<VehicleDto> Vehicles { get; set; } = new List<VehicleDto>();
 
         public async Task OnGetAsync()
         {
             if (Status.HasValue)
             {
-                var result = await _vehicleService.SearchVehiclesAsync(Name, Brand, Status.Value);
+                Vehicles = await _vehicleService.SearchVehiclesAsync(Name ?? string.Empty, Brand ?? string.Empty, Status.Value);
             }
             else
             {
-                var result = await _vehicleService.GetVehiclesAsync();
+                Vehicles = await _vehicleService.GetVehiclesAsync();
             }
         }
     }

@@ -1,5 +1,5 @@
 using BusinessLayer.DTOs;
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using BusinessLayer.Mapping;
 using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -9,10 +9,10 @@ namespace EV_Rental.Pages.Renter
 {
     public class CancelRentalPolicyModel : PageModel
     {
-        private readonly RentalService _rentalService;
-        private readonly VehicleService _vehicleService;
+        private readonly IRentalService _rentalService;
+        private readonly IVehicleService _vehicleService;
 
-        public CancelRentalPolicyModel(RentalService rentalService, VehicleService vehicleService)
+        public CancelRentalPolicyModel(IRentalService rentalService, IVehicleService vehicleService)
         {
             _rentalService = rentalService;
             _vehicleService = vehicleService;

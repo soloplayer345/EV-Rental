@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using BusinessLayer.DTOs;
 using EV_Rental.Helpers;
 using DataAccessLayer.Enums;
@@ -13,18 +13,18 @@ namespace EV_Rental.Pages.Payment
     public class MoMoReturnModel : PageModel
     {
         private readonly MoMoSettings _momoSettings;
-        private readonly PaymentService _paymentService;
-        private readonly RentalService _rentalService;
-        private readonly VehicleService _vehicleService;
-        private readonly AccountService _accountService;
+        private readonly IPaymentService _paymentService;
+        private readonly IRentalService _rentalService;
+        private readonly IVehicleService _vehicleService;
+        private readonly IAccountService _accountService;
         private readonly IEmailSender _emailSender;
 
         public MoMoReturnModel(
             IOptions<MoMoSettings> momoSettings,
-            PaymentService paymentService,
-            RentalService rentalService,
-            VehicleService vehicleService,
-            AccountService accountService,
+            IPaymentService paymentService,
+            IRentalService rentalService,
+            IVehicleService vehicleService,
+            IAccountService accountService,
             IEmailSender emailSender)
         {
             _momoSettings = momoSettings.Value;
@@ -126,7 +126,7 @@ namespace EV_Rental.Pages.Payment
                     {
                         return RedirectToPage("/Payment/PaymentFailure", new
                         {
-                            message = "Thanh toán thành công nhung không th? xác nh?n don thuê: " + confirmResult.Message,
+                            message = "Thanh toï¿½n thï¿½nh cï¿½ng nhung khï¿½ng th? xï¿½c nh?n don thuï¿½: " + confirmResult.Message,
                             transactionId = transId,
                             orderId = orderId,
                             paymentMethod = "MoMo",
@@ -140,7 +140,7 @@ namespace EV_Rental.Pages.Payment
                 
                 return RedirectToPage("/Payment/PaymentFailure", new
                 {
-                    message = "Không tìm th?y thông tin don thuê ch? thanh toán",
+                    message = "Khï¿½ng tï¿½m th?y thï¿½ng tin don thuï¿½ ch? thanh toï¿½n",
                     transactionId = transId,
                     orderId = orderId,
                     paymentMethod = "MoMo",
@@ -194,19 +194,19 @@ namespace EV_Rental.Pages.Payment
         {
             return resultCode switch
             {
-                "0" => "Giao d?ch thành công",
-                "9000" => "Giao d?ch du?c kh?i t?o, ch? xác nh?n",
+                "0" => "Giao d?ch thï¿½nh cï¿½ng",
+                "9000" => "Giao d?ch du?c kh?i t?o, ch? xï¿½c nh?n",
                 "7000" => "Giao d?ch b? t? ch?i",
-                "7001" => "Tài kho?n không d? ti?n",
+                "7001" => "Tï¿½i kho?n khï¿½ng d? ti?n",
                 "1000" => "L?i h? th?ng",
                 "4100" => "Giao d?ch b? t? ch?i",
-                _ => $"Giao d?ch th?t b?i. Mã: {resultCode}"
+                _ => $"Giao d?ch th?t b?i. Mï¿½: {resultCode}"
             };
         }
 
         private async Task SendOtpEmailAsync(string toEmail, string customerName, DataAccessLayer.Entities.RentalRecord rentalRecord)
         {
-            var subject = $"?? Mã OTP #{rentalRecord.Id} - Thanh Toán Thành Công - EV Rental";
+            var subject = $"?? Mï¿½ OTP #{rentalRecord.Id} - Thanh Toï¿½n Thï¿½nh Cï¿½ng - EV Rental";
             
             // Get vehicle info
             var vehicle = await _vehicleService.GetVehicleByIdAsync(rentalRecord.VehicleId);
@@ -259,30 +259,30 @@ namespace EV_Rental.Pages.Payment
 <body>
     <div class='container'>
         <div class='header'>
-            <h1>? THANH TOÁN THÀNH CÔNG</h1>
-            <p>Ðon Thuê Xe Ðã Ðu?c Xác Nh?n</p>
+            <h1>? THANH TOï¿½N THï¿½NH Cï¿½NG</h1>
+            <p>ï¿½on Thuï¿½ Xe ï¿½ï¿½ ï¿½u?c Xï¿½c Nh?n</p>
         </div>
         
         <div class='content'>
-            <p class='greeting'>Xin chào <strong>{customerName}</strong>,</p>
-            <p>Chúc m?ng! Thanh toán c?a b?n dã du?c x? lý thành công. Ðon thuê xe c?a b?n dã du?c xác nh?n! ??</p>
+            <p class='greeting'>Xin chï¿½o <strong>{customerName}</strong>,</p>
+            <p>Chï¿½c m?ng! Thanh toï¿½n c?a b?n dï¿½ du?c x? lï¿½ thï¿½nh cï¿½ng. ï¿½on thuï¿½ xe c?a b?n dï¿½ du?c xï¿½c nh?n! ??</p>
             
-            <div class='success-badge'>? ÐÃ THANH TOÁN THÀNH CÔNG</div>
+            <div class='success-badge'>? ï¿½ï¿½ THANH TOï¿½N THï¿½NH Cï¿½NG</div>
             
             <div class='otp-section'>
-                <p class='otp-label'>?? MÃ OTP XÁC NH?N NH?N XE</p>
+                <p class='otp-label'>?? Mï¿½ OTP Xï¿½C NH?N NH?N XE</p>
                 <div class='otp-code'>{rentalRecord.OtpCode}</div>
-                <p style='margin: 10px 0 0 0; font-size: 13px; color: #6b7280;'>Vui lòng xu?t trình mã này khi nh?n xe</p>
+                <p style='margin: 10px 0 0 0; font-size: 13px; color: #6b7280;'>Vui lï¿½ng xu?t trï¿½nh mï¿½ nï¿½y khi nh?n xe</p>
             </div>
 
             <div class='info-box'>
-                <h3>?? Thông Tin Chi Ti?t Ðon Thuê</h3>
+                <h3>?? Thï¿½ng Tin Chi Ti?t ï¿½on Thuï¿½</h3>
                 <div class='info-row'>
-                    <span class='info-label'>Mã don hàng:</span>
+                    <span class='info-label'>Mï¿½ don hï¿½ng:</span>
                     <span class='info-value'><strong>#{rentalRecord.Id}</strong></span>
                 </div>
                 <div class='info-row'>
-                    <span class='info-label'>Xe thuê:</span>
+                    <span class='info-label'>Xe thuï¿½:</span>
                     <span class='info-value'>{vehicleName}</span>
                 </div>
                 <div class='info-row'>
@@ -302,24 +302,24 @@ namespace EV_Rental.Pages.Payment
                     <span class='info-value'><strong>{rentalRecord.ExpectedEndTime:dd/MM/yyyy HH:mm}</strong></span>
                 </div>
                 <div class='info-row'>
-                    <span class='info-label'>Tr?ng thái:</span>
-                    <span class='info-value'><span class='status-badge'>? Ðã xác nh?n</span></span>
+                    <span class='info-label'>Tr?ng thï¿½i:</span>
+                    <span class='info-value'><span class='status-badge'>? ï¿½ï¿½ xï¿½c nh?n</span></span>
                 </div>
             </div>
 
             <div class='cost-box'>
-                <p class='cost-label'>?? Ðã Thanh Toán</p>
-                <div class='cost-amount'>{rentalRecord.TotalPrice:N0} VNÐ</div>
-                <p style='margin: 0; font-size: 13px; opacity: 0.9;'>Thanh toán qua MoMo</p>
+                <p class='cost-label'>?? ï¿½ï¿½ Thanh Toï¿½n</p>
+                <div class='cost-amount'>{rentalRecord.TotalPrice:N0} VNï¿½</div>
+                <p style='margin: 0; font-size: 13px; opacity: 0.9;'>Thanh toï¿½n qua MoMo</p>
             </div>
 
             <div class='warning-box'>
-                <p style='margin: 0 0 8px 0;'><strong>?? LUU Ý QUAN TR?NG</strong></p>
+                <p style='margin: 0 0 8px 0;'><strong>?? LUU ï¿½ QUAN TR?NG</strong></p>
                 <ul>
-                    <li><strong>Mang theo mã OTP</strong> khi d?n nh?n xe t?i tr?m</li>
-                    <li>Xu?t trình mã OTP cho nhân viên d? xác nh?n danh tính</li>
-                    <li>Ð?n dúng gi? nh?n xe: <strong>{rentalRecord.StartTime:dd/MM/yyyy HH:mm}</strong></li>
-                    <li>Mang theo <strong>CMND/CCCD và Gi?y phép lái xe</strong> (b?n g?c)</li>
+                    <li><strong>Mang theo mï¿½ OTP</strong> khi d?n nh?n xe t?i tr?m</li>
+                    <li>Xu?t trï¿½nh mï¿½ OTP cho nhï¿½n viï¿½n d? xï¿½c nh?n danh tï¿½nh</li>
+                    <li>ï¿½?n dï¿½ng gi? nh?n xe: <strong>{rentalRecord.StartTime:dd/MM/yyyy HH:mm}</strong></li>
+                    <li>Mang theo <strong>CMND/CCCD vï¿½ Gi?y phï¿½p lï¿½i xe</strong> (b?n g?c)</li>
                     <li>Ki?m tra k? xe tru?c khi nh?n</li>
                 </ul>
             </div>
@@ -327,18 +327,18 @@ namespace EV_Rental.Pages.Payment
             <div class='divider'></div>
 
             <p style='text-align: center; margin: 25px 0;'>
-                <a href='https://localhost:7158/Renter/MyTrips' class='btn'>?? Xem Chi Ti?t Ðon Thuê</a>
+                <a href='https://localhost:7158/Renter/MyTrips' class='btn'>?? Xem Chi Ti?t ï¿½on Thuï¿½</a>
             </p>
 
             <p style='color: #6b7280; font-size: 13px; text-align: center; margin: 20px 0 0 0;'>
-                N?u b?n có b?t k? th?c m?c nào, vui lòng liên h? hotline: <strong style='color: #2563eb;'>1900-xxxx</strong>
+                N?u b?n cï¿½ b?t k? th?c m?c nï¿½o, vui lï¿½ng liï¿½n h? hotline: <strong style='color: #2563eb;'>1900-xxxx</strong>
             </p>
         </div>
         
         <div class='footer'>
             <p style='font-weight: 600; color: white; margin-bottom: 10px;'>?? EV RENTAL SYSTEM</p>
-            <p>Email này du?c g?i t? d?ng t? h? th?ng</p>
-            <p>C?m on b?n dã s? d?ng d?ch v? c?a chúng tôi!</p>
+            <p>Email nï¿½y du?c g?i t? d?ng t? h? th?ng</p>
+            <p>C?m on b?n dï¿½ s? d?ng d?ch v? c?a chï¿½ng tï¿½i!</p>
             <p style='margin-top: 15px;'>&copy; 2025 EV Rental System. All rights reserved.</p>
         </div>
     </div>

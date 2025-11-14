@@ -1,4 +1,4 @@
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using DataAccessLayer.Enums;
 using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -8,9 +8,9 @@ namespace EV_Rental.Pages.Api
 {
     public class SearchVehiclesModel : PageModel
     {
-        private readonly VehicleService _vehicleService;
+        private readonly IVehicleService _vehicleService;
 
-        public SearchVehiclesModel(VehicleService vehicleService)
+        public SearchVehiclesModel(IVehicleService vehicleService)
         {
             _vehicleService = vehicleService;
         }

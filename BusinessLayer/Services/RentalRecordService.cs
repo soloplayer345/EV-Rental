@@ -1,4 +1,5 @@
 using BusinessLayer.DTOs;
+using BusinessLayer.Interfaces;
 using BusinessLayer.Mapping;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer.Services
 {
-    public class RentalRecordService
+    public class RentalRecordService : IRentalRecordService
     {
         private readonly IUnitOfWork _unitOfWork;
 

@@ -1,5 +1,5 @@
 using BusinessLayer.DTOs;
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using DataAccessLayer.Enums;
 using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -9,14 +9,14 @@ namespace EV_Rental.Pages.Admin.Station
 {
     public class IndexModel : PageModel
     {
-        private readonly StationService _stationService;
-        private readonly VehicleService _vehicleService;
+        private readonly IStationService _stationService;
+        private readonly IVehicleService _vehicleService;
         public string UserEmail { get; set; } = string.Empty;
         public List<StationDto> Stations { get; set; } = new();
         public string SearchQuery { get; set; } = "";
         public string FilterState { get; set; } = "";
 
-        public IndexModel(StationService stationService, VehicleService vehicleService)
+        public IndexModel(IStationService stationService, IVehicleService vehicleService)
         {
             _stationService = stationService;
             _vehicleService = vehicleService;

@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using BusinessLayer.DTOs;
 using EV_Rental.Helpers;
 using DataAccessLayer.Enums;
@@ -13,18 +13,18 @@ namespace EV_Rental.Pages.Payment
     public class VNPayReturnModel : PageModel
     {
         private readonly VNPaySettings _vnPaySettings;
-        private readonly PaymentService _paymentService;
-        private readonly RentalService _rentalService;
-        private readonly VehicleService _vehicleService;
-        private readonly AccountService _accountService;
+        private readonly IPaymentService _paymentService;
+        private readonly IRentalService _rentalService;
+        private readonly IVehicleService _vehicleService;
+        private readonly IAccountService _accountService;
         private readonly IEmailSender _emailSender;
 
         public VNPayReturnModel(
             IOptions<VNPaySettings> vnPaySettings, 
-            PaymentService paymentService,
-            RentalService rentalService,
-            VehicleService vehicleService,
-            AccountService accountService,
+            IPaymentService paymentService,
+            IRentalService rentalService,
+            IVehicleService vehicleService,
+            IAccountService accountService,
             IEmailSender emailSender)
         {
             _vnPaySettings = vnPaySettings.Value;

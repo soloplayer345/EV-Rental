@@ -1,16 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using BusinessLayer.DTOs;
 
 namespace EV_Rental.Pages.Renter
 {
     public class VehicleDetailModel : PageModel
     {
-        private readonly VehicleService _vehicleService;
-        private readonly ReviewService _reviewService;
+        private readonly IVehicleService _vehicleService;
+        private readonly IReviewService _reviewService;
 
-        public VehicleDetailModel(VehicleService vehicleService, ReviewService reviewService)
+        public VehicleDetailModel(IVehicleService vehicleService, IReviewService reviewService)
         {
             _vehicleService = vehicleService;
             _reviewService = reviewService;

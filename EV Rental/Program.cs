@@ -52,15 +52,15 @@ namespace EV_Rental
             // Register UnitOfWork and Services
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IAuthService, AuthService>();
-            builder.Services.AddScoped<VehicleService>();
-            builder.Services.AddScoped<StationService>();
-            builder.Services.AddScoped<RentalRecordService>();
-            builder.Services.AddScoped<RentalService>();
-            builder.Services.AddScoped<PaymentService>();
-            builder.Services.AddScoped<ReviewService>();
-            builder.Services.AddScoped<ReportService>();
-            builder.Services.AddScoped<AccountService>();
+            builder.Services.AddScoped<IVehicleService, VehicleService>();
+            builder.Services.AddScoped<IRentalService, RentalService>();
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
+            builder.Services.AddScoped<IAccountService, AccountService>();
             builder.Services.AddScoped<ICheckInService, CheckInService>();
+            builder.Services.AddScoped<IStationService, StationService>();
+            builder.Services.AddScoped<IRentalRecordService, RentalRecordService>();
+            builder.Services.AddScoped<IReviewService, ReviewService>();
+            builder.Services.AddScoped<IReportService, ReportService>();
             
             // Register SignalR wrapper service
             builder.Services.AddScoped<EV_Rental.Services.VehicleHubService>();

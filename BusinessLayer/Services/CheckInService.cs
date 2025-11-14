@@ -120,7 +120,7 @@ namespace BusinessLayer.Services
                 // 6. Cập nhật rental record
                 rental.ActualEndTime = actualEndTime;
                 rental.ReturnStationId = checkInDto.ReturnStationId ?? rental.PickupStationId;
-                rental.ExtraFees = checkInDto.ExtraFees;
+                rental.ExtraFees = checkInDto.ExtraFees + totalPenalty + lateFee;
                 rental.Discount = checkInDto.Discount;
                 rental.TotalPrice = totalAmount;
                 rental.Status = RentalRecordStatus.Completed;

@@ -1,4 +1,4 @@
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using BusinessLayer.DTOs;
 using BusinessLayer.Mapping;
 using EV_Rental.Helpers;
@@ -9,10 +9,10 @@ namespace EV_Rental.Pages.Renter
 {
     public class MyTripsModel : PageModel
     {
-        private readonly RentalService _rentalService;
-        private readonly VehicleService _vehicleService;
+        private readonly IRentalService _rentalService;
+        private readonly IVehicleService _vehicleService;
 
-        public MyTripsModel(RentalService rentalService, VehicleService vehicleService)
+        public MyTripsModel(IRentalService rentalService, IVehicleService vehicleService)
         {
             _rentalService = rentalService;
             _vehicleService = vehicleService;

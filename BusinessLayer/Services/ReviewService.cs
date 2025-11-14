@@ -1,10 +1,11 @@
 using BusinessLayer.DTOs;
+using BusinessLayer.Interfaces;
 using DataAccessLayer.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace BusinessLayer.Services
 {
-    public class ReviewService
+    public class ReviewService : IReviewService
     {
         private readonly IUnitOfWork _unitOfWork;
 

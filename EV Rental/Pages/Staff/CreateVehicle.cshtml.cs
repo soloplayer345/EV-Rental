@@ -1,5 +1,5 @@
 using BusinessLayer.DTOs;
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using DataAccessLayer.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -8,9 +8,9 @@ namespace EV_Rental.Pages.Staff
 {
     public class CreateVehicleModel : PageModel
     {
-        private readonly VehicleService _vehicleService;
+        private readonly IVehicleService _vehicleService;
 
-        public CreateVehicleModel(VehicleService vehicleService)
+        public CreateVehicleModel(IVehicleService vehicleService)
         {
             _vehicleService = vehicleService;
         }

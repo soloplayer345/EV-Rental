@@ -1,4 +1,5 @@
 using BusinessLayer.DTOs;
+using BusinessLayer.Interfaces;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
 using DataAccessLayer.Interfaces;
@@ -6,12 +7,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BusinessLayer.Services
 {
-    public class RentalService
+    public class RentalService : IRentalService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly VehicleService _vehicleService;
+        private readonly IVehicleService _vehicleService;
 
-        public RentalService(IUnitOfWork unitOfWork, VehicleService vehicleService)
+        public RentalService(IUnitOfWork unitOfWork, IVehicleService vehicleService)
         {
             _unitOfWork = unitOfWork;
             _vehicleService = vehicleService;

@@ -1,5 +1,5 @@
 using BusinessLayer.DTOs;
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using DataAccessLayer.Enums;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -7,10 +7,10 @@ namespace EV_Rental.Pages.Admin
 {
     public class ReportsModel : PageModel
     {
-        private readonly ReviewService _reviewService;
-        private readonly ReportService _reportService;
+        private readonly IReviewService _reviewService;
+        private readonly IReportService _reportService;
 
-        public ReportsModel(ReviewService reviewService, ReportService reportService)
+        public ReportsModel(IReviewService reviewService, IReportService reportService)
         {
             _reviewService = reviewService;
             _reportService = reportService;

@@ -1,5 +1,5 @@
 using BusinessLayer.DTOs;
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using DataAccessLayer.Enums;
 using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -9,10 +9,10 @@ namespace EV_Rental.Pages.Renter
 {
     public class IndexModel : PageModel
     {
-        private readonly VehicleService _vehicleService;
+        private readonly IVehicleService _vehicleService;
         private const int PageSize = 6;
 
-        public IndexModel(VehicleService vehicleService)
+        public IndexModel(IVehicleService vehicleService)
         {
             _vehicleService = vehicleService;
         }

@@ -1,5 +1,5 @@
 using BusinessLayer.DTOs;
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -7,9 +7,9 @@ namespace EV_Rental.Pages.Staff
 {
     public class UpdateVehicleModel : PageModel
     {
-        private readonly VehicleService _vehicleService;
+        private readonly IVehicleService _vehicleService;
 
-        public UpdateVehicleModel(VehicleService vehicleService)
+        public UpdateVehicleModel(IVehicleService vehicleService)
         {
             _vehicleService = vehicleService;
         }

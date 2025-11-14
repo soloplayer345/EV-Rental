@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using BusinessLayer.DTOs;
 using EV_Rental.Helpers;
 
@@ -8,9 +8,9 @@ namespace EV_Rental.Pages.Renter
 {
     public class TripDetailModel : PageModel
     {
-        private readonly RentalRecordService _rentalRecordService;
+        private readonly IRentalRecordService _rentalRecordService;
 
-        public TripDetailModel(RentalRecordService rentalRecordService)
+        public TripDetailModel(IRentalRecordService rentalRecordService)
         {
             _rentalRecordService = rentalRecordService;
         }

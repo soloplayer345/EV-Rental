@@ -1,5 +1,5 @@
 using BusinessLayer.DTOs;
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using DataAccessLayer.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -8,9 +8,9 @@ namespace EV_Rental.Pages.Staff
 {
     public class StaffIndexModel : PageModel
     {
-        private readonly VehicleService _vehicleService;
+        private readonly IVehicleService _vehicleService;
         
-        public StaffIndexModel(VehicleService vehicleService)
+        public StaffIndexModel(IVehicleService vehicleService)
         {
             _vehicleService = vehicleService;
         }
@@ -30,12 +30,12 @@ namespace EV_Rental.Pages.Staff
         {
             if (Status.HasValue)
             {
-                // G?i hàm search trong service (l?c theo status)
+                // G?i hï¿½m search trong service (l?c theo status)
                 Vehicles = await _vehicleService.SearchVehiclesAsync(Name ?? "", Brand ?? "", Status.Value);
             }
             else
             {
-                // N?u không ch?n status ? l?y toàn b?
+                // N?u khï¿½ng ch?n status ? l?y toï¿½n b?
                 Vehicles = await _vehicleService.GetVehiclesAsync();
             }
         }

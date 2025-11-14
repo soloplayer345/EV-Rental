@@ -1,18 +1,18 @@
 using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 
 namespace EV_Rental.Pages.Admin
 {
     public class DashboardModel : PageModel
     {
-        private readonly ReportService _reportService;
+        private readonly IReportService _reportService;
         
         public string UserEmail { get; set; } = string.Empty;
         public int NewReportsCount { get; set; } = 0;
 
-        public DashboardModel(ReportService reportService)
+        public DashboardModel(IReportService reportService)
         {
             _reportService = reportService;
         }

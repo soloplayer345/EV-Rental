@@ -1,11 +1,12 @@
 using BusinessLayer.DTOs;
+using BusinessLayer.Interfaces;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
 using DataAccessLayer.Interfaces;
 
 namespace BusinessLayer.Services
 {
-    public class PaymentService
+    public class PaymentService : IPaymentService
     {
         private readonly IUnitOfWork _unitOfWork;
 

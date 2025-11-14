@@ -1,4 +1,5 @@
 using BusinessLayer.DTOs;
+using BusinessLayer.Interfaces;
 using BusinessLayer.Mapping;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Interfaces;
@@ -11,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BusinessLayer.Services
 {
-    public class StationService
+    public class StationService : IStationService
     {
         private readonly IUnitOfWork _unitOfWork;
 

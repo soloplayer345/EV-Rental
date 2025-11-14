@@ -1,4 +1,5 @@
 using BusinessLayer.DTOs;
+using BusinessLayer.Interfaces;
 using BusinessLayer.Mapping;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
@@ -7,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BusinessLayer.Services
 {
-    public class AccountService
+    public class AccountService : IAccountService
     {
         private readonly IUnitOfWork _unitOfWork;
 

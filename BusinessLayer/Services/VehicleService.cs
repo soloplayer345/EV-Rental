@@ -1,4 +1,5 @@
 using BusinessLayer.DTOs;
+using BusinessLayer.Interfaces;
 using BusinessLayer.Mapping;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer.Services
 {
-    public class VehicleService
+    public class VehicleService : IVehicleService
     {
         private readonly IVehicleRepo _vehicleRepo;
         private readonly IUnitOfWork _unitOfWork;

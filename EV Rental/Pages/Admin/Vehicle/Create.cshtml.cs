@@ -1,5 +1,5 @@
 using BusinessLayer.DTOs;
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using DataAccessLayer.Enums;
 using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -9,8 +9,8 @@ namespace EV_Rental.Pages.Admin.Vehicle
 {
     public class CreateModel : PageModel
     {
-        private readonly VehicleService _vehicleService;
-        private readonly StationService _stationService;
+        private readonly IVehicleService _vehicleService;
+        private readonly IStationService _stationService;
 
         [BindProperty]
         public VehicleCreateDto Vehicle { get; set; } = new();
@@ -18,7 +18,7 @@ namespace EV_Rental.Pages.Admin.Vehicle
         public List<StationDto> Stations { get; set; } = new();
         public string UserEmail { get; set; } = string.Empty;
 
-        public CreateModel(VehicleService vehicleService, StationService stationService)
+        public CreateModel(IVehicleService vehicleService, IStationService stationService)
         {
             _vehicleService = vehicleService;
             _stationService = stationService;

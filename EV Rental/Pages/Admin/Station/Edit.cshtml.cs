@@ -1,5 +1,5 @@
 using BusinessLayer.DTOs;
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -8,13 +8,13 @@ namespace EV_Rental.Pages.Admin.Station
 {
     public class EditModel : PageModel
     {
-        private readonly StationService _stationService;
+        private readonly IStationService _stationService;
         public string UserEmail { get; set; } = string.Empty;
 
         [BindProperty]
         public StationDto Station { get; set; } = new();
 
-        public EditModel(StationService stationService)
+        public EditModel(IStationService stationService)
         {
             _stationService = stationService;
         }

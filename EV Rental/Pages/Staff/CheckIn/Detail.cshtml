@@ -105,9 +105,35 @@
                             <label class="form-label fw-bold">
                                 Thời gian trả xe thực tế <span class="text-danger">*</span>
                             </label>
-                            <input type="datetime-local" id="actualReturnTime" class="form-control" required 
-                                   value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
-                            <small class="text-muted">Thời gian khách hàng trả xe</small>
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <input type="number" id="returnDay" class="form-control" placeholder="Ngày" 
+                                           min="1" max="31" required onchange="updateReturnDateTime()" />
+                                    <small class="text-muted">Ngày</small>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="number" id="returnMonth" class="form-control" placeholder="Tháng" 
+                                           min="1" max="12" required onchange="updateReturnDateTime()" />
+                                    <small class="text-muted">Tháng</small>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="number" id="returnYear" class="form-control" placeholder="Năm" 
+                                           min="2024" max="2030" required onchange="updateReturnDateTime()" />
+                                    <small class="text-muted">Năm</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="number" id="returnHour" class="form-control" placeholder="Giờ" 
+                                           min="0" max="23" required onchange="updateReturnDateTime()" />
+                                    <small class="text-muted">Giờ (0-23)</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="number" id="returnMinute" class="form-control" placeholder="Phút" 
+                                           min="0" max="59" required onchange="updateReturnDateTime()" />
+                                    <small class="text-muted">Phút</small>
+                                </div>
+                            </div>
+                            <input type="hidden" id="actualReturnTime" />
+                            <small class="text-muted">Định dạng: DD/MM/YYYY HH:mm</small>
                         </div>
 
                         <div class="col-md-6 mb-3">
@@ -179,12 +205,23 @@
                                         <div class="col-md-6">
                                             <table class="table table-sm mb-0">
                                                 <tr>
+                                                    <td>Tổng giờ thuê:</td>
+                                                    <td class="text-end fw-bold" id="totalHoursDisplay">0 giờ</td>
+                                                </tr>
+                                                <tr>
                                                     <td>Phí sử dụng:</td>
                                                     <td class="text-end fw-bold" id="usageCostDisplay">0 VNĐ</td>
                                                 </tr>
-                                                <tr>
-                                                    <td>Phí trả chậm (20%/giờ):</td>
-                                                    <td class="text-end fw-bold text-warning" id="lateFeeDisplay">0 VNĐ</td>
+                                                <tr id="lateHoursRow" style="display: none;">
+                                                    <td class="text-danger">Số giờ trễ:</td>
+                                                    <td class="text-end fw-bold text-danger" id="lateHoursDisplay">0 giờ</td>
+                                                </tr>
+                                                <tr id="lateFeeRow" style="display: none;">
+                                                    <td class="text-danger">Phí trả chậm:</td>
+                                                    <td class="text-end fw-bold text-danger">
+                                                        <div id="lateFeeCalcDisplay" class="small text-muted"></div>
+                                                        <div id="lateFeeDisplay">0 VNĐ</div>
+                                                    </td>
                                                 </tr>
                                                 <tr>
                                                     <td>Tổng phí phạt:</td>
@@ -276,6 +313,36 @@ else
     let problemCount = 0;
     let calculatedData = null;
 
+    // Khởi tạo giá trị mặc định cho ngày giờ hiện tại
+    function initializeDateTime() {
+        const now = new Date();
+        document.getElementById('returnDay').value = now.getDate();
+        document.getElementById('returnMonth').value = now.getMonth() + 1;
+        document.getElementById('returnYear').value = now.getFullYear();
+        document.getElementById('returnHour').value = now.getHours();
+        document.getElementById('returnMinute').value = now.getMinutes();
+        updateReturnDateTime();
+    }
+
+    // Cập nhật giá trị actualReturnTime từ các input riêng lẻ
+    window.updateReturnDateTime = function() {
+        const day = document.getElementById('returnDay').value;
+        const month = document.getElementById('returnMonth').value;
+        const year = document.getElementById('returnYear').value;
+        const hour = document.getElementById('returnHour').value || '0';
+        const minute = document.getElementById('returnMinute').value || '0';
+        
+        if (day && month && year) {
+            // Format: yyyy-MM-ddTHH:mm
+            const dateStr = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hour.padStart(2, '0')}:${minute.padStart(2, '0')}`;
+            document.getElementById('actualReturnTime').value = dateStr;
+            
+            if (typeof window.calculateTotal === 'function') {
+                window.calculateTotal();
+            }
+        }
+    }
+
     // Thêm vấn đề kiểm tra xe
     window.addProblem = function() {
         problemCount++;
@@ -366,8 +433,9 @@ else
 
         // 2. Tính phí trả chậm (20% của giá cơ bản cho mỗi giờ trễ)
         let lateFee = 0;
+        let lateHours = 0;
         if (actualReturnTime > expectedEndTime) {
-            const lateHours = Math.ceil((actualReturnTime - expectedEndTime) / (1000 * 60 * 60));
+            lateHours = Math.ceil((actualReturnTime - expectedEndTime) / (1000 * 60 * 60));
             lateFee = lateHours * basePrice * 0.2;
         }
 
@@ -412,6 +480,7 @@ else
             actualReturnTime,
             totalHours,
             usageCost,
+            lateHours,
             lateFee,
             totalPenalty,
             extraFees,
@@ -422,8 +491,22 @@ else
         };
 
         // 7. Hiển thị kết quả
+        document.getElementById('totalHoursDisplay').textContent = totalHours + ' giờ';
         document.getElementById('usageCostDisplay').textContent = usageCost.toLocaleString('vi-VN') + ' VNĐ';
-        document.getElementById('lateFeeDisplay').textContent = lateFee.toLocaleString('vi-VN') + ' VNĐ';
+        
+        // Hiển thị thông tin trả chậm nếu có
+        if (lateHours > 0) {
+            document.getElementById('lateHoursRow').style.display = '';
+            document.getElementById('lateFeeRow').style.display = '';
+            document.getElementById('lateHoursDisplay').textContent = lateHours + ' giờ';
+            document.getElementById('lateFeeCalcDisplay').textContent = 
+                `${lateHours} giờ × ${basePrice.toLocaleString('vi-VN')} × 20% =`;
+            document.getElementById('lateFeeDisplay').textContent = lateFee.toLocaleString('vi-VN') + ' VNĐ';
+        } else {
+            document.getElementById('lateHoursRow').style.display = 'none';
+            document.getElementById('lateFeeRow').style.display = 'none';
+        }
+        
         document.getElementById('totalPenaltyDisplay').textContent = totalPenalty.toLocaleString('vi-VN') + ' VNĐ';
         document.getElementById('extraFeesDisplay').textContent = extraFees.toLocaleString('vi-VN') + ' VNĐ';
         document.getElementById('discountDisplay').textContent = '- ' + discount.toLocaleString('vi-VN') + ' VNĐ';
@@ -510,15 +593,14 @@ else
 
     // Khởi tạo khi load page
     document.addEventListener('DOMContentLoaded', function() {
+        // Khởi tạo ngày giờ hiện tại
+        initializeDateTime();
+        
         if (typeof window.calculateTotal === 'function') {
             window.calculateTotal();
         }
         
-        // Lắng nghe thay đổi thời gian trả xe
-        const timeInput = document.getElementById('actualReturnTime');
-        if (timeInput && typeof window.calculateTotal === 'function') {
-            timeInput.addEventListener('change', window.calculateTotal);
-        }
+        // Lắng nghe thay đổi thời gian trả xe không cần nữa vì đã có onchange
     });
 </script>
 }

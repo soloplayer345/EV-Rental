@@ -1,3 +1,4 @@
+using BusinessLayer.Interfaces;
 using BusinessLayer.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -6,9 +7,9 @@ namespace EV_Rental.Pages.Admin
 {
     public class StatisticsModel : PageModel
     {
-        private readonly ReportService _reportService;
+        private readonly IReportService _reportService;
 
-        public StatisticsModel(ReportService reportService)
+        public StatisticsModel(IReportService reportService)
         {
             _reportService = reportService;
         }

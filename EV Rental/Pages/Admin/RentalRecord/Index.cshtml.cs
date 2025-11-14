@@ -1,5 +1,5 @@
 using BusinessLayer.DTOs;
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using DataAccessLayer.Enums;
 using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +9,7 @@ namespace EV_Rental.Pages.Admin.RentalRecord
 {
     public class IndexModel : PageModel
     {
-        private readonly RentalRecordService _rentalRecordService;
+        private readonly IRentalRecordService _rentalRecordService;
         public string UserEmail { get; set; } = string.Empty;
         public List<RentalRecordDto> RentalRecords { get; set; } = new();
         public string SearchQuery { get; set; } = "";
@@ -17,7 +17,7 @@ namespace EV_Rental.Pages.Admin.RentalRecord
         public string StartDate { get; set; } = "";
         public string EndDate { get; set; } = "";
 
-        public IndexModel(RentalRecordService rentalRecordService)
+        public IndexModel(IRentalRecordService rentalRecordService)
         {
             _rentalRecordService = rentalRecordService;
         }

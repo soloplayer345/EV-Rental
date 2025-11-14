@@ -1,4 +1,4 @@
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using BusinessLayer.DTOs;
 using BusinessLayer.Mapping;
 using DataAccessLayer.Enums;
@@ -10,12 +10,12 @@ namespace EV_Rental.Pages.Staff
 {
     public class PickupVehicleModel : PageModel
     {
-        private readonly RentalService _rentalService;
-        private readonly VehicleService _vehicleService;
+        private readonly IRentalService _rentalService;
+        private readonly IVehicleService _vehicleService;
 
         public PickupVehicleModel(
-            RentalService rentalService,
-            VehicleService vehicleService)
+            IRentalService rentalService,
+            IVehicleService vehicleService)
         {
             _rentalService = rentalService;
             _vehicleService = vehicleService;

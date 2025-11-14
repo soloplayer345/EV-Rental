@@ -1,5 +1,5 @@
 using BusinessLayer.DTOs;
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using DataAccessLayer.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -8,10 +8,10 @@ namespace EV_Rental.Pages.Admin.Vehicle
 {
     public class BulkAssignModel : PageModel
     {
-        private readonly VehicleService _vehicleService;
-        private readonly StationService _stationService;
+        private readonly IVehicleService _vehicleService;
+        private readonly IStationService _stationService;
 
-        public BulkAssignModel(VehicleService vehicleService, StationService stationService)
+        public BulkAssignModel(IVehicleService vehicleService, IStationService stationService)
         {
             _vehicleService = vehicleService;
             _stationService = stationService;

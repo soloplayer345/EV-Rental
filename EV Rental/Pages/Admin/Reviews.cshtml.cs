@@ -1,5 +1,5 @@
 using BusinessLayer.DTOs;
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -7,9 +7,9 @@ namespace EV_Rental.Pages.Admin
 {
     public class ReviewsModel : PageModel
     {
-        private readonly ReviewService _reviewService;
+        private readonly IReviewService _reviewService;
 
-        public ReviewsModel(ReviewService reviewService)
+        public ReviewsModel(IReviewService reviewService)
         {
             _reviewService = reviewService;
         }

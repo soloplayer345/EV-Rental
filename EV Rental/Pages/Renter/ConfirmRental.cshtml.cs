@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using BusinessLayer.DTOs;
 using DataAccessLayer.Enums;
 using EV_Rental.Helpers;
@@ -10,19 +10,19 @@ namespace EV_Rental.Pages.Renter
 {
     public class ConfirmRentalModel : PageModel
     {
-        private readonly VehicleService _vehicleService;
-        private readonly RentalService _rentalService;
-        private readonly PaymentService _paymentService;
-        private readonly AccountService _accountService;
+        private readonly IVehicleService _vehicleService;
+        private readonly IRentalService _rentalService;
+        private readonly IPaymentService _paymentService;
+        private readonly IAccountService _accountService;
         private readonly VNPaySettings _vnPaySettings;
         private readonly MoMoSettings _momoSettings;
         private readonly IEmailSender _emailSender;
 
         public ConfirmRentalModel(
-            VehicleService vehicleService, 
-            RentalService rentalService,
-            PaymentService paymentService,
-            AccountService accountService,
+            IVehicleService vehicleService, 
+            IRentalService rentalService,
+            IPaymentService paymentService,
+            IAccountService accountService,
             IOptions<VNPaySettings> vnPaySettings,
             IOptions<MoMoSettings> momoSettings,
             IEmailSender emailSender)

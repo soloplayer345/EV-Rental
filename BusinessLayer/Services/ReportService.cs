@@ -1,3 +1,4 @@
+using BusinessLayer.Interfaces;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
 using DataAccessLayer.Interfaces;
@@ -5,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BusinessLayer.Services
 {
-    public class ReportService
+    public class ReportService : IReportService
     {
         private readonly IUnitOfWork _unitOfWork;
 

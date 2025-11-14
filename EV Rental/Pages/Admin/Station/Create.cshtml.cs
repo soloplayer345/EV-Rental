@@ -1,4 +1,4 @@
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using BusinessLayer.DTOs;
 using BusinessLayer.Mapping;
 using EV_Rental.Helpers;
@@ -9,13 +9,13 @@ namespace EV_Rental.Pages.Admin.Station
 {
     public class CreateModel : PageModel
     {
-        private readonly StationService _stationService;
+        private readonly IStationService _stationService;
         public string UserEmail { get; set; } = string.Empty;
 
         [BindProperty]
         public StationDto Station { get; set; } = new();
 
-        public CreateModel(StationService stationService)
+        public CreateModel(IStationService stationService)
         {
             _stationService = stationService;
         }

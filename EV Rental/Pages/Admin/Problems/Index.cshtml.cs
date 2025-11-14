@@ -1,4 +1,4 @@
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using BusinessLayer.DTOs;
 using DataAccessLayer.Enums;
 using Microsoft.AspNetCore.Mvc;
@@ -8,13 +8,13 @@ namespace EV_Rental.Pages.Admin.Problems
 {
     public class IndexModel : PageModel
     {
-        private readonly ReportService _reportService;
-        private readonly VehicleService _vehicleService;
-        private readonly AccountService _accountService;
-        private readonly RentalRecordService _rentalRecordService;
+        private readonly IReportService _reportService;
+        private readonly IVehicleService _vehicleService;
+        private readonly IAccountService _accountService;
+        private readonly IRentalRecordService _rentalRecordService;
 
-        public IndexModel(ReportService reportService, VehicleService vehicleService, 
-            AccountService accountService, RentalRecordService rentalRecordService)
+        public IndexModel(IReportService reportService, IVehicleService vehicleService, 
+            IAccountService accountService, IRentalRecordService rentalRecordService)
         {
             _reportService = reportService;
             _vehicleService = vehicleService;

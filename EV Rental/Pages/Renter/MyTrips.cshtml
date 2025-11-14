@@ -244,7 +244,7 @@
                                     {
                                         @if (rental.Status == DataAccessLayer.Enums.RentalRecordStatus.Pending)
                                         {
-                                            <button class="btn btn-primary" onclick="window.location.href='/Payment/VNPayReturn?rentalId=@rental.Id'">
+                                            <button class="btn btn-primary" onclick="window.location.href='/Renter/Payment?rentalId=@rental.Id'">
                                                 <i class="fas fa-credit-card"></i> Thanh Toán
                                             </button>
                                         }
@@ -254,6 +254,12 @@
                                     }
                                     else if (rental.Status == DataAccessLayer.Enums.RentalRecordStatus.Completed)
                                     {
+                                        @if (rental.ExtraFees > 0)
+                                        {
+                                            <button class="btn btn-primary" onclick="window.location.href='/Renter/Payment?rentalId=@rental.Id'">
+                                                <i class="fas fa-credit-card"></i> Thanh Toán Phí Phạt
+                                            </button>
+                                        }
                                         <button class="btn btn-secondary">
                                             <i class="fas fa-star"></i> Đánh Giá
                                         </button>

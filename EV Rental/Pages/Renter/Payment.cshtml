@@ -1,0 +1,760 @@
+@page
+@model EV_Rental.Pages.Renter.PaymentModel
+@{
+    ViewData["Title"] = "Thanh Toán Đơn Thuê";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <h1 class="logo">🔋 Hệ Thống Thuê Xe Điện</h1>
+                <nav class="nav">
+                    <a href="/Renter/Index" class="nav-link">Trang Chủ</a>
+                    <a href="/Renter/MyTrips" class="nav-link">Chuyến Đi Của Tôi</a>
+                    <a href="#" class="nav-link active">Thanh Toán</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <section class="payment-section">
+        <div class="container">
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i> @Model.ErrorMessage
+                </div>
+                <div class="text-center">
+                    <a href="/Renter/MyTrips" class="btn btn-primary">
+                        <i class="fas fa-arrow-left"></i> Quay Lại Chuyến Đi
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="payment-wrapper">
+                    <!-- Page Header -->
+                    <div class="page-header">
+                        <h1 class="page-title">
+                            <i class="fas fa-credit-card"></i> Thanh Toán Đơn Thuê
+                        </h1>
+                        <p class="page-subtitle">Hoàn tất thanh toán để xác nhận đơn thuê xe của bạn</p>
+                    </div>
+
+                    <div class="payment-grid">
+                        <!-- Left: Order Summary -->
+                        <div class="order-column">
+                            <!-- Rental Info Card -->
+                            <div class="info-card">
+                                <h2 class="card-title">
+                                    <span class="icon">📋</span>
+                                    Thông Tin Đơn Thuê
+                                </h2>
+                                
+                                <div class="rental-header">
+                                    <div class="rental-id">
+                                        <span class="label">Mã đơn:</span>
+                                        <span class="value">#@Model.RentalRecord.Id</span>
+                                    </div>
+                                    <div class="rental-status">
+                                        <span class="badge badge-pending">
+                                            <i class="fas fa-clock"></i> Chờ Thanh Toán
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="info-details">
+                                    @if (Model.Vehicle != null)
+                                    {
+                                        <div class="vehicle-section">
+                                            @if (!string.IsNullOrEmpty(Model.Vehicle.ImageUrl))
+                                            {
+                                                <img src="@Model.Vehicle.ImageUrl" alt="@Model.Vehicle.Name" class="vehicle-img">
+                                            }
+                                            else
+                                            {
+                                                <div class="vehicle-placeholder">
+                                                    <i class="fas fa-car fa-3x"></i>
+                                                </div>
+                                            }
+                                            <div class="vehicle-info">
+                                                <h3 class="vehicle-name">@Model.Vehicle.Name</h3>
+                                                <p class="vehicle-meta">
+                                                    <i class="fas fa-tag"></i> @Model.Vehicle.Brand • @Model.Vehicle.VehicleType
+                                                </p>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    <div class="detail-row">
+                                        <span class="detail-label">
+                                            <i class="fas fa-calendar-alt"></i> Ngày nhận xe
+                                        </span>
+                                        <span class="detail-value">@Model.RentalRecord.StartTime?.ToString("dd/MM/yyyy HH:mm")</span>
+                                    </div>
+
+                                    <div class="detail-row">
+                                        <span class="detail-label">
+                                            <i class="fas fa-calendar-check"></i> Ngày trả xe
+                                        </span>
+                                        <span class="detail-value">@Model.RentalRecord.ExpectedEndTime?.ToString("dd/MM/yyyy HH:mm")</span>
+                                    </div>
+
+                                    <div class="detail-row">
+                                        <span class="detail-label">
+                                            <i class="fas fa-map-marker-alt"></i> Trạm nhận xe
+                                        </span>
+                                        <span class="detail-value">@Model.PickupStationName</span>
+                                    </div>
+
+                                    <div class="detail-row">
+                                        <span class="detail-label">
+                                            <i class="fas fa-map-marker"></i> Trạm trả xe
+                                        </span>
+                                        <span class="detail-value">@Model.ReturnStationName</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Cost Breakdown Card -->
+                            <div class="info-card">
+                                <h2 class="card-title">
+                                    <span class="icon">💰</span>
+                                    Chi Tiết Chi Phí
+                                </h2>
+                                
+                                <div class="cost-breakdown">
+                                    <div class="cost-row">
+                                        <span class="cost-label">Phí thuê xe:</span>
+                                        <span class="cost-value">@Model.RentalRecord.BasePrice.ToString("N0") đ</span>
+                                    </div>
+                                    
+                                    @if (Model.RentalRecord.ReservationFee > 0)
+                                    {
+                                        <div class="cost-row">
+                                            <span class="cost-label">Phí giữ chỗ:</span>
+                                            <span class="cost-value">@Model.RentalRecord.ReservationFee.ToString("N0") đ</span>
+                                        </div>
+                                    }
+                                    
+                                    <div class="cost-row">
+                                        <span class="cost-label">Phí cọc:</span>
+                                        <span class="cost-value">@Model.RentalRecord.DepositFee.ToString("N0") đ</span>
+                                    </div>
+                                    
+                                    <div class="cost-divider"></div>
+                                    
+                                    <div class="cost-row total">
+                                        <span class="cost-label">Tổng cần thanh toán:</span>
+                                        <span class="cost-value total-amount">@Model.RentalRecord.TotalPrice.ToString("N0") đ</span>
+                                    </div>
+                                </div>
+
+                                <div class="cost-note">
+                                    <i class="fas fa-info-circle"></i>
+                                    <div>
+                                        <strong>Lưu ý:</strong>
+                                        <ul>
+                                            <li>Phí cọc sẽ được hoàn trả khi bạn trả xe đúng thời gian và không có hư hại</li>
+                                            <li>Vui lòng hoàn tất thanh toán để nhận mã OTP</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Payment Method -->
+                        <div class="payment-column">
+                            <div class="payment-card">
+                                <h2 class="card-title">
+                                    <span class="icon">💳</span>
+                                    Chọn Phương Thức Thanh Toán
+                                </h2>
+
+                                <form method="post" id="paymentForm">
+                                    <input type="hidden" name="RentalId" value="@Model.RentalRecord.Id" />
+                                    
+                                    <div class="payment-methods">
+                                        <!-- MoMo Payment -->
+                                        <label class="payment-option">
+                                            <input type="radio" name="PaymentMethod" value="momo" checked />
+                                            <div class="payment-box">
+                                                <div class="payment-header">
+                                                    <img src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png" 
+                                                         alt="MoMo" class="payment-logo"
+                                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+                                                    <span class="payment-icon" style="display: none;">
+                                                        <i class="fas fa-wallet fa-3x" style="color: #A50087;"></i>
+                                                    </span>
+                                                    <div class="payment-badge recommended">Khuyến nghị</div>
+                                                </div>
+                                                <h3 class="payment-name">MoMo ATM</h3>
+                                                <p class="payment-desc">Thanh toán qua thẻ ATM/Ngân hàng liên kết MoMo</p>
+                                                <ul class="payment-features">
+                                                    <li><i class="fas fa-check"></i> Liên kết thẻ ATM với MoMo</li>
+                                                    <li><i class="fas fa-check"></i> Thanh toán nhanh chóng</li>
+                                                    <li><i class="fas fa-check"></i> Bảo mật cao</li>
+                                                    <li><i class="fas fa-check"></i> Nhận mã OTP ngay lập tức</li>
+                                                </ul>
+                                            </div>
+                                        </label>
+                                    </div>
+
+                                    <div class="security-note">
+                                        <i class="fas fa-shield-alt"></i>
+                                        <p>
+                                            <strong>Thanh toán an toàn</strong><br>
+                                            Thông tin thanh toán của bạn được mã hóa và bảo mật 100%
+                                        </p>
+                                    </div>
+
+                                    <div class="form-actions">
+                                        <a href="/Renter/MyTrips" class="btn btn-secondary">
+                                            <i class="fas fa-arrow-left"></i> Quay Lại
+                                        </a>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-lock"></i> Thanh Toán Ngay
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Hệ Thống Thuê Xe Điện. Bản quyền thuộc về chúng tôi.</p>
+        </div>
+    </footer>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            color: #2563eb;
+            font-weight: 700;
+        }
+
+        .nav {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #666;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: #2563eb;
+        }
+
+        /* Payment Section */
+        .payment-section {
+            padding: 3rem 0;
+            min-height: calc(100vh - 200px);
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .page-subtitle {
+            color: #6b7280;
+            font-size: 1.1rem;
+        }
+
+        /* Alert */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 500;
+        }
+
+        .alert-error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        /* Payment Grid */
+        .payment-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        /* Cards */
+        .info-card,
+        .payment-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .icon {
+            font-size: 1.5rem;
+        }
+
+        /* Rental Header */
+        .rental-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .rental-id .label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .rental-id .value {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .badge-pending {
+            background-color: #fbbf24;
+            color: #78350f;
+        }
+
+        /* Vehicle Section */
+        .vehicle-section {
+            display: flex;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: #f9fafb;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .vehicle-img {
+            width: 120px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .vehicle-placeholder {
+            width: 120px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+            border-radius: 8px;
+            color: #667eea;
+        }
+
+        .vehicle-info {
+            flex: 1;
+        }
+
+        .vehicle-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .vehicle-meta {
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+
+        /* Info Details */
+        .info-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: #f9fafb;
+            border-radius: 6px;
+        }
+
+        .detail-label {
+            color: #6b7280;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .detail-value {
+            color: #1f2937;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        /* Cost Breakdown */
+        .cost-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .cost-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: #f9fafb;
+            border-radius: 6px;
+        }
+
+        .cost-label {
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .cost-value {
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        .cost-row.total {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            padding: 1.25rem;
+            margin-top: 0.5rem;
+        }
+
+        .cost-row.total .cost-label,
+        .cost-row.total .cost-value {
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .total-amount {
+            font-size: 1.5rem !important;
+            font-weight: 700 !important;
+        }
+
+        .cost-divider {
+            height: 2px;
+            background: linear-gradient(to right, transparent, #e5e7eb, transparent);
+            margin: 0.5rem 0;
+        }
+
+        .cost-note {
+            display: flex;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: #fef3c7;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .cost-note i {
+            color: #f59e0b;
+            font-size: 1.25rem;
+        }
+
+        .cost-note ul {
+            margin: 0.5rem 0 0 1.25rem;
+            color: #78350f;
+        }
+
+        /* Payment Methods */
+        .payment-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .payment-option {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .payment-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .payment-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 3px solid #e5e7eb;
+            transition: all 0.3s;
+        }
+
+        .payment-option input[type="radio"]:checked + .payment-box {
+            border-color: #2563eb;
+            background: #eff6ff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .payment-box:hover {
+            border-color: #93c5fd;
+        }
+
+        .payment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            min-height: 50px;
+        }
+
+        .payment-logo {
+            height: 45px;
+            object-fit: contain;
+        }
+
+        .payment-badge {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .payment-badge.recommended {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .payment-name {
+            font-size: 1.2rem;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .payment-desc {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .payment-features {
+            list-style: none;
+            padding: 0;
+        }
+
+        .payment-features li {
+            padding: 0.4rem 0;
+            color: #374151;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .payment-features i {
+            color: #10b981;
+        }
+
+        /* Security Note */
+        .security-note {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f0fdf4;
+            border-radius: 8px;
+            border-left: 4px solid #10b981;
+            margin-bottom: 2rem;
+        }
+
+        .security-note i {
+            color: #10b981;
+            font-size: 1.5rem;
+        }
+
+        .security-note p {
+            color: #065f46;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-secondary {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e5e7eb;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #1f2937;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        /* Responsive */
+        @@media (max-width: 1024px) {
+            .payment-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .page-title {
+                font-size: 1.8rem;
+            }
+
+            .form-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .vehicle-section {
+                flex-direction: column;
+            }
+
+            .vehicle-img,
+            .vehicle-placeholder {
+                width: 100%;
+                height: 150px;
+            }
+        }
+    </style>
+</body>
+</html>

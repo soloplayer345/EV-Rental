@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using BusinessLayer.DTOs;
 using BusinessLayer.Mapping;
 using DataAccessLayer.Enums;
@@ -9,9 +9,9 @@ namespace EV_Rental.Pages.Admin.RentalRecord
 {
     public class DetailModel : PageModel
     {
-        private readonly RentalRecordService _rentalRecordService;
+        private readonly IRentalRecordService _rentalRecordService;
 
-        public DetailModel(RentalRecordService rentalRecordService)
+        public DetailModel(IRentalRecordService rentalRecordService)
         {
             _rentalRecordService = rentalRecordService;
         }
