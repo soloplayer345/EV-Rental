@@ -22,6 +22,6 @@ namespace BusinessLayer.DTOs
         public string features { get; set; }
         public string imageUrl { get; set; }
         public int maxDistance { get; set; }
-        
+        public int seartCapacity { get; set; }
     }
 }

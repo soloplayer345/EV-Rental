@@ -33,7 +33,8 @@ namespace EV_Rental.Pages.Renter
         [BindProperty(SupportsGet = true)]
         public VehicleStatus? Status { get; set; }
 
-        public IEnumerable<VehicleDto> Vehicles { get; set; }
+        public IEnumerable<VehicleDto> Vehicles { get; set; } = new List<VehicleDto>();
+
 
         public async Task<IActionResult> OnGetAsync(int pageNumber = 1)
         {
@@ -68,13 +69,11 @@ namespace EV_Rental.Pages.Renter
         {
             if (Status.HasValue)
             {
-                // Gọi hàm search trong service (lọc theo status)
-                Vehicles = (IEnumerable<VehicleDto>)await _vehicleService.SearchVehiclesAsync(Name, Brand, Status.Value);
+                var result = await _vehicleService.SearchVehiclesAsync(Name, Brand, Status.Value);
             }
             else
             {
-                // Nếu không chọn status → lấy toàn bộ
-                Vehicles = (IEnumerable<VehicleDto>)await _vehicleService.GetVehiclesAsync();
+                var result = await _vehicleService.GetVehiclesAsync();
             }
         }
     }
