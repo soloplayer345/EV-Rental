@@ -108,21 +108,48 @@
                                         <span class="icon-small">📅</span>
                                         Thời gian bắt đầu:
                                     </span>
-                                    <span class="detail-value highlight">@Model.StartDate.ToString("dd/MM/yyyy HH:mm")</span>
+                                    <span class="detail-value highlight">@Model.StartDate.ToString("dd/MM/yy HH:mm")</span>
                                 </div>
                                 <div class="detail-row">
                                     <span class="detail-label">
                                         <span class="icon-small">📅</span>
                                         Thời gian kết thúc:
                                     </span>
-                                    <span class="detail-value highlight">@Model.EndDate.ToString("dd/MM/yyyy HH:mm")</span>
+                                    <span class="detail-value highlight">@Model.EndDate.ToString("dd/MM/yy HH:mm")</span>
                                 </div>
-                                <div class="detail-row">
+                                <div class="detail-row duration-highlight">
                                     <span class="detail-label">
                                         <span class="icon-small">⏱️</span>
                                         Thời lượng thuê:
                                     </span>
                                     <span class="detail-value">@Model.RentalDuration</span>
+                                </div>
+                                @{
+                                    var duration = Model.EndDate - Model.StartDate;
+                                    var totalHours = (int)Math.Ceiling(duration.TotalHours);
+                                    var totalDays = (int)Math.Ceiling(duration.TotalDays);
+                                    var remainingHours = totalHours % 24;
+                                }
+                                <div class="detail-row duration-breakdown">
+                                    <span class="detail-label">
+                                        <span class="icon-small">📊</span>
+                                        Chi tiết:
+                                    </span>
+                                    <span class="detail-value">
+                                        @if (totalDays >= 1)
+                                        {
+                                            @($"{totalDays} ngày")
+                                            if (remainingHours > 0)
+                                            {
+                                                @($" {remainingHours} giờ")
+                                            }
+                                            @($" ({totalHours} giờ)")
+                                        }
+                                        else
+                                        {
+                                            @($"{totalHours} giờ")
+                                        }
+                                    </span>
                                 </div>
                                 <div class="detail-row">
                                     <span class="detail-label">
@@ -522,6 +549,21 @@
 
         .detail-value.highlight {
             color: #2563eb;
+        }
+
+        .detail-row.duration-highlight {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-left: 4px solid #2563eb;
+        }
+
+        .detail-row.duration-breakdown {
+            background: #f0fdf4;
+            border-left: 4px solid #10b981;
+        }
+
+        .detail-row.duration-breakdown .detail-value {
+            color: #059669;
+            font-weight: 700;
         }
 
         /* Cost Breakdown */

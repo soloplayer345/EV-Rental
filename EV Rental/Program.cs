@@ -34,13 +34,19 @@ namespace EV_Rental
             // Register Repositories
             builder.Services.AddScoped<IVehicleRepo, VehicleRepo>();
             builder.Services.AddScoped<IAccountRepo, AccountRepo>();
+            builder.Services.AddScoped<IRatingReviewRepo, RatingReviewRepo>();
 
             // Register UnitOfWork and Services
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<VehicleService>();
+            builder.Services.AddScoped<StationService>();
+            builder.Services.AddScoped<RentalRecordService>();
             builder.Services.AddScoped<RentalService>();
             builder.Services.AddScoped<PaymentService>();
+            builder.Services.AddScoped<ReviewService>();
+            builder.Services.AddScoped<ReportService>();
+            builder.Services.AddScoped<AccountService>();
 
             // Bind SMTP settings & register EmailSender
             builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("Smtp"));

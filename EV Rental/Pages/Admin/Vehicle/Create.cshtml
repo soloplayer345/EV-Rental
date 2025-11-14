@@ -1,0 +1,204 @@
+@page
+@model EV_Rental.Pages.Admin.Vehicle.CreateModel
+@{
+    ViewData["Title"] = "Thêm Xe Mới";
+    Layout = "~/Pages/Shared/_AdminLayout.cshtml";
+}
+
+<!-- Page Header -->
+<div class="page-header mb-4">
+    <div>
+        <h1><i class="fas fa-plus me-2"></i>Thêm Xe Mới</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Admin/Dashboard">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="/Admin/Vehicle/Index">Quản lý Xe</a></li>
+                <li class="breadcrumb-item active">Thêm mới</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- Alerts -->
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Form Card -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-car me-2"></i>Thông tin xe mới</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            <div class="row">
+                <!-- Tên xe -->
+                <div class="col-md-6 mb-3">
+                    <label for="vehicle_name" class="form-label">
+                        Tên xe <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control @(ModelState.IsValid ? "" : "is-invalid")" 
+                           id="vehicle_name" asp-for="Vehicle.Name" placeholder="VD: VinFast VF8 Plus 2025" required>
+                    <span asp-validation-for="Vehicle.Name" class="text-danger"></span>
+                </div>
+
+                <!-- Hãng -->
+                <div class="col-md-6 mb-3">
+                    <label for="vehicle_brand" class="form-label">
+                        Hãng <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control" id="vehicle_brand" asp-for="Vehicle.Brand" 
+                           placeholder="VD: VinFast" required>
+                </div>
+
+                <!-- Mẫu xe -->
+                <div class="col-md-6 mb-3">
+                    <label for="vehicle_model" class="form-label">
+                        Mẫu <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control" id="vehicle_model" asp-for="Vehicle.Model" 
+                           placeholder="VD: VF8" required>
+                </div>
+
+                <!-- Biển số -->
+                <div class="col-md-6 mb-3">
+                    <label for="vehicle_plate" class="form-label">
+                        Biển số <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control" id="vehicle_plate" asp-for="Vehicle.PlateNumber" 
+                           placeholder="VD: 30A-12345" required>
+                </div>
+
+                <!-- Loại xe -->
+                <div class="col-md-6 mb-3">
+                    <label for="vehicle_type" class="form-label">
+                        Loại xe <span class="text-danger">*</span>
+                    </label>
+                    <select class="form-select" id="vehicle_type" asp-for="Vehicle.VehicleType" required>
+                        <option value="">-- Chọn loại xe --</option>
+                        <option value="car">Ô tó 4 bánh</option>
+                    </select>
+                </div>
+
+                <!-- Trạm -->
+                <div class="col-md-6 mb-3">
+                    <label for="vehicle_station" class="form-label">
+                        Trạm <span class="text-danger">*</span>
+                    </label>
+                    <select class="form-select" id="vehicle_station" asp-for="Vehicle.StationId" required>
+                        <option value="">-- Chọn trạm --</option>
+                        @foreach (var station in Model.Stations)
+                        {
+                            <option value="@station.Id">@station.Name</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Trạng thái -->
+                <div class="col-md-6 mb-3">
+                    <label for="vehicle_status" class="form-label">
+                        Trạng thái <span class="text-danger">*</span>
+                    </label>
+                    <select class="form-select" id="vehicle_status" asp-for="Vehicle.Status" required>
+                        <option value="Available" selected>Sẵn sàng</option>
+                        <option value="Rented">Đang cho thuê</option>
+                        <option value="Maintenance">Bảo trì</option>
+                        <option value="Charging">Sạc pin</option>
+                    </select>
+                </div>
+
+                <!-- Giá/Giờ -->
+                <div class="col-md-6 mb-3">
+                    <label for="vehicle_price_hour" class="form-label">
+                        Giá/Giờ (VNĐ) <span class="text-danger">*</span>
+                    </label>
+                    <input type="number" class="form-control" id="vehicle_price_hour" 
+                           asp-for="Vehicle.PricePerHour" placeholder="50000" min="0" step="1000" required>
+                </div>
+
+                <!-- Giá/Ngày -->
+                <div class="col-md-6 mb-3">
+                    <label for="vehicle_price_day" class="form-label">
+                        Giá/Ngày (VNĐ) <span class="text-danger">*</span>
+                    </label>
+                    <input type="number" class="form-control" id="vehicle_price_day" 
+                           asp-for="Vehicle.PricePerDay" placeholder="300000" min="0" step="1000" required>
+                </div>
+
+                <!-- Chỗ ngồi -->
+                <div class="col-md-6 mb-3">
+                    <label for="vehicle_seat" class="form-label">
+                        Chỗ ngồi <span class="text-danger">*</span>
+                    </label>
+                    <input type="number" class="form-control" id="vehicle_seat" 
+                           asp-for="Vehicle.seartCapacity" placeholder="5" min="1" required>
+                </div>
+
+                <!-- Quãng đường tối đa -->
+                <div class="col-md-6 mb-3">
+                    <label for="vehicle_max_distance" class="form-label">
+                        Quãng đường tối đa (km) <span class="text-danger">*</span>
+                    </label>
+                    <input type="number" class="form-control" id="vehicle_max_distance" 
+                           asp-for="Vehicle.MaxDistance" placeholder="300" min="0" required>
+                </div>
+
+                <!-- URL Ảnh -->
+                <div class="col-md-12 mb-3">
+                    <label for="vehicle_image" class="form-label">URL Ảnh</label>
+                    <input type="url" class="form-control" id="vehicle_image" 
+                           asp-for="Vehicle.ImageUrl" placeholder="https://example.com/image.jpg">
+                    <small class="text-muted">Nhập URL đầy đủ của ảnh xe</small>
+                </div>
+
+                <!-- Buttons -->
+                <div class="col-12">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-admin-primary">
+                            <i class="fas fa-plus me-2"></i>Thêm xe
+                        </button>
+                        <a href="/Admin/Vehicle/Index" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Quay lại
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Info Card -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="alert alert-info d-flex align-items-start">
+            <i class="fas fa-info-circle me-3 mt-1"></i>
+            <div>
+                <strong>Gợi ý thêm xe:</strong>
+                <ul class="mb-0 mt-2">
+                    <li>Điền đầy đủ thông tin cơ bản (tên, hãng, biển số)</li>
+                    <li>Chọn trạm quản lý xe</li>
+                    <li>Đặt giá hợp lý theo thị trường</li>
+                    <li>Thêm ảnh để tăng tính hấp dẫn</li>
+                    <li>Bổ sung tính năng nếu xe có (GPS, bảo hiểm, WiFi)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto dismiss alerts
+        document.querySelectorAll('.alert').forEach(alert => {
+            setTimeout(() => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 5000);
+        });
+    </script>
+}

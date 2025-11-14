@@ -1,0 +1,442 @@
+@page
+@model EV_Rental.Pages.Admin.Station.IndexModel
+@{
+    ViewData["Title"] = "Quản lý Trạm";
+    Layout = "~/Pages/Shared/_AdminLayout.cshtml";
+}
+
+<!-- Page Header -->
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1><i class="fas fa-charging-station me-2"></i>Quản lý Trạm</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Admin/Dashboard">Trang chủ</a></li>
+                <li class="breadcrumb-item active">Quản lý Trạm</li>
+            </ol>
+        </nav>
+    </div>
+    <div>
+        <a href="/Admin/Station/Create" class="btn btn-admin-primary">
+            <i class="fas fa-plus me-2"></i>Thêm trạm mới
+        </a>
+    </div>
+</div>
+
+<!-- Alerts -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Search and Filter Section -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-7">
+                <label for="search" class="form-label">Tìm kiếm trạm</label>
+                <input type="text" class="form-control" id="search" name="search" 
+                       placeholder="Tên trạm, địa chỉ, tỉnh/thành phố..." value="@Model.SearchQuery">
+            </div>
+            <div class="col-md-3">
+                <label for="state" class="form-label">Tỉnh/Thành phố</label>
+                <input type="text" class="form-control" id="state" name="state" 
+                       placeholder="VD: Hà Nội, Hồ Chí Minh..." value="@Model.FilterState">
+            </div>
+            <div class="col-md-2 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-admin-primary flex-grow-1">
+                    <i class="fas fa-search me-1"></i>Tìm kiếm
+                </button>
+                <a href="/Admin/Station/Index" class="btn btn-outline-secondary">
+                    <i class="fas fa-redo me-1"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Stations Table -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-list me-2"></i>Danh sách trạm (@Model.Stations.Count)</h5>
+    </div>
+    <div class="table-responsive">
+        @if (Model.Stations.Count > 0)
+        {
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên trạm</th>
+                        <th>Địa chỉ</th>
+                        <th>Tỉnh/Thành phố</th>
+                        <th>Số xe</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var station in Model.Stations)
+                    {
+                        <tr>
+                            <td>
+                                <span class="badge bg-light text-dark">@station.Id</span>
+                            </td>
+                            <td>
+                                <strong>@station.Name</strong>
+                            </td>
+                            <td>
+                                <small class="text-muted">@station.Address</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-info text-white">@station.State</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark">@station.Vehicles.Count</span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button type="button" class="btn btn-outline-success" 
+                                            onclick="manageVehicles(@station.Id, '@station.Name')" title="Điều phối xe">
+                                        <i class="fas fa-exchange-alt"></i>
+                                    </button>
+                                    <a href="/Admin/Station/Edit/@station.Id" class="btn btn-outline-primary" 
+                                       title="Chỉnh sửa">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-outline-danger" 
+                                            data-bs-toggle="modal" data-bs-target="#deleteModal_@station.Id"
+                                            title="Xóa">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Delete Confirmation Modal -->
+                                <div class="modal fade" id="deleteModal_@station.Id" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Xác nhận xóa</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Bạn có chắc chắn muốn xóa trạm <strong>@station.Name</strong> không?</p>
+                                                <p class="text-muted"><small>Thao tác này không thể hoàn tác.</small></p>
+                                                @if (station.Vehicles.Count > 0)
+                                                {
+                                                    <div class="alert alert-warning mb-0">
+                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                        <strong>Cảnh báo:</strong> Trạm này đang có @station.Vehicles.Count chiếc xe. Bạn vẫn muốn xóa?
+                                                    </div>
+                                                }
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                                <form method="post" asp-page-handler="Delete" style="display: inline;">
+                                                    <input type="hidden" name="id" value="@station.Id">
+                                                    <button type="submit" class="btn btn-danger">Xóa</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="table-empty-state p-5 text-center">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <p class="text-muted">
+                    @if (!string.IsNullOrEmpty(Model.SearchQuery) || !string.IsNullOrEmpty(Model.FilterState))
+                    {
+                        <span>Không tìm thấy trạm nào phù hợp với điều kiện tìm kiếm.</span>
+                    }
+                    else
+                    {
+                        <span>Chưa có trạm nào được thêm vào hệ thống.</span>
+                    }
+                </p>
+                @if (string.IsNullOrEmpty(Model.SearchQuery) && string.IsNullOrEmpty(Model.FilterState))
+                {
+                    <a href="/Admin/Station/Create" class="btn btn-admin-primary mt-3">
+                        <i class="fas fa-plus me-2"></i>Thêm trạm mới
+                    </a>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Vehicle Management Modal -->
+<div class="modal fade" id="vehicleManagementModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-exchange-alt me-2"></i>Điều phối xe - <span id="stationNameTitle"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Current Vehicles -->
+                    <div class="col-md-6">
+                        <h6 class="mb-3"><i class="fas fa-car me-2"></i>Xe hiện có tại trạm (<span id="currentVehicleCount">0</span>)</h6>
+                        <div id="currentVehiclesList" class="vehicle-list">
+                            <div class="text-center p-3">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Available Vehicles from Other Stations -->
+                    <div class="col-md-6">
+                        <h6 class="mb-3"><i class="fas fa-plus-circle me-2"></i>Xe có thể điều chuyển đến</h6>
+                        <div class="mb-3">
+                            <select class="form-select form-select-sm" id="sourceStationFilter">
+                                <option value="">Tất cả các trạm khác</option>
+                            </select>
+                        </div>
+                        <div id="availableVehiclesList" class="vehicle-list">
+                            <div class="text-center p-3">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentStationId = null;
+
+        // Auto dismiss alerts after 5 seconds
+        document.querySelectorAll('.alert').forEach(alert => {
+            setTimeout(() => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 5000);
+        });
+
+        function manageVehicles(stationId, stationName) {
+            currentStationId = stationId;
+            document.getElementById('stationNameTitle').textContent = stationName;
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('vehicleManagementModal'));
+            modal.show();
+            
+            // Load vehicles
+            loadStationVehicles(stationId);
+            loadAvailableVehicles(stationId);
+            loadStationFilters(stationId);
+        }
+
+        function loadStationVehicles(stationId) {
+            fetch(`/Admin/Station/Index?handler=StationVehicles&stationId=${stationId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('currentVehiclesList');
+                    document.getElementById('currentVehicleCount').textContent = data.length;
+                    
+                    if (data.length === 0) {
+                        container.innerHTML = '<div class="alert alert-info">Trạm chưa có xe nào</div>';
+                        return;
+                    }
+                    
+                    let html = '<div class="list-group">';
+                    data.forEach(vehicle => {
+                        const statusBadge = getStatusBadge(vehicle.status);
+                        html += `
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>${vehicle.name}</strong><br>
+                                    <small class="text-muted">${vehicle.plateNumber} - ${vehicle.vehicleType}</small>
+                                </div>
+                                <div>
+                                    ${statusBadge}
+                                    ${vehicle.status === 'Available' || vehicle.status === 'Maintenance' ? 
+                                        `<button class="btn btn-sm btn-outline-danger ms-2" onclick="moveVehicleOut(${vehicle.id}, '${vehicle.name}')" title="Chuyển đi">
+                                            <i class="fas fa-arrow-right"></i>
+                                        </button>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    container.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('currentVehiclesList').innerHTML = 
+                        '<div class="alert alert-danger">Lỗi tải dữ liệu</div>';
+                });
+        }
+
+        function loadAvailableVehicles(stationId, sourceStationId = null) {
+            let url = `/Admin/Station/Index?handler=AvailableVehicles&excludeStationId=${stationId}`;
+            if (sourceStationId) {
+                url += `&sourceStationId=${sourceStationId}`;
+            }
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('availableVehiclesList');
+                    
+                    if (data.length === 0) {
+                        container.innerHTML = '<div class="alert alert-info">Không có xe nào có thể điều chuyển</div>';
+                        return;
+                    }
+                    
+                    let html = '<div class="list-group">';
+                    data.forEach(vehicle => {
+                        const statusBadge = getStatusBadge(vehicle.status);
+                        html += `
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>${vehicle.name}</strong><br>
+                                    <small class="text-muted">${vehicle.plateNumber} - ${vehicle.vehicleType}</small><br>
+                                    <small class="badge bg-secondary mt-1">${vehicle.stationName}</small>
+                                </div>
+                                <div>
+                                    ${statusBadge}
+                                    <button class="btn btn-sm btn-outline-success ms-2" onclick="moveVehicleIn(${vehicle.id}, '${vehicle.name}')" title="Chuyển đến">
+                                        <i class="fas fa-arrow-left"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    container.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('availableVehiclesList').innerHTML = 
+                        '<div class="alert alert-danger">Lỗi tải dữ liệu</div>';
+                });
+        }
+
+        function loadStationFilters(currentStationId) {
+            fetch(`/Admin/Station/Index?handler=AllStations`)
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById('sourceStationFilter');
+                    select.innerHTML = '<option value="">Tất cả các trạm khác</option>';
+                    
+                    data.forEach(station => {
+                        if (station.id !== currentStationId) {
+                            select.innerHTML += `<option value="${station.id}">${station.name} (${station.vehicleCount} xe)</option>`;
+                        }
+                    });
+                    
+                    select.onchange = () => {
+                        const sourceId = select.value || null;
+                        loadAvailableVehicles(currentStationId, sourceId);
+                    };
+                });
+        }
+
+        function moveVehicleOut(vehicleId, vehicleName) {
+            if (!confirm(`Bạn muốn chuyển xe "${vehicleName}" khỏi trạm này?`)) return;
+            
+            fetch(`/Admin/Station/Index?handler=AllStations`)
+                .then(response => response.json())
+                .then(data => {
+                    const stations = data.filter(s => s.id !== currentStationId);
+                    let options = stations.map((s, i) => `${i+1}. ${s.name} (${s.vehicleCount} xe)\n`).join('');
+                    const choice = prompt(`Chọn trạm đích:\n${options}\nNhập số thứ tự (1-${stations.length}):`);
+                    
+                    if (choice) {
+                        const index = parseInt(choice) - 1;
+                        if (index >= 0 && index < stations.length) {
+                            moveVehicle(vehicleId, stations[index].id);
+                        }
+                    }
+                });
+        }
+
+        function moveVehicleIn(vehicleId, vehicleName) {
+            if (!confirm(`Bạn muốn chuyển xe "${vehicleName}" đến trạm này?`)) return;
+            moveVehicle(vehicleId, currentStationId);
+        }
+
+        function moveVehicle(vehicleId, targetStationId) {
+            fetch(`/Admin/Station/Index?handler=MoveVehicle`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: JSON.stringify({ vehicleId, targetStationId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Điều chuyển xe thành công!');
+                    loadStationVehicles(currentStationId);
+                    loadAvailableVehicles(currentStationId);
+                    location.reload();
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi điều chuyển xe');
+            });
+        }
+
+        function getStatusBadge(status) {
+            const badges = {
+                'Available': '<span class="badge bg-success">Sẵn sàng</span>',
+                'Rented': '<span class="badge bg-secondary">Đang thuê</span>',
+                'Maintenance': '<span class="badge bg-warning">Bảo trì</span>',
+                'Charging': '<span class="badge bg-primary">Sạc pin</span>'
+            };
+            return badges[status] || '<span class="badge bg-secondary">Unknown</span>';
+        }
+    </script>
+    
+    <style>
+        .vehicle-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .list-group-item {
+            border-left: 4px solid #0d6efd;
+        }
+        
+        .list-group-item:hover {
+            background-color: #f8f9fa;
+        }
+    </style>
+}

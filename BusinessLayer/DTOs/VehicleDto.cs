@@ -23,5 +23,6 @@ namespace BusinessLayer.DTOs
         public string imageUrl { get; set; }
         public int maxDistance { get; set; }
         public int seartCapacity { get; set; }
+        public decimal batteryCapacity { get; set; }
     }
 }

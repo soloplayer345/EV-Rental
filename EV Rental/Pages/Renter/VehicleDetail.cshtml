@@ -70,8 +70,15 @@
                     <p class="vehicle-type">Loại xe: @Model.Vehicle?.VehicleType</p>
                     
                     <div class="rating">
-                        <span class="stars">★★★★★</span>
-                        <span class="rating-text">(4.8 / 5.0 - 120 đánh giá)</span>
+                        <span class="stars">@{
+                            var filledStars = (int)Math.Round(Model.AverageRating);
+                            var emptyStars = 5 - filledStars;
+                            var starString = string.Empty;
+                            for (int i = 0; i < filledStars; i++) starString += "★";
+                            for (int i = 0; i < emptyStars; i++) starString += "☆";
+                            @:@starString
+                        }</span>
+                        <span class="rating-text">(@Model.AverageRating.ToString("F1") / 5.0 - @Model.TotalReviews đánh giá)</span>
                     </div>
 
                     <div class="specs-quick">
@@ -79,6 +86,11 @@
                             <span class="spec-icon">🔋</span>
                             <span class="spec-label">Quãng đường</span>
                             <span class="spec-value">@Model.Vehicle?.MaxDistance km</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-icon">⚡</span>
+                            <span class="spec-label">Dung lượng pin</span>
+                            <span class="spec-value">@Model.Vehicle?.BatteryCapacity kWh</span>
                         </div>
                         <div class="spec-item">
                             <span class="spec-icon">👥</span>
@@ -99,7 +111,25 @@
 
                     <div class="price-section">
                         <div class="price-label">Giá thuê</div>
-                        <div class="price-amount">@Model.Vehicle?.PricePerDay.ToString("N0") đ/ngày</div>
+                        <div class="price-grid">
+                            <div class="price-option">
+                                <div class="price-type">
+                                    <span class="price-icon">⏱️</span>
+                                    <span>Theo giờ</span>
+                                </div>
+                                <div class="price-amount-small">@Model.Vehicle?.PricePerHour.ToString("N0") đ/giờ</div>
+                            </div>
+                            <div class="price-option primary">
+                                <div class="price-type">
+                                    <span class="price-icon">📅</span>
+                                    <span>Theo ngày</span>
+                                </div>
+                                <div class="price-amount-large">@Model.Vehicle?.PricePerDay.ToString("N0") đ/ngày</div>
+                            </div>
+                        </div>
+                        <div class="price-note">
+                            💡 <strong>Mẹo:</strong> Thuê theo ngày sẽ tiết kiệm hơn nếu thuê trên 8 giờ
+                        </div>
                     </div>
 
                     <div class="availability">
@@ -183,6 +213,10 @@
                         <span class="spec-detail">@Model.Vehicle?.MaxDistance km</span>
                     </div>
                     <div class="spec-row">
+                        <span class="spec-name">Dung lượng pin</span>
+                        <span class="spec-detail">@Model.Vehicle?.BatteryCapacity kWh</span>
+                    </div>
+                    <div class="spec-row">
                         <span class="spec-name">Số chỗ ngồi</span>
                         <span class="spec-detail">@Model.Vehicle?.seartCapacity chỗ</span>
                     </div>
@@ -230,47 +264,33 @@
             <div class="content-card">
                 <h2 class="section-title">Đánh Giá Của Khách Hàng</h2>
                 
-                <div class="review-item">
-                    <div class="review-header">
-                        <div class="reviewer-info">
-                            <span class="reviewer-name">Nguyễn Văn A</span>
-                            <span class="review-date">15/10/2024</span>
+                @if (Model.Reviews.Any())
+                {
+                    @foreach (var review in Model.Reviews)
+                    {
+                        <div class="review-item">
+                            <div class="review-header">
+                                <div class="reviewer-info">
+                                    <span class="reviewer-name">@review.RenterName</span>
+                                    <span class="review-date">@review.CreatedAt.ToString("dd/MM/yyyy")</span>
+                                </div>
+                                <div class="review-rating">@{
+                                    var reviewFilledStars = review.Rating;
+                                    var reviewEmptyStars = 5 - reviewFilledStars;
+                                    var reviewStarString = string.Empty;
+                                    for (int i = 0; i < reviewFilledStars; i++) reviewStarString += "★";
+                                    for (int i = 0; i < reviewEmptyStars; i++) reviewStarString += "☆";
+                                    @:@reviewStarString
+                                }</div>
+                            </div>
+                            <p class="review-text">@review.Comment</p>
                         </div>
-                        <div class="review-rating">★★★★★</div>
-                    </div>
-                    <p class="review-text">
-                        Xe rất tốt, nội thất đẹp và sạch sẽ. Pin đầy đủ, chạy êm. 
-                        Rất phù hợp cho chuyến đi ngắn ngày của gia đình. Sẽ thuê lại lần sau!
-                    </p>
-                </div>
-
-                <div class="review-item">
-                    <div class="review-header">
-                        <div class="reviewer-info">
-                            <span class="reviewer-name">Trần Thị B</span>
-                            <span class="review-date">10/10/2024</span>
-                        </div>
-                        <div class="review-rating">★★★★☆</div>
-                    </div>
-                    <p class="review-text">
-                        Xe chạy êm, tiết kiệm chi phí. Dịch vụ hỗ trợ tốt. 
-                        Chỉ có điều trạm sạc còn ít, nhưng với quãng đường trong thành phố thì vẫn đủ dùng.
-                    </p>
-                </div>
-
-                <div class="review-item">
-                    <div class="review-header">
-                        <div class="reviewer-info">
-                            <span class="reviewer-name">Lê Minh C</span>
-                            <span class="review-date">05/10/2024</span>
-                        </div>
-                        <div class="review-rating">★★★★★</div>
-                    </div>
-                    <p class="review-text">
-                        Lần đầu lái xe điện và trải nghiệm rất tuyệt vời! Xe êm, tăng tốc nhanh, 
-                        không khí trong lành hơn. Giá cả hợp lý, sẽ giới thiệu cho bạn bè.
-                    </p>
-                </div>
+                    }
+                }
+                else
+                {
+                    <p style="text-align: center; color: #999; padding: 2rem;">Chưa có đánh giá nào cho xe này</p>
+                }
             </div>
         </div>
     </section>
@@ -445,16 +465,84 @@
         }
 
         .price-section {
-            padding: 1rem;
-            background: #eff6ff;
-            border-radius: 8px;
-            border-left: 4px solid #2563eb;
+            padding: 1.5rem;
+            background: #fafbfc;
+            border-radius: 12px;
+            border: 1px solid #e1e4e8;
         }
 
         .price-label {
-            font-size: 0.9rem;
+            font-size: 1rem;
             color: #6b7280;
-            margin-bottom: 0.25rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .price-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .price-option {
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e1e4e8;
+            transition: all 0.3s;
+        }
+
+        .price-option:hover {
+            border-color: #93c5fd;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(147, 197, 253, 0.2);
+        }
+
+        .price-option.primary {
+            border-color: #93c5fd;
+            background: #f0f9ff;
+        }
+
+        .price-type {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-icon {
+            font-size: 1.2rem;
+        }
+
+        .price-amount-small {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #374151;
+        }
+
+        .price-amount-large {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+
+        .price-note {
+            padding: 0.75rem;
+            background: #fffbeb;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            color: #92400e;
+            border-left: 3px solid #fbbf24;
+        }
+
+        .price-note strong {
+            color: #78350f;
         }
 
         .price-amount {
@@ -642,8 +730,16 @@
                 font-size: 1.5rem;
             }
 
-            .price-amount {
-                font-size: 1.5rem;
+            .price-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .price-amount-small {
+                font-size: 1.1rem;
+            }
+
+            .price-amount-large {
+                font-size: 1.3rem;
             }
         }
     </style>

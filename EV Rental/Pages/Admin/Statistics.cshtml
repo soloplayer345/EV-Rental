@@ -1,0 +1,260 @@
+@page
+@model EV_Rental.Pages.Admin.StatisticsModel
+@{
+    ViewData["Title"] = "Thống Kê Nâng Cao";
+    Layout = "~/Pages/Shared/_AdminLayout.cshtml";
+}
+
+<!-- Page Header -->
+<div class="page-header mb-4">
+    <div>
+        <h1><i class="fas fa-chart-line me-2"></i>Thống Kê Nâng Cao</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Admin/Dashboard">Trang chủ</a></li>
+                <li class="breadcrumb-item active">Thống Kê Nâng Cao</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- Date Range Filter -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label for="startDate" class="form-label">Từ ngày</label>
+                <input type="date" class="form-control" id="startDate" name="startDate" value="@Model.StartDate?.ToString("yyyy-MM-dd")">
+            </div>
+            <div class="col-md-3">
+                <label for="endDate" class="form-label">Đến ngày</label>
+                <input type="date" class="form-control" id="endDate" name="endDate" value="@Model.EndDate?.ToString("yyyy-MM-dd")">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-admin-primary w-100">
+                    <i class="fas fa-filter me-1"></i>Lọc
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Revenue by Station -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-charging-station me-2"></i>Doanh thu theo Trạm</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Trạm</th>
+                        <th>Số đơn thuê</th>
+                        <th>Doanh thu</th>
+                        <th>Trung bình/đơn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var station in Model.StationRevenue)
+                    {
+                        <tr>
+                            <td><strong>@station.StationName</strong></td>
+                            <td>@station.TotalRentals</td>
+                            <td class="text-success fw-bold">@station.TotalRevenue.ToString("N0") ₫</td>
+                            <td>@((station.TotalRevenue / station.TotalRentals).ToString("N0")) ₫</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-3">
+            <canvas id="stationRevenueChart" height="80"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Daily Rental Frequency -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-calendar-day me-2"></i>Tần suất thuê theo Ngày</h5>
+    </div>
+    <div class="card-body">
+        <canvas id="dailyFrequencyChart" height="80"></canvas>
+    </div>
+</div>
+
+<!-- Vehicle Type Statistics -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-car-side me-2"></i>Thống kê theo Loại Xe</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Loại xe</th>
+                                <th>Số lượt thuê</th>
+                                <th>Doanh thu</th>
+                                <th>TB/lượt</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var type in Model.VehicleTypeStats)
+                            {
+                                <tr>
+                                    <td><strong>@type.VehicleType</strong></td>
+                                    <td>@type.RentalCount</td>
+                                    <td class="text-success">@type.TotalRevenue.ToString("N0") ₫</td>
+                                    <td>@type.AveragePrice.ToString("N0") ₫</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <canvas id="vehicleTypeChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Most Rented Vehicles -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-trophy me-2"></i>Top Xe được thuê nhiều nhất</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Hạng</th>
+                        <th>Tên xe</th>
+                        <th>Loại xe</th>
+                        <th>Tổng lượt thuê</th>
+                        <th>Hoàn thành</th>
+                        <th>Doanh thu</th>
+                        <th>Tỷ lệ hoàn thành</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.MostRentedVehicles.Count; i++)
+                    {
+                        var vehicle = Model.MostRentedVehicles[i];
+                        var completionRate = vehicle.RentalCount > 0 ? (double)vehicle.CompletedCount / vehicle.RentalCount * 100 : 0;
+                        <tr>
+                            <td>
+                                @if (i == 0)
+                                {
+                                    <span class="badge bg-warning text-dark"><i class="fas fa-crown"></i> 1</span>
+                                }
+                                else if (i == 1)
+                                {
+                                    <span class="badge bg-secondary"><i class="fas fa-medal"></i> 2</span>
+                                }
+                                else if (i == 2)
+                                {
+                                    <span class="badge bg-danger"><i class="fas fa-award"></i> 3</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-light text-dark">@(i + 1)</span>
+                                }
+                            </td>
+                            <td><strong>@vehicle.VehicleName</strong></td>
+                            <td><span class="badge bg-info">@vehicle.VehicleType</span></td>
+                            <td class="fw-bold">@vehicle.RentalCount</td>
+                            <td>@vehicle.CompletedCount</td>
+                            <td class="text-success">@vehicle.TotalRevenue.ToString("N0") ₫</td>
+                            <td>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                         style="width: @completionRate%">
+                                        @completionRate.ToString("F1")%
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Station Revenue Chart
+    const stationRevenueCtx = document.getElementById('stationRevenueChart');
+    new Chart(stationRevenueCtx, {
+        type: 'bar',
+        data: {
+            labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.StationRevenue.Select(s => s.StationName))),
+            datasets: [{
+                label: 'Doanh thu (triệu VNĐ)',
+                data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.StationRevenue.Select(s => s.TotalRevenue / 1000000))),
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // Daily Frequency Chart
+    const dailyFrequencyCtx = document.getElementById('dailyFrequencyChart');
+    new Chart(dailyFrequencyCtx, {
+        type: 'line',
+        data: {
+            labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DailyFrequency.Select(d => d.Date.ToString("dd/MM")))),
+            datasets: [{
+                label: 'Số lượt thuê',
+                data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DailyFrequency.Select(d => d.RentalCount))),
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // Vehicle Type Chart
+    const vehicleTypeCtx = document.getElementById('vehicleTypeChart');
+    new Chart(vehicleTypeCtx, {
+        type: 'doughnut',
+        data: {
+            labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.VehicleTypeStats.Select(v => v.VehicleType))),
+            datasets: [{
+                label: 'Số lượt thuê',
+                data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.VehicleTypeStats.Select(v => v.RentalCount))),
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.5)',
+                    'rgba(54, 162, 235, 0.5)',
+                    'rgba(255, 206, 86, 0.5)',
+                    'rgba(75, 192, 192, 0.5)',
+                    'rgba(153, 102, 255, 0.5)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+</script>
+}
