@@ -26,15 +26,41 @@
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="notificationDropdown" 
                            role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-bell me-1"></i>
-                            <span class="badge bg-danger badge-notification">3</span>
+                            @{
+                                int notificationCount = 0;
+                                try
+                                {
+                                    // Lấy từ Model nếu có NewReportsCount property
+                                    var modelType = Model?.GetType();
+                                    var property = modelType?.GetProperty("NewReportsCount");
+                                    if (property != null)
+                                    {
+                                        var value = property.GetValue(Model);
+                                        if (value != null)
+                                        {
+                                            notificationCount = (int)value;
+                                        }
+                                    }
+                                }
+                                catch
+                                {
+                                    notificationCount = 0;
+                                }
+                            }
+                            @if (notificationCount > 0)
+                            {
+                                <span class="badge bg-danger badge-notification">@notificationCount</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary badge-notification">0</span>
+                            }
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end notification-dropdown" aria-labelledby="notificationDropdown">
                             <li><h6 class="dropdown-header">Thông báo</h6></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-user-plus me-2"></i>Người dùng mới đăng ký</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-car me-2"></i>Yêu cầu thuê xe mới</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-exclamation-triangle me-2"></i>Cảnh báo hệ thống</a></li>
+                            <li><a class="dropdown-item" href="/Admin/Problems/Index"><i class="fas fa-exclamation-triangle me-2"></i>Báo cáo sự cố mới (@notificationCount)</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-center" href="#">Xem tất cả</a></li>
+                            <li><a class="dropdown-item text-center" href="/Admin/Problems/Index">Xem tất cả</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown ms-3">
@@ -50,8 +76,8 @@
                             }
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
+                            <li><a class="dropdown-item" href="#" style="display: none;"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
+                            <li><a class="dropdown-item" href="#" style="display: none;"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" asp-page="/Account/Logout"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
                         </ul>
@@ -115,12 +141,6 @@
                     <a href="/Admin/Statistics" class="menu-link">
                         <i class="fas fa-chart-line"></i>
                         <span>Thống Kê Nâng Cao</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="/Admin/Settings" class="menu-link">
-                        <i class="fas fa-cog"></i>
-                        <span>Cài đặt</span>
                     </a>
                 </li>
             </ul>

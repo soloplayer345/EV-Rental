@@ -1,14 +1,23 @@
 using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using BusinessLayer.Services;
 
 namespace EV_Rental.Pages.Admin
 {
     public class DashboardModel : PageModel
     {
+        private readonly ReportService _reportService;
+        
         public string UserEmail { get; set; } = string.Empty;
+        public int NewReportsCount { get; set; } = 0;
 
-        public IActionResult OnGet()
+        public DashboardModel(ReportService reportService)
+        {
+            _reportService = reportService;
+        }
+
+        public async Task<IActionResult> OnGetAsync()
         {
             // Kiểm tra quyền Admin
             if (!SessionHelper.IsAdmin(HttpContext.Session))
@@ -18,6 +27,9 @@ namespace EV_Rental.Pages.Admin
 
             var user = SessionHelper.GetUserSession(HttpContext.Session);
             UserEmail = user?.Email ?? "";
+
+            // Lấy số báo cáo mới
+            NewReportsCount = await _reportService.GetNewReportsCountAsync();
 
             return Page();
         }

@@ -291,6 +291,24 @@ namespace BusinessLayer.Services
 
             return result;
         }
+
+        /// <summary>
+        /// Lấy số báo cáo mới (sự cố chưa được xử lý)
+        /// </summary>
+        public async Task<int> GetNewReportsCountAsync()
+        {
+            try
+            {
+                var inspectionProblemRepo = _unitOfWork.GetRepository<InspectionProblem>();
+                var problems = await inspectionProblemRepo.GetAllAsync();
+                // Assume problems không có status, nên lấy tất cả là "mới"
+                return problems.Count();
+            }
+            catch
+            {
+                return 0;
+            }
+        }
     }
 
     // DTOs

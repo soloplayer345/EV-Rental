@@ -192,10 +192,25 @@
                                 }
                             </td>
                             <td>
+                                @{
+                                    // Nếu IsActive = false và UpdateDate gần bằng CreateDate thì là "Chờ duyệt" (vừa đăng ký)
+                                    // Nếu IsActive = false và UpdateDate khác CreateDate thì là "Bị ban" (admin đã ban)
+                                    var minutesDiff = user.UpdateDate.HasValue 
+                                        ? (user.UpdateDate.Value - user.CreateDate).TotalMinutes 
+                                        : 0;
+                                    var isBanned = !user.IsActive && user.UpdateDate.HasValue && minutesDiff > 1;
+                                }
+                                
                                 @if (user.IsActive)
                                 {
                                     <span class="badge badge-custom badge-active">
                                         <i class="fas fa-check-circle me-1"></i>Hoạt động
+                                    </span>
+                                }
+                                else if (isBanned)
+                                {
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-ban me-1"></i>Bị ban
                                     </span>
                                 }
                                 else
@@ -216,20 +231,20 @@
                                             onclick="editUser(@user.Id)" title="Chỉnh sửa">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    @if (user.IsActive)
-                                    {
-                                        <button type="button" class="btn btn-sm btn-outline-danger" 
-                                                onclick="toggleUserStatus(@user.Id, false)" title="Vô hiệu hóa">
-                                            <i class="fas fa-ban"></i>
-                                        </button>
-                                    }
-                                    else
-                                    {
-                                        <button type="button" class="btn btn-sm btn-outline-success" 
-                                                onclick="toggleUserStatus(@user.Id, true)" title="Kích hoạt">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                    }
+                    @if (user.IsActive)
+                    {
+                        <button type="button" class="btn btn-sm btn-outline-danger" 
+                                onclick="toggleUserStatus(@user.Id, false)" title="Ban user">
+                            <i class="fas fa-ban"></i>
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-sm btn-outline-success" 
+                                onclick="toggleUserStatus(@user.Id, true)" title="Kích hoạt">
+                            <i class="fas fa-check"></i>
+                        </button>
+                    }
                                     @* Ẩn nút xóa user
                                     <button type="button" class="btn btn-sm btn-outline-danger" 
                                             onclick="deleteUser(@user.Id)" title="Xóa">
@@ -488,7 +503,7 @@
     }
 
     function toggleUserStatus(userId, newStatus) {
-        const action = newStatus ? 'kích hoạt' : 'vô hiệu hóa';
+        const action = newStatus ? 'kích hoạt' : 'ban';
         if (confirm(`Bạn có chắc chắn muốn ${action} user này?`)) {
             const formData = new FormData();
             formData.append('userId', userId);
@@ -504,7 +519,8 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert(`${action.charAt(0).toUpperCase() + action.slice(1)} user thành công!`);
+                    const message = newStatus ? 'Kích hoạt user thành công!' : 'Ban user thành công!';
+                    alert(message);
                     location.reload();
                 } else {
                     alert('Có lỗi xảy ra: ' + data.message);

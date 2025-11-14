@@ -122,6 +122,7 @@ namespace EV_Rental.Pages.Admin
                 var passwordHash = BCrypt.Net.BCrypt.HashPassword(Password);
 
                 // Create new user using service
+                // Admin tạo user sẽ tự động active, không cần chờ duyệt
                 var newUser = new AccountEntity
                 {
                     FullName = FullName,
@@ -129,7 +130,7 @@ namespace EV_Rental.Pages.Admin
                     Phone = Phone,
                     PasswordHash = passwordHash,
                     Role = (AccountRole)Role,
-                    IsActive = IsActive
+                    IsActive = true // Admin thêm user tự động active
                 };
 
                 await _accountService.AddAccountAsync(newUser);

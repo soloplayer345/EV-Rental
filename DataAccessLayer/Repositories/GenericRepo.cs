@@ -140,6 +140,16 @@ namespace DataAccessLayer.Repositories
             }
 
             model.UpdateDate = DateTime.UtcNow;
+            
+            // Detach any existing tracked instance with the same key
+            var existingEntity = _dbContext.ChangeTracker.Entries<TModel>()
+                .FirstOrDefault(e => e.Entity.Id == model.Id && e.Entity != model);
+            
+            if (existingEntity != null)
+            {
+                _dbContext.Entry(existingEntity.Entity).State = EntityState.Detached;
+            }
+            
             _dbSet.Update(model);
         }
 
