@@ -80,7 +80,8 @@
                                 <h3 class="vehicle-name">@vehicle.Name</h3>
                                 <p class="vehicle-type">Loại xe: @vehicle.VehicleType</p>
                                 <p class="vehicle-brand">Hãng: @vehicle.Brand</p>
-                                <p class="vehicle-distance">Quãng đường: @vehicle.MaxDistance km</p>
+                                <p class="vehicle-distance">🔋 Quãng đường: @vehicle.MaxDistance km</p>
+                                <p class="vehicle-battery">⚡ Dung lượng pin: @vehicle.BatteryCapacity kWh</p>
                                 <p class="vehicle-seats">👥 Số ghế: @vehicle.seartCapacity chỗ</p>
                                 <p class="vehicle-price">@vehicle.PricePerDay.ToString("N0") đ/ngày</p>
                                 <button class="btn-rent" onclick="window.location.href='/Renter/VehicleDetail/@vehicle.Id'">Thuê Ngay</button>
@@ -297,10 +298,16 @@
         }
 
         .vehicle-brand,
-        .vehicle-distance {
+        .vehicle-distance,
+        .vehicle-battery {
             margin: 0.5rem 0;
             color: #6b7280;
             font-size: 0.9rem;
+        }
+
+        .vehicle-battery {
+            color: #059669;
+            font-weight: 600;
         }
 
         .no-vehicles {

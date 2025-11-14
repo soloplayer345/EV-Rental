@@ -13,6 +13,7 @@ namespace DataAccessLayer
 
         // Lazy initialization cho AccountRepo
         private IAccountRepo? _accountRepo;
+        private IRatingReviewRepo? _ratingReviewRepo;
 
         public UnitOfWork(EVRentalDBContext context)
         {
@@ -43,7 +44,19 @@ namespace DataAccessLayer
             var type = typeof(TModel);
             if (!_repositories.ContainsKey(type))
             {
-                _repositories[type] = new GenericRepo<TModel>(_context);
+                // Kiểm tra xem có repository đặc thù cho entity này không
+                if (type == typeof(RatingReview))
+                {
+                    if (_ratingReviewRepo == null)
+                    {
+                        _ratingReviewRepo = new RatingReviewRepo(_context);
+                    }
+                    _repositories[type] = _ratingReviewRepo;
+                }
+                else
+                {
+                    _repositories[type] = new GenericRepo<TModel>(_context);
+                }
             }
             return (IGenericRepo<TModel>)_repositories[type];
         }

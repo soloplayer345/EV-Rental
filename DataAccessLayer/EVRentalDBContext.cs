@@ -61,6 +61,7 @@ namespace DataAccessLayer
                 entity.Property(e => e.VehicleType).HasMaxLength(50);
                 entity.Property(e => e.PricePerHour).HasColumnType("decimal(12,2)");
                 entity.Property(e => e.PricePerDay).HasColumnType("decimal(12,2)");
+                entity.Property(e => e.BatteryCapacity).HasColumnType("decimal(6,2)").HasDefaultValue(0);
 
                 entity.HasOne(v => v.Station)
                     .WithMany(s => s.Vehicles)

@@ -19,7 +19,8 @@ namespace EV_Rental.Middlewares
             // Bỏ qua các static files, login/register, và payment callbacks
             if (path.StartsWith("/css") || path.StartsWith("/js") || 
                 path.StartsWith("/lib") || path.StartsWith("/account/login") || 
-                path.StartsWith("/account/register") || path.StartsWith("/payment") ||
+                path.StartsWith("/account/register") || path.StartsWith("/account/verifyotp") ||
+                path.StartsWith("/payment") ||
                 path == "/")
             {
                 await _next(context);

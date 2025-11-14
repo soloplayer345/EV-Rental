@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - EV Rental Admin</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="admin-body">
+    <!-- Top Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark admin-navbar fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="/Admin/Dashboard">
+                <i class="fas fa-bolt me-2"></i>
+                <span class="fw-bold">EV Rental Admin</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="notificationDropdown" 
+                           role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-bell me-1"></i>
+                            @{
+                                int notificationCount = 0;
+                                try
+                                {
+                                    // Lấy từ Model nếu có NewReportsCount property
+                                    var modelType = Model?.GetType();
+                                    var property = modelType?.GetProperty("NewReportsCount");
+                                    if (property != null)
+                                    {
+                                        var value = property.GetValue(Model);
+                                        if (value != null)
+                                        {
+                                            notificationCount = (int)value;
+                                        }
+                                    }
+                                }
+                                catch
+                                {
+                                    notificationCount = 0;
+                                }
+                            }
+                            @if (notificationCount > 0)
+                            {
+                                <span class="badge bg-danger badge-notification">@notificationCount</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary badge-notification">0</span>
+                            }
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end notification-dropdown" aria-labelledby="notificationDropdown">
+                            <li><h6 class="dropdown-header">Thông báo</h6></li>
+                            <li><a class="dropdown-item" href="/Admin/Problems/Index"><i class="fas fa-exclamation-triangle me-2"></i>Báo cáo sự cố mới (@notificationCount)</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-center" href="/Admin/Problems/Index">Xem tất cả</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown ms-3">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" 
+                           role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="admin-avatar me-2">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            @if (EV_Rental.Helpers.SessionHelper.IsLoggedIn(Context.Session))
+                            {
+                                var user = EV_Rental.Helpers.SessionHelper.GetUserSession(Context.Session);
+                                <span>@(user?.Email?.Split('@')[0] ?? "Admin")</span>
+                            }
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="#" style="display: none;"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
+                            <li><a class="dropdown-item" href="#" style="display: none;"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" asp-page="/Account/Logout"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h5 class="mb-0">Quản trị</h5>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="/Admin/Dashboard" class="menu-link active">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/Admin/Users" class="menu-link">
+                        <i class="fas fa-users"></i>
+                        <span>Quản lý Users</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/Admin/Vehicle/Index" class="menu-link">
+                        <i class="fas fa-car"></i>
+                        <span>Quản lý Xe</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/Admin/Station/Index" class="menu-link">
+                        <i class="fas fa-charging-station"></i>
+                        <span>Quản lý Trạm</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/Admin/RentalRecord/Index" class="menu-link">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Quản lý Đơn Thuê</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/Admin/Problems/Index" class="menu-link">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Báo cáo Sự cố</span>
+                    </a>
+                </li>
+                <li class="menu-divider"></li>
+                <li class="menu-item">
+                    <a href="/Admin/Reports" class="menu-link">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Báo Cáo & Đánh Giá</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/Admin/Statistics" class="menu-link">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Thống Kê Nâng Cao</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <div class="d-flex align-items-center justify-content-between">
+                    <small class="text-muted">© 2025 EV Rental</small>
+                    <button class="btn btn-sm btn-outline-light" id="sidebarToggle">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-content">
+            <div class="content-wrapper">
+                @RenderBody()
+            </div>
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/admin.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

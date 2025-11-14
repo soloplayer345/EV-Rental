@@ -1,0 +1,651 @@
+@page
+@model EV_Rental.Pages.Admin.ReportsModel
+@{
+    Layout = "~/Pages/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Báo Cáo & Thống Kê";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1"><i class="bi bi-graph-up text-primary me-2"></i>Báo Cáo & Thống Kê</h2>
+            <p class="text-muted mb-0">Tổng quan hoạt động và đánh giá hệ thống</p>
+        </div>
+        <div class="btn-group">
+            <button type="button" class="btn btn-outline-primary" onclick="showSection('overview')">
+                <i class="bi bi-grid-3x3"></i> Tổng Quan
+            </button>
+            <button type="button" class="btn btn-outline-primary" onclick="showSection('rentals')">
+                <i class="bi bi-clipboard-check"></i> Đơn Thuê
+            </button>
+            <button type="button" class="btn btn-outline-primary" onclick="showSection('reviews')">
+                <i class="bi bi-star"></i> Đánh Giá
+            </button>
+            <button type="button" class="btn btn-outline-primary" onclick="showSection('revenue')">
+                <i class="bi bi-cash-coin"></i> Doanh Thu
+            </button>
+        </div>
+    </div>
+
+    <!-- Overview Section -->
+    <div id="overview-section" class="report-section">
+        <div class="row g-4 mb-4">
+            <!-- Total Rentals -->
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small">Tổng Đơn Thuê</p>
+                                <h3 class="mb-0 fw-bold">@Model.TotalRentals</h3>
+                                <small class="text-success">
+                                    <i class="bi bi-arrow-up"></i> @Model.RentalGrowth%
+                                </small>
+                            </div>
+                            <div class="bg-primary bg-opacity-10 p-3 rounded">
+                                <i class="bi bi-clipboard-check text-primary fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Revenue -->
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small">Tổng Doanh Thu</p>
+                                <h3 class="mb-0 fw-bold">@Model.TotalRevenue.ToString("N0") VNĐ</h3>
+                                <small class="text-success">
+                                    <i class="bi bi-arrow-up"></i> @Model.RevenueGrowth%
+                                </small>
+                            </div>
+                            <div class="bg-success bg-opacity-10 p-3 rounded">
+                                <i class="bi bi-cash-coin text-success fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Vehicles -->
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small">Tổng Xe</p>
+                                <h3 class="mb-0 fw-bold">@Model.TotalVehicles</h3>
+                                <small class="text-info">
+                                    <i class="bi bi-check-circle"></i> @Model.AvailableVehicles sẵn sàng
+                                </small>
+                            </div>
+                            <div class="bg-info bg-opacity-10 p-3 rounded">
+                                <i class="bi bi-car-front text-info fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Average Rating -->
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small">Đánh Giá TB</p>
+                                <h3 class="mb-0 fw-bold">
+                                    @Model.ReviewStatistics.AverageRating.ToString("F1")
+                                    <i class="bi bi-star-fill text-warning fs-5"></i>
+                                </h3>
+                                <small class="text-muted">@Model.ReviewStatistics.TotalReviews đánh giá</small>
+                            </div>
+                            <div class="bg-warning bg-opacity-10 p-3 rounded">
+                                <i class="bi bi-star text-warning fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">
+                            <i class="bi bi-graph-up me-2"></i>Doanh Thu Theo Tháng
+                        </h5>
+                        <canvas id="revenueChart" height="80"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">
+                            <i class="bi bi-pie-chart me-2"></i>Trạng Thái Đơn Thuê
+                        </h5>
+                        <canvas id="statusChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rentals Section -->
+    <div id="rentals-section" class="report-section" style="display: none;">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <h5 class="card-title mb-4">
+                    <i class="bi bi-clipboard-data me-2"></i>Thống Kê Đơn Thuê
+                </h5>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="text-center p-3 bg-light rounded">
+                            <h4 class="text-primary mb-1">@Model.PendingRentals</h4>
+                            <p class="text-muted mb-0">Chờ Xử Lý</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center p-3 bg-light rounded">
+                            <h4 class="text-success mb-1">@Model.ActiveRentals</h4>
+                            <p class="text-muted mb-0">Đang Thuê</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center p-3 bg-light rounded">
+                            <h4 class="text-info mb-1">@Model.CompletedRentals</h4>
+                            <p class="text-muted mb-0">Hoàn Thành</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title mb-4">
+                    <i class="bi bi-calendar-week me-2"></i>Đơn Thuê Gần Đây
+                </h5>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Mã Đơn</th>
+                                <th>Khách Hàng</th>
+                                <th>Xe</th>
+                                <th>Thời Gian</th>
+                                <th>Giá Trị</th>
+                                <th>Trạng Thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var rental in Model.RecentRentals.Take(10))
+                            {
+                                <tr>
+                                    <td>#@rental.Id</td>
+                                    <td>@rental.RenterName</td>
+                                    <td>@rental.VehicleName</td>
+                                    <td>@rental.StartTime?.ToString("dd/MM/yyyy")</td>
+                                    <td>@rental.TotalPrice.ToString("N0") VNĐ</td>
+                                    <td>
+                                        <span class="badge @GetStatusBadgeClass(rental.Status)">
+                                            @GetStatusText(rental.Status)
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reviews Section -->
+    <div id="reviews-section" class="report-section" style="display: none;">
+        <!-- Statistics Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small">Tổng Đánh Giá</p>
+                                <h3 class="mb-0 fw-bold">@Model.ReviewStatistics.TotalReviews</h3>
+                            </div>
+                            <div class="bg-primary bg-opacity-10 p-3 rounded">
+                                <i class="bi bi-chat-text text-primary fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small">Điểm Trung Bình</p>
+                                <h3 class="mb-0 fw-bold">
+                                    @Model.ReviewStatistics.AverageRating.ToString("F1")
+                                    <i class="bi bi-star-fill text-warning fs-5"></i>
+                                </h3>
+                            </div>
+                            <div class="bg-warning bg-opacity-10 p-3 rounded">
+                                <i class="bi bi-star text-warning fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small">5 Sao</p>
+                                <h3 class="mb-0 fw-bold">@Model.ReviewStatistics.FiveStarCount</h3>
+                                <small class="text-success">@Model.ReviewStatistics.FiveStarPercentage.ToString("F1")%</small>
+                            </div>
+                            <div class="bg-success bg-opacity-10 p-3 rounded">
+                                <i class="bi bi-emoji-smile text-success fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small">1-2 Sao</p>
+                                <h3 class="mb-0 fw-bold">@(Model.ReviewStatistics.OneStarCount + Model.ReviewStatistics.TwoStarCount)</h3>
+                                <small class="text-danger">@((Model.ReviewStatistics.OneStarPercentage + Model.ReviewStatistics.TwoStarPercentage).ToString("F1"))%</small>
+                            </div>
+                            <div class="bg-danger bg-opacity-10 p-3 rounded">
+                                <i class="bi bi-emoji-frown text-danger fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rating Distribution -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <h5 class="card-title mb-4"><i class="bi bi-bar-chart-fill me-2"></i>Phân Bố Đánh Giá</h5>
+                <div class="rating-distribution">
+                    @for (int i = 5; i >= 1; i--)
+                    {
+                        var count = Model.ReviewStatistics.RatingDistribution.GetValueOrDefault(i, 0);
+                        var percentage = Model.ReviewStatistics.TotalReviews > 0 
+                            ? (count / (double)Model.ReviewStatistics.TotalReviews * 100) 
+                            : 0;
+                        
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="me-2" style="min-width: 50px;">@i <i class="bi bi-star-fill text-warning"></i></span>
+                                <div class="progress flex-grow-1" style="height: 25px;">
+                                    <div class="progress-bar bg-warning" 
+                                         role="progressbar" 
+                                         style="width: @percentage.ToString("F1")%;" 
+                                         aria-valuenow="@percentage" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                    </div>
+                                </div>
+                                <span class="ms-3 text-muted" style="min-width: 80px;">@count (@percentage.ToString("F1")%)</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Reviews -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-list-ul me-2"></i>Đánh Giá Gần Đây
+                    </h5>
+                    <a href="/Admin/Reviews" class="btn btn-sm btn-outline-primary">
+                        Xem Tất Cả <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+                
+                @if (!Model.Reviews.Any())
+                {
+                    <div class="text-center py-5">
+                        <i class="bi bi-inbox fs-1 text-muted"></i>
+                        <p class="text-muted mt-3">Chưa có đánh giá nào</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Xe</th>
+                                    <th>Khách Hàng</th>
+                                    <th>Đánh Giá</th>
+                                    <th>Nhận Xét</th>
+                                    <th>Ngày</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var review in Model.Reviews.Take(10))
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="@review.VehicleImageUrl" 
+                                                     alt="@review.VehicleName" 
+                                                     class="rounded me-3"
+                                                     style="width: 50px; height: 50px; object-fit: cover;"
+                                                     onerror="this.src='/images/default-vehicle.png'">
+                                                <div>
+                                                    <div class="fw-semibold">@review.VehicleName</div>
+                                                    <small class="text-muted">@review.VehiclePlateNumber</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-semibold">@review.RenterName</div>
+                                        </td>
+                                        <td>
+                                            <span class="badge @GetRatingBadgeClass(review.Rating) fs-6">
+                                                @review.Rating <i class="bi bi-star-fill"></i>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div style="max-width: 300px;">
+                                                @if (!string.IsNullOrEmpty(review.Comment))
+                                                {
+                                                    <p class="mb-0 text-truncate" title="@review.Comment">
+                                                        @review.Comment
+                                                    </p>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted fst-italic">Không có nhận xét</span>
+                                                }
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <small>@review.CreatedAt.ToString("dd/MM/yyyy")</small>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenue Section -->
+    <div id="revenue-section" class="report-section" style="display: none;">
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">
+                            <i class="bi bi-cash-stack me-2"></i>Doanh Thu Theo Tháng
+                        </h5>
+                        <canvas id="monthlyRevenueChart" height="100"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">
+                            <i class="bi bi-car-front-fill me-2"></i>Top 5 Xe Có Doanh Thu Cao
+                        </h5>
+                        <canvas id="topVehiclesChart" height="100"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title mb-4">
+                    <i class="bi bi-table me-2"></i>Chi Tiết Doanh Thu
+                </h5>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Tháng</th>
+                                <th>Số Đơn</th>
+                                <th>Tổng Thu</th>
+                                <th>TB/Đơn</th>
+                                <th>Tăng Trưởng</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 1; i <= 12; i++)
+                            {
+                                var monthData = GetMonthData(i);
+                                <tr>
+                                    <td>Tháng @i/2025</td>
+                                    <td>@monthData.Count</td>
+                                    <td>@monthData.Revenue.ToString("N0") VNĐ</td>
+                                    <td>@monthData.Average.ToString("N0") VNĐ</td>
+                                    <td>
+                                        @if (monthData.Growth > 0)
+                                        {
+                                            <span class="text-success">
+                                                <i class="bi bi-arrow-up"></i> @monthData.Growth.ToString("F1")%
+                                            </span>
+                                        }
+                                        else if (monthData.Growth < 0)
+                                        {
+                                            <span class="text-danger">
+                                                <i class="bi bi-arrow-down"></i> @Math.Abs(monthData.Growth).ToString("F1")%
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Section Navigation
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.report-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName + '-section').style.display = 'block';
+            
+            // Update button states
+            document.querySelectorAll('.btn-group .btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('button').classList.add('active');
+        }
+
+        // Revenue Chart
+        const revenueCtx = document.getElementById('revenueChart');
+        if (revenueCtx) {
+            new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
+                    datasets: [{
+                        label: 'Doanh Thu (triệu VNĐ)',
+                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyRevenue)),
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Status Chart
+        const statusCtx = document.getElementById('statusChart');
+        if (statusCtx) {
+            new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Chờ Xử Lý', 'Đang Thuê', 'Hoàn Thành', 'Đã Hủy'],
+                    datasets: [{
+                        data: [@Model.PendingRentals, @Model.ActiveRentals, @Model.CompletedRentals, @Model.CancelledRentals],
+                        backgroundColor: [
+                            'rgba(255, 206, 86, 0.8)',
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(54, 162, 235, 0.8)',
+                            'rgba(255, 99, 132, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Monthly Revenue Chart (in Revenue section)
+        const monthlyRevenueCtx = document.getElementById('monthlyRevenueChart');
+        if (monthlyRevenueCtx) {
+            new Chart(monthlyRevenueCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
+                    datasets: [{
+                        label: 'Doanh Thu (triệu VNĐ)',
+                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyRevenue)),
+                        backgroundColor: 'rgba(54, 162, 235, 0.8)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true
+                }
+            });
+        }
+
+        // Top Vehicles Chart
+        const topVehiclesCtx = document.getElementById('topVehiclesChart');
+        if (topVehiclesCtx) {
+            new Chart(topVehiclesCtx, {
+                type: 'bar',
+                data: {
+                    labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TopVehicleNames)),
+                    datasets: [{
+                        label: 'Doanh Thu (triệu VNĐ)',
+                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TopVehicleRevenue)),
+                        backgroundColor: 'rgba(75, 192, 192, 0.8)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    indexAxis: 'y'
+                }
+            });
+        }
+
+        // Set default active section
+        document.addEventListener('DOMContentLoaded', function() {
+            showSection('overview');
+        });
+    </script>
+}
+
+@functions {
+    private string GetRatingBadgeClass(int rating)
+    {
+        return rating switch
+        {
+            5 => "bg-success",
+            4 => "bg-info",
+            3 => "bg-warning",
+            2 => "bg-orange text-dark",
+            1 => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+
+    private string GetStatusBadgeClass(DataAccessLayer.Enums.RentalRecordStatus status)
+    {
+        return status switch
+        {
+            DataAccessLayer.Enums.RentalRecordStatus.Pending => "bg-warning",
+            DataAccessLayer.Enums.RentalRecordStatus.Active => "bg-success",
+            DataAccessLayer.Enums.RentalRecordStatus.Completed => "bg-info",
+            DataAccessLayer.Enums.RentalRecordStatus.Cancelled => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+
+    private string GetStatusText(DataAccessLayer.Enums.RentalRecordStatus status)
+    {
+        return status switch
+        {
+            DataAccessLayer.Enums.RentalRecordStatus.Pending => "Chờ Xử Lý",
+            DataAccessLayer.Enums.RentalRecordStatus.Active => "Đang Thuê",
+            DataAccessLayer.Enums.RentalRecordStatus.Completed => "Hoàn Thành",
+            DataAccessLayer.Enums.RentalRecordStatus.Cancelled => "Đã Hủy",
+            _ => "Không xác định"
+        };
+    }
+
+    private (int Count, decimal Revenue, decimal Average, double Growth) GetMonthData(int month)
+    {
+        // This is a placeholder - in real implementation, calculate from actual data
+        var random = new Random(month);
+        var count = random.Next(10, 50);
+        var revenue = random.Next(50, 200) * 1000000m;
+        var average = count > 0 ? revenue / count : 0;
+        var growth = random.NextDouble() * 20 - 5; // -5% to 15%
+        return (count, revenue, average, growth);
+    }
+}

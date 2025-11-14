@@ -28,6 +28,17 @@ namespace BusinessLayer.Services
             return await _vehicleRepo.GetAllAsync();
         }
 
+        public async Task<IEnumerable<Vehicle>> GetAllVehiclesAsync()
+        {
+            return await _vehicleRepo.GetAllAsync();
+        }
+
+        public async Task<IEnumerable<Vehicle>> GetVehiclesByStationIdAsync(int stationId)
+        {
+            var allVehicles = await _vehicleRepo.GetAllAsync();
+            return allVehicles.Where(v => v.StationId == stationId);
+        }
+
         public async Task<Vehicle> GetVehicleByIdAsync(int id)
         {
             return await _vehicleRepo.GetByIdAsync(id);
@@ -41,7 +52,7 @@ namespace BusinessLayer.Services
 
         public async Task UpdateVehicleAsync(Vehicle vehicle)
         {
-            _vehicleRepo.Update(vehicle);
+            await _vehicleRepo.Update(vehicle);
             await _unitOfWork.SaveChangesAsync();
         }
 
@@ -50,10 +61,58 @@ namespace BusinessLayer.Services
             var vehicle = await _vehicleRepo.GetByIdAsync(id);
             if (vehicle != null)
             {
-                _vehicleRepo.Delete(vehicle);
+                // Check for rental records related to this vehicle
+                var rentalRecordRepo = _unitOfWork.GetRepository<RentalRecord>();
+                var paymentRepo = _unitOfWork.GetRepository<Payment>();
+                var inspectionProblemRepo = _unitOfWork.GetRepository<InspectionProblem>();
+                var ratingReviewRepo = _unitOfWork.GetRepository<RatingReview>();
+
+                var relatedRentalRecords = (await rentalRecordRepo.GetAllAsync())
+                    .Where(r => r.VehicleId == id)
+                    .ToList();
+
+                // Delete all related data in cascade order
+                if (relatedRentalRecords.Count > 0)
+                {
+                    foreach (var rentalRecord in relatedRentalRecords)
+                    {
+                        // Delete Payments
+                        var payments = (await paymentRepo.GetAllAsync())
+                            .Where(p => p.RentalId == rentalRecord.Id)
+                            .ToList();
+                        foreach (var payment in payments)
+                        {
+                            await paymentRepo.Delete(payment);
+                        }
+
+                        // Delete InspectionProblems
+                        var inspectionProblems = (await inspectionProblemRepo.GetAllAsync())
+                            .Where(i => i.RentalId == rentalRecord.Id)
+                            .ToList();
+                        foreach (var inspectionProblem in inspectionProblems)
+                        {
+                            await inspectionProblemRepo.Delete(inspectionProblem);
+                        }
+
+                        // Delete RatingReview
+                        var ratingReviews = (await ratingReviewRepo.GetAllAsync())
+                            .Where(r => r.RentalId == rentalRecord.Id)
+                            .ToList();
+                        foreach (var ratingReview in ratingReviews)
+                        {
+                            await ratingReviewRepo.Delete(ratingReview);
+                        }
+
+                        // Delete RentalRecord
+                        await rentalRecordRepo.Delete(rentalRecord);
+                    }
+                }
+
+                await _vehicleRepo.Delete(vehicle);
                 await _unitOfWork.SaveChangesAsync();
             }
         }
 
     }
 }
+
