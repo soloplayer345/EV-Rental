@@ -171,5 +171,162 @@ namespace BusinessLayer.Services
                 };
             }
         }
+
+        public async Task<ServiceResultDto<RatingReviewDto>> GetReviewByRentalIdAsync(int rentalId)
+        {
+            try
+            {
+                var ratingReviewRepo = _unitOfWork.GetRepository<DataAccessLayer.Entities.RatingReview>() 
+                    as DataAccessLayer.Interfaces.IRatingReviewRepo;
+
+                if (ratingReviewRepo == null)
+                {
+                    return new ServiceResultDto<RatingReviewDto>
+                    {
+                        Success = false,
+                        Message = "Repository not found"
+                    };
+                }
+
+                var review = await ratingReviewRepo.GetByRentalIdAsync(rentalId);
+                
+                if (review == null)
+                {
+                    return new ServiceResultDto<RatingReviewDto>
+                    {
+                        Success = false,
+                        Message = "Chưa có đánh giá cho chuyến đi này"
+                    };
+                }
+
+                var reviewDto = new RatingReviewDto
+                {
+                    Id = review.Id,
+                    RentalId = review.RentalId,
+                    Rating = review.Rating,
+                    Comment = review.Comment ?? "",
+                    CreatedAt = review.CreateDate,
+                    RenterName = review.RentalRecord?.Renter?.FullName ?? "Unknown",
+                    RenterEmail = review.RentalRecord?.Renter?.Email ?? "",
+                    VehicleId = review.RentalRecord?.VehicleId ?? 0,
+                    VehicleName = review.RentalRecord?.Vehicle?.Name ?? "Unknown",
+                    VehiclePlateNumber = review.RentalRecord?.Vehicle?.PlateNumber ?? "",
+                    VehicleImageUrl = review.RentalRecord?.Vehicle?.ImageUrl ?? "/images/default-vehicle.png"
+                };
+
+                return new ServiceResultDto<RatingReviewDto>
+                {
+                    Success = true,
+                    Data = reviewDto
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResultDto<RatingReviewDto>
+                {
+                    Success = false,
+                    Message = $"Error: {ex.Message}"
+                };
+            }
+        }
+
+        public async Task<ServiceResultDto<object>> CreateReviewAsync(CreateRatingReviewDto request, int renterId)
+        {
+            try
+            {
+                var ratingReviewRepo = _unitOfWork.GetRepository<DataAccessLayer.Entities.RatingReview>() 
+                    as DataAccessLayer.Interfaces.IRatingReviewRepo;
+                var rentalRecordRepo = _unitOfWork.GetRepository<DataAccessLayer.Entities.RentalRecord>() 
+                    as DataAccessLayer.Interfaces.IRentalrecordRepo;
+
+                if (ratingReviewRepo == null || rentalRecordRepo == null)
+                {
+                    return new ServiceResultDto<object>
+                    {
+                        Success = false,
+                        Message = "Repository not found"
+                    };
+                }
+
+                // Kiểm tra rental record có tồn tại
+                var rental = await rentalRecordRepo.GetByIdAsync(request.RentalId);
+                if (rental == null)
+                {
+                    return new ServiceResultDto<object>
+                    {
+                        Success = false,
+                        Message = "Không tìm thấy chuyến đi"
+                    };
+                }
+
+                // Kiểm tra rental thuộc về renter
+                if (rental.RenterId != renterId)
+                {
+                    return new ServiceResultDto<object>
+                    {
+                        Success = false,
+                        Message = "Bạn không có quyền đánh giá chuyến đi này"
+                    };
+                }
+
+                // Kiểm tra rental đã hoàn thành chưa
+                if (rental.Status != DataAccessLayer.Enums.RentalRecordStatus.Completed)
+                {
+                    return new ServiceResultDto<object>
+                    {
+                        Success = false,
+                        Message = "Chỉ có thể đánh giá sau khi hoàn thành chuyến đi"
+                    };
+                }
+
+                // Kiểm tra phí phạt đã thanh toán chưa
+                if (rental.ExtraFees > 0)
+                {
+                    return new ServiceResultDto<object>
+                    {
+                        Success = false,
+                        Message = "Vui lòng thanh toán phí phạt trước khi đánh giá"
+                    };
+                }
+
+                // Kiểm tra đã đánh giá chưa
+                var existingReview = await ratingReviewRepo.GetByRentalIdAsync(request.RentalId);
+                if (existingReview != null)
+                {
+                    return new ServiceResultDto<object>
+                    {
+                        Success = false,
+                        Message = "Bạn đã đánh giá chuyến đi này rồi"
+                    };
+                }
+
+                // Tạo review mới
+                var review = new DataAccessLayer.Entities.RatingReview
+                {
+                    RentalId = request.RentalId,
+                    Rating = request.Rating,
+                    Comment = request.Comment,
+                    CreateDate = DateTime.Now,
+                    UpdateDate = DateTime.Now
+                };
+
+                await ratingReviewRepo.AddAsync(review);
+                await _unitOfWork.SaveChangesAsync();
+
+                return new ServiceResultDto<object>
+                {
+                    Success = true,
+                    Message = "Cảm ơn bạn đã đánh giá! Đánh giá của bạn đã được ghi nhận."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResultDto<object>
+                {
+                    Success = false,
+                    Message = $"Lỗi: {ex.Message}"
+                };
+            }
+        }
     }
 }

@@ -41,6 +41,16 @@ namespace DataAccessLayer.Repositories
                 .ToListAsync();
         }
 
+        public async Task<RatingReview?> GetByRentalIdAsync(int rentalId)
+        {
+            return await _dbContext.RatingReviews
+                .Include(r => r.RentalRecord)
+                    .ThenInclude(rr => rr.Renter)
+                .Include(r => r.RentalRecord)
+                    .ThenInclude(rr => rr.Vehicle)
+                .FirstOrDefaultAsync(r => r.RentalId == rentalId);
+        }
+
         public async Task<double> GetAverageRatingForVehicleAsync(int vehicleId)
         {
             var ratings = await _dbContext.RatingReviews

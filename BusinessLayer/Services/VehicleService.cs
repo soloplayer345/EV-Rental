@@ -50,7 +50,7 @@ namespace BusinessLayer.Services
             return filtered.Select(VehicleMapper.ToVehicleDto);
         }
 
-        public async Task<VehicleDto> GetVehicleByIdAsync(int id)
+        public async Task<VehicleDto?> GetVehicleByIdAsync(int id)
         {
             var vehicle = await _vehicleRepo.GetByIdAsync(id);
             return vehicle != null ? VehicleMapper.ToVehicleDto(vehicle) : null;

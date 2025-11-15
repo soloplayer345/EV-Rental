@@ -69,7 +69,7 @@
                     <h1 class="vehicle-title">@Model.Vehicle?.Name</h1>
                     <p class="vehicle-type">Loại xe: @Model.Vehicle?.VehicleType</p>
                     
-                    <div class="rating">
+                    @* <div class="rating">
                         <span class="stars">@{
                             var filledStars = (int)Math.Round(Model.AverageRating);
                             var emptyStars = 5 - filledStars;
@@ -79,7 +79,7 @@
                             @:@starString
                         }</span>
                         <span class="rating-text">(@Model.AverageRating.ToString("F1") / 5.0 - @Model.TotalReviews đánh giá)</span>
-                    </div>
+                    </div> *@
 
                     <div class="specs-quick">
                         <div class="spec-item">
@@ -258,7 +258,7 @@
         </div>
     </section>
 
-    <!-- Customer Reviews Section -->
+    @* <!-- Customer Reviews Section -->
     <section class="reviews-section">
         <div class="container">
             <div class="content-card">
@@ -293,7 +293,7 @@
                 }
             </div>
         </div>
-    </section>
+    </section> *@
 
     <!-- Footer -->
     <footer class="footer">
