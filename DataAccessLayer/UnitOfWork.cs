@@ -14,6 +14,44 @@ namespace DataAccessLayer
         // Lazy initialization cho AccountRepo
         private IAccountRepo? _accountRepo;
         private IRatingReviewRepo? _ratingReviewRepo;
+        private IVehicleRepo? _vehicleRepo;
+        private IRentalrecordRepo? _rentalRecordRepo;
+        private IGenericRepo<Payment>? _paymentRepo;
+        public IVehicleRepo VehicleRepo
+        {
+            get
+            {
+                if (_vehicleRepo == null)
+                {
+                    _vehicleRepo = new VehicleRepo(_context);
+                }
+                return _vehicleRepo;
+            }
+        }
+
+        public IRentalrecordRepo RentalRecordRepo
+        {
+            get
+            {
+                if (_rentalRecordRepo == null)
+                {
+                    _rentalRecordRepo = new RentalRecordRepo(_context);
+                }
+                return _rentalRecordRepo;
+            }
+        }
+
+        public IGenericRepo<Payment> PaymentRepo
+        {
+            get
+            {
+                if (_paymentRepo == null)
+                {
+                    _paymentRepo = new GenericRepo<Payment>(_context);
+                }
+                return _paymentRepo;
+            }
+        }
 
         public UnitOfWork(EVRentalDBContext context)
         {

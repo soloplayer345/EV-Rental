@@ -1,3 +1,4 @@
+using DataAccessLayer.Entities;
 namespace DataAccessLayer.Interfaces
 {
     public interface IUnitOfWork : IDisposable
@@ -11,6 +12,21 @@ namespace DataAccessLayer.Interfaces
         /// Lấy AccountRepo với các methods đặc thù
         /// </summary>
         IAccountRepo AccountRepo { get; }
+
+        /// <summary>
+        /// Lấy VehicleRepo
+        /// </summary>
+        IVehicleRepo VehicleRepo { get; }
+
+        /// <summary>
+        /// Lấy RentalRecordRepo
+        /// </summary>
+        IRentalrecordRepo RentalRecordRepo { get; }
+
+        /// <summary>
+        /// Lấy PaymentRepo (generic)
+        /// </summary>
+        IGenericRepo<Payment> PaymentRepo { get; }
 
         /// <summary>
         /// Lưu tất cả thay đổi (async)

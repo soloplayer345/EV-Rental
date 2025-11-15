@@ -6,6 +6,33 @@ namespace DataAccessLayer.Repositories
 {
     public class GenericRepo<TModel> : IGenericRepo<TModel> where TModel : BaseEntity
     {
+            public async Task<TModel> FindOneAsync(Expression<Func<TModel, bool>> predicate, string includeProperties = "")
+        {
+            if (predicate == null)
+                throw new ArgumentNullException(nameof(predicate));
+
+            IQueryable<TModel> query;
+            if (!IsPropertyIgnored<TModel>("IsDeleted"))
+                query = _dbSet.Where(x => !x.IsDeleted);
+            else
+                query = _dbSet;
+
+            if (!string.IsNullOrWhiteSpace(includeProperties))
+            {
+                foreach (var includeProperty in includeProperties.Split(
+                    new char[] { ',' },
+                    StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(includeProperty.Trim());
+                }
+            }
+
+            var result = await query.FirstOrDefaultAsync(predicate);
+            if (result == null)
+                throw new KeyNotFoundException($"{typeof(TModel).Name} not found with the specified criteria");
+            return result;
+        }
+    
         protected readonly DbSet<TModel> _dbSet;
         protected readonly EVRentalDBContext _dbContext;
 
@@ -179,48 +206,38 @@ namespace DataAccessLayer.Repositories
                     query = query.Include(includeProperty.Trim());
                 }
             }
-
             return query;
         }
 
         /// <summary>
-        /// Tìm một entity dựa theo điều kiện, có thể include navigation properties
+        /// Đếm số lượng entity, có thể truyền predicate
         /// </summary>
-        public async Task<TModel> FindOneAsync(Expression<Func<TModel, bool>> predicate, string includeProperties = "")
+        public async Task<int> CountAsync(Expression<Func<TModel, bool>>? predicate = null)
         {
-            if (predicate == null)
-                throw new ArgumentNullException(nameof(predicate));
-
             IQueryable<TModel> query;
-            
-            // Check if IsDeleted is available and not ignored
             if (!IsPropertyIgnored<TModel>("IsDeleted"))
-            {
                 query = _dbSet.Where(x => !x.IsDeleted);
-            }
             else
-            {
                 query = _dbSet;
-            }
 
-            if (!string.IsNullOrWhiteSpace(includeProperties))
-            {
-                foreach (var includeProperty in includeProperties.Split(
-                    new char[] { ',' }, 
-                    StringSplitOptions.RemoveEmptyEntries))
-                {
-                    query = query.Include(includeProperty.Trim());
-                }
-            }
+            if (predicate != null)
+                query = query.Where(predicate);
 
-            var result = await query.FirstOrDefaultAsync(predicate);
-            
-            if (result == null)
-            {
-                throw new KeyNotFoundException($"{typeof(TModel).Name} not found with the specified criteria");
-            }
+            return await query.CountAsync();
+        }
 
-            return result;
+        /// <summary>
+        /// Tính tổng giá trị một trường decimal
+        /// </summary>
+        public async Task<decimal> SumAsync(Expression<Func<TModel, decimal>> selector)
+        {
+            IQueryable<TModel> query;
+            if (!IsPropertyIgnored<TModel>("IsDeleted"))
+                query = _dbSet.Where(x => !x.IsDeleted);
+            else
+                query = _dbSet;
+
+            return await query.SumAsync(selector);
         }
     }
 }

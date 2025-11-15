@@ -2,19 +2,19 @@ using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BusinessLayer.Interfaces;
+using BusinessLayer.DTOs;
+using BusinessLayer.Services;
 
 namespace EV_Rental.Pages.Admin
 {
     public class DashboardModel : PageModel
     {
-        private readonly IReportService _reportService;
-        
-        public string UserEmail { get; set; } = string.Empty;
-        public int NewReportsCount { get; set; } = 0;
+        private readonly IDashboardService _dashboardService;
+        public DashboardDto? Dashboard { get; set; }
 
-        public DashboardModel(IReportService reportService)
+        public DashboardModel(IDashboardService dashboardService)
         {
-            _reportService = reportService;
+            _dashboardService = dashboardService;
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -25,12 +25,7 @@ namespace EV_Rental.Pages.Admin
                 return RedirectToPage("/Account/Login");
             }
 
-            var user = SessionHelper.GetUserSession(HttpContext.Session);
-            UserEmail = user?.Email ?? "";
-
-            // Lấy số báo cáo mới
-            NewReportsCount = await _reportService.GetNewReportsCountAsync();
-
+            Dashboard = await _dashboardService.GetDashboardAsync();
             return Page();
         }
     }

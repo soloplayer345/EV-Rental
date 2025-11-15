@@ -12,5 +12,9 @@ namespace DataAccessLayer.Interfaces
         Task<TModel> GetByIdAsync(int id);
         IQueryable<TModel> GetAllQueryable(string includeProperties = "");
         Task<TModel> FindOneAsync(Expression<Func<TModel, bool>> predicate, string includeProperties = "");
+
+        // Thêm cho dashboard
+        Task<int> CountAsync(Expression<Func<TModel, bool>>? predicate = null);
+        Task<decimal> SumAsync(Expression<Func<TModel, decimal>> selector);
     }
 }
