@@ -423,8 +423,12 @@ namespace DataAccessLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal>("BatteryCapacity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(6,2)")
+                        .HasDefaultValue(0m);
+
                     b.Property<string>("Brand")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -432,11 +436,9 @@ namespace DataAccessLayer.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Features")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
@@ -446,17 +448,14 @@ namespace DataAccessLayer.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Model")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("PlateNumber")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -476,7 +475,6 @@ namespace DataAccessLayer.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("VehicleType")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -493,6 +491,7 @@ namespace DataAccessLayer.Migrations
                         new
                         {
                             Id = 1,
+                            BatteryCapacity = 37.5m,
                             Brand = "VinFast",
                             CreateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true}",
@@ -508,71 +507,12 @@ namespace DataAccessLayer.Migrations
                             Status = 0,
                             UpdateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             VehicleType = "car",
-                            seartCapacity = 0
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Brand = "VinFast",
-                            CreateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Features = "{\"gps\":true,\"insurance\":true}",
-                            ImageUrl = "https://shop.vinfastauto.com/on/demandware.static/-/Sites-app_vinfast_vn-Library/default/dw02b7ceb2/images/kara/head-banner.png",
-                            IsDeleted = false,
-                            MaxDistance = 90,
-                            Model = "Klara S",
-                            Name = "VinFast Klara S",
-                            PlateNumber = "59B-67890",
-                            PricePerDay = 200000m,
-                            PricePerHour = 30000m,
-                            StationId = 1,
-                            Status = 0,
-                            UpdateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            VehicleType = "scooter",
-                            seartCapacity = 0
+                            seartCapacity = 5
                         },
                         new
                         {
                             Id = 3,
-                            Brand = "DatBike",
-                            CreateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true,\"usbCharging\":true,\"antiTheft\":true}",
-                            ImageUrl = "https://vcdn1-vnexpress.vnecdn.net/2021/11/30/weaver-200-1-1638229818-5666-1638230365.jpg?w=460&h=0&q=100&dpr=2&fit=crop&s=tEMINgIF_iQNoKpS66-pQQ",
-                            IsDeleted = false,
-                            MaxDistance = 120,
-                            Model = "Weaver 200",
-                            Name = "DatBike Weaver 200",
-                            PlateNumber = "51A-11111",
-                            PricePerDay = 250000m,
-                            PricePerHour = 35000m,
-                            StationId = 2,
-                            Status = 0,
-                            UpdateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            VehicleType = "motorbike",
-                            seartCapacity = 0
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Brand = "DatBike",
-                            CreateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true,\"usbCharging\":true}",
-                            ImageUrl = "https://dat.bike/cdn/shop/files/datbike-1_1728x_ead528e3-8a1c-4de4-89b9-4a567cfa2fdb.jpg?v=1668681506",
-                            IsDeleted = false,
-                            MaxDistance = 100,
-                            Model = "Weaver 100",
-                            Name = "DatBike Weaver 100",
-                            PlateNumber = "51B-22222",
-                            PricePerDay = 195000m,
-                            PricePerHour = 28000m,
-                            StationId = 2,
-                            Status = 0,
-                            UpdateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            VehicleType = "scooter",
-                            seartCapacity = 0
-                        },
-                        new
-                        {
-                            Id = 5,
+                            BatteryCapacity = 82m,
                             Brand = "Tesla",
                             CreateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"autopilot\":true}",
@@ -584,35 +524,16 @@ namespace DataAccessLayer.Migrations
                             PlateNumber = "59C-33333",
                             PricePerDay = 1800000m,
                             PricePerHour = 220000m,
-                            StationId = 3,
+                            StationId = 2,
                             Status = 0,
                             UpdateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             VehicleType = "car",
-                            seartCapacity = 0
+                            seartCapacity = 5
                         },
                         new
                         {
-                            Id = 6,
-                            Brand = "Yadea",
-                            CreateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Features = "{\"gps\":true,\"insurance\":true,\"usbCharging\":true}",
-                            ImageUrl = "https://xedienvietthanh.com/wp-content/uploads/2022/01/1-2.jpg",
-                            IsDeleted = false,
-                            MaxDistance = 80,
-                            Model = "G5 Pro",
-                            Name = "Yadea G5",
-                            PlateNumber = "59D-44444",
-                            PricePerDay = 160000m,
-                            PricePerHour = 22000m,
-                            StationId = 3,
-                            Status = 1,
-                            UpdateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            VehicleType = "scooter",
-                            seartCapacity = 0
-                        },
-                        new
-                        {
-                            Id = 7,
+                            Id = 5,
+                            BatteryCapacity = 84m,
                             Brand = "BMW",
                             CreateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"sunroof\":true,\"leatherSeats\":true,\"panoramicRoof\":true}",
@@ -624,35 +545,37 @@ namespace DataAccessLayer.Migrations
                             PlateNumber = "51C-55555",
                             PricePerDay = 2200000m,
                             PricePerHour = 280000m,
+                            StationId = 3,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 5
+                        },
+                        new
+                        {
+                            Id = 7,
+                            BatteryCapacity = 93m,
+                            Brand = "Audi",
+                            CreateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"leatherSeats\":true,\"sportMode\":true}",
+                            ImageUrl = "https://i1-vnexpress.vnecdn.net/2024/11/23/DSC09878JPG-1732351567.jpg?w=750&h=450&q=100&dpr=1&fit=crop&s=UVB1kqgA08fA_pGNG7EjvA",
+                            IsDeleted = false,
+                            MaxDistance = 488,
+                            Model = "e-tron GT quattro",
+                            Name = "Audi e-tron GT",
+                            PlateNumber = "51E-99999",
+                            PricePerDay = 2500000m,
+                            PricePerHour = 320000m,
                             StationId = 4,
                             Status = 0,
                             UpdateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             VehicleType = "car",
-                            seartCapacity = 0
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Brand = "Honda",
-                            CreateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true}",
-                            ImageUrl = "https://imgs.vietnamnet.vn/Images/2010/12/18/15/20101218153440_HondaEV_neo1.jpg?width=0&s=nYxnKbZLc3xcypiHjjRVgA",
-                            IsDeleted = false,
-                            MaxDistance = 90,
-                            Model = "EV-neo Electric",
-                            Name = "Honda EV-neo",
-                            PlateNumber = "51D-66666",
-                            PricePerDay = 185000m,
-                            PricePerHour = 26000m,
-                            StationId = 4,
-                            Status = 2,
-                            UpdateDate = new DateTime(2025, 10, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            VehicleType = "scooter",
-                            seartCapacity = 0
+                            seartCapacity = 4
                         },
                         new
                         {
                             Id = 9,
+                            BatteryCapacity = 75m,
                             Brand = "VinFast",
                             CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"autopilot\":true}",
@@ -668,71 +591,12 @@ namespace DataAccessLayer.Migrations
                             Status = 0,
                             UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             VehicleType = "car",
-                            seartCapacity = 0
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Brand = "Pega",
-                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Features = "{\"gps\":true,\"insurance\":true,\"usbCharging\":true}",
-                            ImageUrl = "https://thegioixechaydien.com.vn/upload/hinhanh/xe-may-dien-pega-xmen-350.jpg",
-                            IsDeleted = false,
-                            MaxDistance = 85,
-                            Model = "Xmen 110",
-                            Name = "Pega Xmen",
-                            PlateNumber = "59F-88888",
-                            PricePerDay = 175000m,
-                            PricePerHour = 25000m,
-                            StationId = 1,
-                            Status = 0,
-                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            VehicleType = "scooter",
-                            seartCapacity = 0
+                            seartCapacity = 5
                         },
                         new
                         {
                             Id = 11,
-                            Brand = "Audi",
-                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"leatherSeats\":true,\"sportMode\":true}",
-                            ImageUrl = "https://i1-vnexpress.vnecdn.net/2024/11/23/DSC09878JPG-1732351567.jpg?w=750&h=450&q=100&dpr=1&fit=crop&s=UVB1kqgA08fA_pGNG7EjvA",
-                            IsDeleted = false,
-                            MaxDistance = 488,
-                            Model = "e-tron GT quattro",
-                            Name = "Audi e-tron GT",
-                            PlateNumber = "51E-99999",
-                            PricePerDay = 2500000m,
-                            PricePerHour = 320000m,
-                            StationId = 2,
-                            Status = 0,
-                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            VehicleType = "car",
-                            seartCapacity = 0
-                        },
-                        new
-                        {
-                            Id = 12,
-                            Brand = "Yamaha",
-                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true,\"usbCharging\":true}",
-                            ImageUrl = "https://xedoisong.vn/uploads/20221030/xedoisong_chi_tiet_mau_xe_tay_ga_thuan_dien_yamaha_e01_1__bggd.jpg",
-                            IsDeleted = false,
-                            MaxDistance = 110,
-                            Model = "E01 Electric",
-                            Name = "Yamaha E01",
-                            PlateNumber = "51F-11122",
-                            PricePerDay = 270000m,
-                            PricePerHour = 38000m,
-                            StationId = 2,
-                            Status = 0,
-                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            VehicleType = "motorbike",
-                            seartCapacity = 0
-                        },
-                        new
-                        {
-                            Id = 13,
+                            BatteryCapacity = 107.8m,
                             Brand = "Mercedes-Benz",
                             CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"leatherSeats\":true,\"massage\":true,\"panoramicRoof\":true}",
@@ -744,35 +608,16 @@ namespace DataAccessLayer.Migrations
                             PlateNumber = "59G-22233",
                             PricePerDay = 2800000m,
                             PricePerHour = 350000m,
-                            StationId = 3,
+                            StationId = 2,
                             Status = 0,
                             UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             VehicleType = "car",
-                            seartCapacity = 0
+                            seartCapacity = 5
                         },
                         new
                         {
-                            Id = 14,
-                            Brand = "Gogoro",
-                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true,\"batterySwap\":true}",
-                            ImageUrl = "https://autopro8.mediacdn.vn/2017/-1495870369869.jpg",
-                            IsDeleted = false,
-                            MaxDistance = 110,
-                            Model = "Gogoro 2 Plus",
-                            Name = "Gogoro 2",
-                            PlateNumber = "59H-33344",
-                            PricePerDay = 220000m,
-                            PricePerHour = 32000m,
-                            StationId = 3,
-                            Status = 0,
-                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            VehicleType = "scooter",
-                            seartCapacity = 0
-                        },
-                        new
-                        {
-                            Id = 15,
+                            Id = 13,
+                            BatteryCapacity = 93.2m,
                             Brand = "Porsche",
                             CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"leatherSeats\":true,\"sportMode\":true,\"launch\":true}",
@@ -784,35 +629,16 @@ namespace DataAccessLayer.Migrations
                             PlateNumber = "51G-44455",
                             PricePerDay = 3000000m,
                             PricePerHour = 380000m,
-                            StationId = 4,
+                            StationId = 3,
                             Status = 0,
                             UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             VehicleType = "car",
-                            seartCapacity = 0
+                            seartCapacity = 4
                         },
                         new
                         {
-                            Id = 16,
-                            Brand = "Pega",
-                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true,\"usbCharging\":true}",
-                            ImageUrl = "https://xedienducanh.com/upload/product/xe-may-dien-xmen-gt13030.jpg",
-                            IsDeleted = false,
-                            MaxDistance = 95,
-                            Model = "Xmen GT Pro",
-                            Name = "Xmen GT",
-                            PlateNumber = "51H-55566",
-                            PricePerDay = 190000m,
-                            PricePerHour = 28000m,
-                            StationId = 4,
-                            Status = 0,
-                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            VehicleType = "scooter",
-                            seartCapacity = 0
-                        },
-                        new
-                        {
-                            Id = 17,
+                            Id = 15,
+                            BatteryCapacity = 92m,
                             Brand = "VinFast",
                             CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"7seats\":true,\"panoramicRoof\":true}",
@@ -824,15 +650,16 @@ namespace DataAccessLayer.Migrations
                             PlateNumber = "59I-66677",
                             PricePerDay = 1600000m,
                             PricePerHour = 200000m,
-                            StationId = 1,
+                            StationId = 4,
                             Status = 0,
                             UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             VehicleType = "car",
-                            seartCapacity = 0
+                            seartCapacity = 7
                         },
                         new
                         {
-                            Id = 18,
+                            Id = 17,
+                            BatteryCapacity = 82m,
                             Brand = "Tesla",
                             CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"autopilot\":true,\"7seats\":true}",
@@ -844,15 +671,16 @@ namespace DataAccessLayer.Migrations
                             PlateNumber = "51I-77788",
                             PricePerDay = 1900000m,
                             PricePerHour = 240000m,
-                            StationId = 2,
+                            StationId = 1,
                             Status = 0,
                             UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             VehicleType = "car",
-                            seartCapacity = 0
+                            seartCapacity = 7
                         },
                         new
                         {
                             Id = 19,
+                            BatteryCapacity = 84m,
                             Brand = "Hyundai",
                             CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"solarRoof\":true}",
@@ -864,15 +692,16 @@ namespace DataAccessLayer.Migrations
                             PlateNumber = "59J-88899",
                             PricePerDay = 1500000m,
                             PricePerHour = 190000m,
-                            StationId = 3,
+                            StationId = 2,
                             Status = 0,
                             UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             VehicleType = "car",
-                            seartCapacity = 0
+                            seartCapacity = 5
                         },
                         new
                         {
-                            Id = 20,
+                            Id = 21,
+                            BatteryCapacity = 84m,
                             Brand = "Kia",
                             CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"fastCharging\":true}",
@@ -884,55 +713,16 @@ namespace DataAccessLayer.Migrations
                             PlateNumber = "51J-99900",
                             PricePerDay = 1550000m,
                             PricePerHour = 195000m,
-                            StationId = 4,
+                            StationId = 3,
                             Status = 0,
                             UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             VehicleType = "car",
-                            seartCapacity = 0
-                        },
-                        new
-                        {
-                            Id = 21,
-                            Brand = "DatBike",
-                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true,\"usbCharging\":true,\"antiTheft\":true}",
-                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4I4PWW4787JMocGpiEGGCSx1vybQqpptKWg&s",
-                            IsDeleted = false,
-                            MaxDistance = 150,
-                            Model = "Weaver 300 Pro",
-                            Name = "DatBike Weaver 300",
-                            PlateNumber = "59K-11100",
-                            PricePerDay = 280000m,
-                            PricePerHour = 40000m,
-                            StationId = 1,
-                            Status = 0,
-                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            VehicleType = "motorbike",
-                            seartCapacity = 0
-                        },
-                        new
-                        {
-                            Id = 22,
-                            Brand = "Yadea",
-                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true,\"usbCharging\":true}",
-                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDSr3w-Z6dXCDd1X2htVbLBP6VL4YXEd-Ofw&s",
-                            IsDeleted = false,
-                            MaxDistance = 75,
-                            Model = "C1S Smart",
-                            Name = "Yadea C1S",
-                            PlateNumber = "51K-22211",
-                            PricePerDay = 170000m,
-                            PricePerHour = 24000m,
-                            StationId = 2,
-                            Status = 0,
-                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            VehicleType = "scooter",
-                            seartCapacity = 0
+                            seartCapacity = 5
                         },
                         new
                         {
                             Id = 23,
+                            BatteryCapacity = 100m,
                             Brand = "Polestar",
                             CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"googleIntegration\":true}",
@@ -944,55 +734,16 @@ namespace DataAccessLayer.Migrations
                             PlateNumber = "59L-33322",
                             PricePerDay = 1850000m,
                             PricePerHour = 230000m,
-                            StationId = 3,
-                            Status = 0,
-                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            VehicleType = "car",
-                            seartCapacity = 0
-                        },
-                        new
-                        {
-                            Id = 24,
-                            Brand = "Nissan",
-                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"proPilot\":true}",
-                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNR4feHONvrN5Y-HK13689YKvLgkYgtqWiyA&s",
-                            IsDeleted = false,
-                            MaxDistance = 500,
-                            Model = "Ariya e-4ORCE",
-                            Name = "Nissan Ariya",
-                            PlateNumber = "51L-44433",
-                            PricePerDay = 1700000m,
-                            PricePerHour = 210000m,
                             StationId = 4,
                             Status = 0,
                             UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             VehicleType = "car",
-                            seartCapacity = 0
+                            seartCapacity = 5
                         },
                         new
                         {
                             Id = 25,
-                            Brand = "VinFast",
-                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Features = "{\"gps\":true,\"insurance\":true,\"smartKey\":true}",
-                            ImageUrl = "https://shop.vinfastauto.com/on/demandware.static/-/Sites-app_vinfast_vn-Library/default/dw0b27b768/images/PDP-XMD/evo200/img-evo-red.png",
-                            IsDeleted = false,
-                            MaxDistance = 85,
-                            Model = "Evo200 Lite",
-                            Name = "VinFast Evo200",
-                            PlateNumber = "59M-55544",
-                            PricePerDay = 185000m,
-                            PricePerHour = 27000m,
-                            StationId = 1,
-                            Status = 0,
-                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            VehicleType = "scooter",
-                            seartCapacity = 0
-                        },
-                        new
-                        {
-                            Id = 26,
+                            BatteryCapacity = 60.48m,
                             Brand = "BYD",
                             CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"panoramicSunroof\":true}",
@@ -1004,11 +755,368 @@ namespace DataAccessLayer.Migrations
                             PlateNumber = "51M-66655",
                             PricePerDay = 1450000m,
                             PricePerHour = 185000m,
+                            StationId = 1,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 5
+                        },
+                        new
+                        {
+                            Id = 27,
+                            BatteryCapacity = 87m,
+                            Brand = "Nissan",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"proPilot\":true}",
+                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNR4feHONvrN5Y-HK13689YKvLgkYgtqWiyA&s",
+                            IsDeleted = false,
+                            MaxDistance = 500,
+                            Model = "Ariya e-4ORCE",
+                            Name = "Nissan Ariya",
+                            PlateNumber = "51L-44433",
+                            PricePerDay = 1700000m,
+                            PricePerHour = 210000m,
                             StationId = 2,
                             Status = 0,
                             UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             VehicleType = "car",
-                            seartCapacity = 0
+                            seartCapacity = 5
+                        },
+                        new
+                        {
+                            Id = 28,
+                            BatteryCapacity = 112m,
+                            Brand = "Lexus",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"leatherSeats\":true,\"markLevinson\":true}",
+                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8Xr-6nI1VqKU3Jn7pKYqIw-8L_xK3y8T9cxo&s",
+                            IsDeleted = false,
+                            MaxDistance = 565,
+                            Model = "ES 300h Hybrid",
+                            Name = "Lexus ES 300h",
+                            PlateNumber = "59N-11234",
+                            PricePerDay = 2000000m,
+                            PricePerHour = 250000m,
+                            StationId = 3,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 5
+                        },
+                        new
+                        {
+                            Id = 29,
+                            BatteryCapacity = 78m,
+                            Brand = "Volvo",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"panoramicSunroof\":true,\"safetyFeatures\":true}",
+                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQqJME5P0q8Z9p5Y5e5o5o5o5o5o5o5o5o&s",
+                            IsDeleted = false,
+                            MaxDistance = 470,
+                            Model = "XC60 Recharge",
+                            Name = "Volvo XC60",
+                            PlateNumber = "51N-22345",
+                            PricePerDay = 1900000m,
+                            PricePerHour = 240000m,
+                            StationId = 4,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 5
+                        },
+                        new
+                        {
+                            Id = 30,
+                            BatteryCapacity = 100m,
+                            Brand = "Jaguar",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"leatherSeats\":true,\"premiumAudio\":true,\"fastCharging\":true}",
+                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3_3_3_3_3_3_3_3&s",
+                            IsDeleted = false,
+                            MaxDistance = 480,
+                            Model = "I-PACE SE",
+                            Name = "Jaguar I-PACE",
+                            PlateNumber = "59O-33456",
+                            PricePerDay = 2150000m,
+                            PricePerHour = 270000m,
+                            StationId = 1,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 5
+                        },
+                        new
+                        {
+                            Id = 31,
+                            BatteryCapacity = 66m,
+                            Brand = "Chevrolet",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"backupCamera\":true}",
+                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4_4_4_4_4_4_4_4&s",
+                            IsDeleted = false,
+                            MaxDistance = 417,
+                            Model = "Bolt EV",
+                            Name = "Chevrolet Bolt EV",
+                            PlateNumber = "51O-44567",
+                            PricePerDay = 1280000m,
+                            PricePerHour = 160000m,
+                            StationId = 2,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 5
+                        },
+                        new
+                        {
+                            Id = 32,
+                            BatteryCapacity = 82m,
+                            Brand = "Volkswagen",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"spacious\":true,\"familyFriendly\":true}",
+                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR5_5_5_5_5_5_5_5&s",
+                            IsDeleted = false,
+                            MaxDistance = 450,
+                            Model = "ID.Buzz Pro",
+                            Name = "Volkswagen ID.Buzz",
+                            PlateNumber = "59P-55678",
+                            PricePerDay = 2200000m,
+                            PricePerHour = 280000m,
+                            StationId = 3,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 7
+                        },
+                        new
+                        {
+                            Id = 33,
+                            BatteryCapacity = 112.5m,
+                            Brand = "Lucid",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"leatherSeats\":true,\"luxuryInterior\":true,\"advancedTech\":true}",
+                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6_6_6_6_6_6_6_6&s",
+                            IsDeleted = false,
+                            MaxDistance = 650,
+                            Model = "Air Touring",
+                            Name = "Lucid Air",
+                            PlateNumber = "51P-66789",
+                            PricePerDay = 3200000m,
+                            PricePerHour = 400000m,
+                            StationId = 4,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 5
+                        },
+                        new
+                        {
+                            Id = 34,
+                            BatteryCapacity = 112m,
+                            Brand = "Fisker",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"solarPanel\":true,\"sustainableDesign\":true}",
+                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7_7_7_7_7_7_7_7&s",
+                            IsDeleted = false,
+                            MaxDistance = 440,
+                            Model = "Ocean Extreme",
+                            Name = "Fisker Ocean",
+                            PlateNumber = "59Q-77890",
+                            PricePerDay = 1600000m,
+                            PricePerHour = 200000m,
+                            StationId = 1,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 5
+                        },
+                        new
+                        {
+                            Id = 35,
+                            BatteryCapacity = 99m,
+                            Brand = "Genesis",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"leatherSeats\":true,\"premiumAudio\":true,\"luxuryBrand\":true}",
+                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8_8_8_8_8_8_8_8&s",
+                            IsDeleted = false,
+                            MaxDistance = 480,
+                            Model = "GV70 Electrified",
+                            Name = "Genesis GV70",
+                            PlateNumber = "51Q-88901",
+                            PricePerDay = 2150000m,
+                            PricePerHour = 270000m,
+                            StationId = 2,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 5
+                        },
+                        new
+                        {
+                            Id = 36,
+                            BatteryCapacity = 71.4m,
+                            Brand = "Subaru",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"awd\":true,\"offRoad\":true}",
+                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9_9_9_9_9_9_9_9&s",
+                            IsDeleted = false,
+                            MaxDistance = 460,
+                            Model = "Solterra Premium",
+                            Name = "Subaru Solterra",
+                            PlateNumber = "59R-99012",
+                            PricePerDay = 1750000m,
+                            PricePerHour = 220000m,
+                            StationId = 3,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 5
+                        },
+                        new
+                        {
+                            Id = 37,
+                            BatteryCapacity = 112m,
+                            Brand = "Lotus",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"sportDesign\":true,\"performanceMode\":true}",
+                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0_0_0_0_0_0_0_0&s",
+                            IsDeleted = false,
+                            MaxDistance = 520,
+                            Model = "Eletre Sport",
+                            Name = "Lotus Eletre",
+                            PlateNumber = "51R-00123",
+                            PricePerDay = 2300000m,
+                            PricePerHour = 290000m,
+                            StationId = 4,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 5
+                        },
+                        new
+                        {
+                            Id = 38,
+                            BatteryCapacity = 35.5m,
+                            Brand = "Mazda",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"stylishDesign\":true}",
+                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1_1_1_1_1_1_1_1&s",
+                            IsDeleted = false,
+                            MaxDistance = 290,
+                            Model = "MX-30",
+                            Name = "Mazda MX-30",
+                            PlateNumber = "59S-11234",
+                            PricePerDay = 1360000m,
+                            PricePerHour = 170000m,
+                            StationId = 1,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 5
+                        },
+                        new
+                        {
+                            Id = 39,
+                            BatteryCapacity = 52m,
+                            Brand = "Renault",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"retroDesign\":true,\"sporty\":true}",
+                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2_2_2_2_2_2_2_2&s",
+                            IsDeleted = false,
+                            MaxDistance = 380,
+                            Model = "5 Turbo 3E",
+                            Name = "Renault 5 Turbo 3E",
+                            PlateNumber = "51S-22345",
+                            PricePerDay = 1440000m,
+                            PricePerHour = 180000m,
+                            StationId = 2,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 4
+                        },
+                        new
+                        {
+                            Id = 40,
+                            BatteryCapacity = 42m,
+                            Brand = "Fiat",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"compact\":true,\"cityFriendly\":true}",
+                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3_3_3_3_3_3_3_3&s",
+                            IsDeleted = false,
+                            MaxDistance = 330,
+                            Model = "500e",
+                            Name = "Fiat 500e",
+                            PlateNumber = "59T-33456",
+                            PricePerDay = 1120000m,
+                            PricePerHour = 140000m,
+                            StationId = 3,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 4
+                        },
+                        new
+                        {
+                            Id = 41,
+                            BatteryCapacity = 54m,
+                            Brand = "MINI",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"compact\":true,\"fun\":true}",
+                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4_4_4_4_4_4_4_4&s",
+                            IsDeleted = false,
+                            MaxDistance = 270,
+                            Model = "Cooper SE",
+                            Name = "MINI Cooper SE",
+                            PlateNumber = "51T-44567",
+                            PricePerDay = 1240000m,
+                            PricePerHour = 155000m,
+                            StationId = 4,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 4
+                        },
+                        new
+                        {
+                            Id = 42,
+                            BatteryCapacity = 77m,
+                            Brand = "Opel",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"spacious\":true,\"practical\":true}",
+                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5_5_5_5_5_5_5_5&s",
+                            IsDeleted = false,
+                            MaxDistance = 440,
+                            Model = "Grandland Electric",
+                            Name = "Opel Grandland",
+                            PlateNumber = "59U-55678",
+                            PricePerDay = 1600000m,
+                            PricePerHour = 200000m,
+                            StationId = 1,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 5
+                        },
+                        new
+                        {
+                            Id = 43,
+                            BatteryCapacity = 82m,
+                            Brand = "Cupra",
+                            CreateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Features = "{\"gps\":true,\"insurance\":true,\"bluetooth\":true,\"airConditioner\":true,\"sportStyle\":true,\"performance\":true}",
+                            ImageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:AnD9GcS6_6_6_6_6_6_6_6&s",
+                            IsDeleted = false,
+                            MaxDistance = 500,
+                            Model = "Born e-Boost",
+                            Name = "Cupra Born",
+                            PlateNumber = "51U-66789",
+                            PricePerDay = 1680000m,
+                            PricePerHour = 210000m,
+                            StationId = 2,
+                            Status = 0,
+                            UpdateDate = new DateTime(2025, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            VehicleType = "car",
+                            seartCapacity = 5
                         });
                 });
 

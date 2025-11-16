@@ -1,11 +1,12 @@
 using BusinessLayer.DTOs;
+using BusinessLayer.Interfaces;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
 using DataAccessLayer.Interfaces;
 
 namespace BusinessLayer.Services
 {
-    public class PaymentService
+    public class PaymentService : IPaymentService
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -61,6 +62,48 @@ namespace BusinessLayer.Services
             catch (Exception ex)
             {
                 return ServiceResultDto<Payment>.FailureResult($"Có lỗi xảy ra: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Tạo payment record cho refund (hoàn tiền khi hủy đơn)
+        /// </summary>
+        public async Task<ServiceResultDto<Payment>> CreateRefundRecordAsync(int rentalId, decimal refundAmount)
+        {
+            try
+            {
+                // Nếu không có tiền hoàn, không tạo record
+                if (refundAmount <= 0)
+                {
+                    return ServiceResultDto<Payment>.SuccessResult(
+                        null, "Không có tiền hoàn lại.");
+                }
+                
+                var paymentRepo = _unitOfWork.GetRepository<Payment>();
+                
+                // Tạo payment record cho refund
+                var refundPayment = new Payment
+                {
+                    RentalId = rentalId,
+                    Amount = -refundAmount,  // Số âm để đánh dấu là refund
+                    Method = "refund",
+                    TransactionRef = $"REFUND-{rentalId}-{DateTime.Now.Ticks}",
+                    Status = "pending_refund",  // Chờ xử lý refund
+                    CreateDate = DateTime.Now,
+                    UpdateDate = DateTime.Now,
+                    IsDeleted = false
+                };
+                
+                await paymentRepo.AddAsync(refundPayment);
+                await _unitOfWork.SaveChangesAsync();
+                
+                return ServiceResultDto<Payment>.SuccessResult(
+                    refundPayment, "Tạo record hoàn tiền thành công.");
+            }
+            catch (Exception ex)
+            {
+                return ServiceResultDto<Payment>.FailureResult(
+                    $"Có lỗi xảy ra: {ex.Message}");
             }
         }
     }

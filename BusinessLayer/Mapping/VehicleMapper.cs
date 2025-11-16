@@ -8,24 +8,29 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer.Mapping
 {
-    public class VehicleMapper
+    public static class VehicleMapper
     {
-        public static VehicleDto ToVehicleDto(Vehicle vehicle)
+        public static VehicleDto ToVehicleDto(this Vehicle vehicle)
         {
+            if (vehicle == null) return null;
+
             var response = new VehicleDto
             {
-                stationId = vehicle.StationId,
-                name = vehicle.Name,
-                brand = vehicle.Brand,
-                plateNumber = vehicle.PlateNumber,
-                model = vehicle.Model,
-                vehicleType = vehicle.VehicleType,
-                status = vehicle.Status,
-                pricePerHour = vehicle.PricePerHour,
-                pricePerDay = vehicle.PricePerDay,
-                features = vehicle.Features,
-                imageUrl = vehicle.ImageUrl,
-                maxDistance = vehicle.MaxDistance
+                Id = vehicle.Id,
+                StationId = vehicle.StationId,
+                Name = vehicle.Name,
+                Brand = vehicle.Brand,
+                PlateNumber = vehicle.PlateNumber,
+                Model = vehicle.Model,
+                VehicleType = vehicle.VehicleType,
+                Status = vehicle.Status,
+                PricePerHour = vehicle.PricePerHour,
+                PricePerDay = vehicle.PricePerDay,
+                Features = vehicle.Features,
+                ImageUrl = vehicle.ImageUrl,
+                MaxDistance = vehicle.MaxDistance,
+                BatteryCapacity = vehicle.BatteryCapacity,
+                seartCapacity = vehicle.seartCapacity
             };
             return response;
         }
@@ -34,36 +39,40 @@ namespace BusinessLayer.Mapping
         {
             var response = new Vehicle
             {
-                StationId = dto.stationId,
-                Name = dto.name,
-                Brand = dto.brand,
-                PlateNumber = dto.plateNumber,
-                Model = dto.model,
-                VehicleType = dto.vehicleType,
-                PricePerHour = dto.pricePerHour,
-                PricePerDay = dto.pricePerDay,
-                Status = DataAccessLayer.Enums.VehicleStatus.Available,
-                Features = dto.features,
-                ImageUrl = dto.imageUrl,
-                MaxDistance = dto.maxDistance
+                StationId = dto.StationId,
+                Name = dto.Name,
+                Brand = dto.Brand,
+                PlateNumber = dto.PlateNumber,
+                Model = dto.Model,
+                VehicleType = dto.VehicleType,
+                PricePerHour = dto.PricePerHour,
+                PricePerDay = dto.PricePerDay,
+                Status = dto.Status,
+                Features = dto.Features,
+                ImageUrl = dto.ImageUrl,
+                MaxDistance = dto.MaxDistance,
+                BatteryCapacity = dto.BatteryCapacity,
+                seartCapacity = dto.seartCapacity
             };
             return response;
         }
 
         public static void UpdateVehicleEntity(Vehicle vehicle, VehicleUpdateDto dto)
         {
-            vehicle.StationId = dto.stationId;
-            vehicle.Name = dto.name;
-            vehicle.Brand = dto.brand;
-            vehicle.PlateNumber = dto.plateNumber;
-            vehicle.Model = dto.model;
-            vehicle.VehicleType = dto.vehicleType;
-            vehicle.Status = dto.status;
-            vehicle.PricePerHour = dto.pricePerHour;
-            vehicle.PricePerDay = dto.pricePerDay;
-            vehicle.Features = dto.features;
-            vehicle.ImageUrl = dto.imageUrl;
-            vehicle.MaxDistance = dto.maxDistance;
+            vehicle.StationId = dto.StationId;
+            vehicle.Name = dto.Name;
+            vehicle.Brand = dto.Brand;
+            vehicle.PlateNumber = dto.PlateNumber;
+            vehicle.Model = dto.Model;
+            vehicle.VehicleType = dto.VehicleType;
+            vehicle.Status = dto.Status;
+            vehicle.PricePerHour = dto.PricePerHour;
+            vehicle.PricePerDay = dto.PricePerDay;
+            vehicle.Features = dto.Features;
+            vehicle.ImageUrl = dto.ImageUrl;
+            vehicle.MaxDistance = dto.MaxDistance;
+            vehicle.BatteryCapacity = dto.BatteryCapacity;
+            vehicle.seartCapacity = dto.seartCapacity;
         }
 
     }

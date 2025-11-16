@@ -1,5 +1,5 @@
-using DataAccessLayer.Entities;
-using DataAccessLayer.Interfaces;
+using BusinessLayer.DTOs;
+using BusinessLayer.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -7,23 +7,40 @@ namespace EV_Rental.Pages.Staff
 {
     public class UpdateVehicleModel : PageModel
     {
-        private readonly IVehicleRepo _vehicleRepo;
+        private readonly IVehicleService _vehicleService;
 
-        public UpdateVehicleModel(IVehicleRepo vehicleRepo)
+        public UpdateVehicleModel(IVehicleService vehicleService)
         {
-            _vehicleRepo = vehicleRepo;
+            _vehicleService = vehicleService;
         }
 
         [BindProperty]
-        public Vehicle Vehicle { get; set; } = new();
+        public VehicleUpdateDto? Vehicle { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
-            var existing = await _vehicleRepo.GetByIdAsync(id);
+            var existing = await _vehicleService.GetVehicleByIdAsync(id);
             if (existing == null)
                 return NotFound();
 
-            Vehicle = existing;
+            // Map VehicleDto to VehicleUpdateDto
+            Vehicle = new VehicleUpdateDto
+            {
+                Id = existing.Id,
+                StationId = existing.StationId,
+                Name = existing.Name,
+                Brand = existing.Brand,
+                PlateNumber = existing.PlateNumber,
+                Model = existing.Model,
+                VehicleType = existing.VehicleType,
+                Status = existing.Status,
+                PricePerHour = existing.PricePerHour,
+                PricePerDay = existing.PricePerDay,
+                Features = existing.Features,
+                ImageUrl = existing.ImageUrl,
+                MaxDistance = existing.MaxDistance,
+                BatteryCapacity = existing.BatteryCapacity
+            };
             return Page();
         }
 
@@ -32,8 +49,10 @@ namespace EV_Rental.Pages.Staff
             if (!ModelState.IsValid)
                 return Page();
 
-            await _vehicleRepo.Update(Vehicle);
+            await _vehicleService.UpdateVehicleAsync(Vehicle);
             return RedirectToPage("Index");
         }
     }
 }
+
+

@@ -1,5 +1,5 @@
 using BusinessLayer.DTOs;
-using DataAccessLayer.Entities;
+using BusinessLayer.Interfaces;
 using DataAccessLayer.Enums;
 using DataAccessLayer.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -9,39 +9,36 @@ namespace EV_Rental.Pages
 {
     public class IndexModel : PageModel
     {
-        private readonly ILogger<IndexModel> _logger;
-        private readonly IVehicleRepo _vehicleRepo;
+        private readonly IVehicleService _vehicleService;
 
-        public IndexModel(ILogger<IndexModel> logger, IVehicleRepo vehicleRepo)
+
+        public IndexModel(IVehicleService vehicleService)
         {
-            _logger = logger;
-            _vehicleRepo = vehicleRepo;
+            _vehicleService = vehicleService;
         }
 
-        public IEnumerable<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
+        [BindProperty(SupportsGet = true)]
+        public string Name { get; set; }
 
         [BindProperty(SupportsGet = true)]
-        public string? SearchName { get; set; }
+        public string Brand { get; set; }
 
         [BindProperty(SupportsGet = true)]
-        public string? SearchBrand { get; set; }
+        public VehicleStatus? Status { get; set; }
 
-        [BindProperty(SupportsGet = true)]
-        public string? SearchType { get; set; }
-
-        [BindProperty(SupportsGet = true)]
-        public VehicleStatus? SearchStatus { get; set; }
+        public IEnumerable<VehicleDto> Vehicles { get; set; } = new List<VehicleDto>();
 
         public async Task OnGetAsync()
         {
-            if (string.IsNullOrEmpty(SearchName) && string.IsNullOrEmpty(SearchBrand) && string.IsNullOrEmpty(SearchType))
+            if (Status.HasValue)
             {
-                Vehicles = await _vehicleRepo.GetAllAsync();
+                Vehicles = await _vehicleService.SearchVehiclesAsync(Name ?? string.Empty, Brand ?? string.Empty, Status.Value);
             }
             else
             {
-                Vehicles = await _vehicleRepo.SearchVehiclesAsync(SearchName, SearchBrand, SearchType, SearchStatus);
+                Vehicles = await _vehicleService.GetVehiclesAsync();
             }
         }
     }
 }
+

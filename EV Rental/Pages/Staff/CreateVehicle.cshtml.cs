@@ -1,6 +1,6 @@
-﻿using DataAccessLayer.Entities;
+using BusinessLayer.DTOs;
+using BusinessLayer.Interfaces;
 using DataAccessLayer.Enums;
-using DataAccessLayer.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -8,15 +8,15 @@ namespace EV_Rental.Pages.Staff
 {
     public class CreateVehicleModel : PageModel
     {
-        private readonly IVehicleRepo _vehicleRepo;
+        private readonly IVehicleService _vehicleService;
 
-        public CreateVehicleModel(IVehicleRepo vehicleRepo)
+        public CreateVehicleModel(IVehicleService vehicleService)
         {
-            _vehicleRepo = vehicleRepo;
+            _vehicleService = vehicleService;
         }
 
         [BindProperty]
-        public Vehicle Vehicle { get; set; } = new();
+        public VehicleCreateDto NewVehicle { get; set; } = new();
 
         public void OnGet()
         {
@@ -27,10 +27,11 @@ namespace EV_Rental.Pages.Staff
             if (!ModelState.IsValid)
                 return Page();
 
-            Vehicle.Status = VehicleStatus.Available;
+            NewVehicle.Status = VehicleStatus.Available;
 
-            await _vehicleRepo.AddAsync(Vehicle);
+            await _vehicleService.AddVehicleAsync(NewVehicle);
             return RedirectToPage("Index");
         }
     }
 }
+

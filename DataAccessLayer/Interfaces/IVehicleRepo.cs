@@ -10,6 +10,6 @@ namespace DataAccessLayer.Interfaces
 {
     public interface IVehicleRepo : IGenericRepo<Vehicle>
     {
-        Task<IEnumerable<Vehicle>> SearchVehiclesAsync(string? name, string? brand, string? vehicleType, VehicleStatus? status);
+        Task<IEnumerable<Vehicle>> SearchVehiclesAsync(string? name, string? brand, VehicleStatus? status);
     }
 }

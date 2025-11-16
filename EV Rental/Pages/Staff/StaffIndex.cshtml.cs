@@ -1,6 +1,6 @@
 using BusinessLayer.DTOs;
-using DataAccessLayer.Entities;
-using DataAccessLayer.Interfaces;
+using BusinessLayer.Interfaces;
+using DataAccessLayer.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -8,23 +8,37 @@ namespace EV_Rental.Pages.Staff
 {
     public class StaffIndexModel : PageModel
     {
-        private readonly IVehicleRepo _vehicleRepo;
-        public StaffIndexModel(IVehicleRepo vehicleRepo)
+        private readonly IVehicleService _vehicleService;
+        
+        public StaffIndexModel(IVehicleService vehicleService)
         {
-            _vehicleRepo = vehicleRepo;
+            _vehicleService = vehicleService;
         }
 
         [BindProperty(SupportsGet = true)]
-        public VehicleSearchDto Search { get; set; } = new();
+        public string Name { get; set; }
 
-        public IEnumerable<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
-        public object Vehicle { get; private set; }
+        [BindProperty(SupportsGet = true)]
+        public string Brand { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public VehicleStatus? Status { get; set; }
+
+        public IEnumerable<VehicleDto> Vehicles { get; set; } = new List<VehicleDto>();
 
         public async Task OnGetAsync()
         {
-            Vehicle = await _vehicleRepo.SearchVehiclesAsync(
-                Search.Name, Search.Brand, Search.VehicleType, Search.Status
-                );
+            if (Status.HasValue)
+            {
+                // G?i h�m search trong service (l?c theo status)
+                Vehicles = await _vehicleService.SearchVehiclesAsync(Name ?? "", Brand ?? "", Status.Value);
+            }
+            else
+            {
+                // N?u kh�ng ch?n status ? l?y to�n b?
+                Vehicles = await _vehicleService.GetVehiclesAsync();
+            }
         }
     }
 }
+

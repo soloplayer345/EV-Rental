@@ -1,0 +1,95 @@
+@page
+@model EV_Rental.Pages.Admin.Station.CreateModel
+@{
+    ViewData["Title"] = "Thêm Trạm Mới";
+    Layout = "~/Pages/Shared/_AdminLayout.cshtml";
+}
+
+<!-- Page Header -->
+<div class="page-header mb-4">
+    <div>
+        <h1><i class="fas fa-plus me-2"></i>Thêm Trạm Mới</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Admin/Dashboard">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="/Admin/Station/Index">Quản lý Trạm</a></li>
+                <li class="breadcrumb-item active">Thêm mới</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- Alerts -->
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Form Card -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-charging-station me-2"></i>Thông tin trạm mới</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            <div class="row">
+                <!-- Tên trạm -->
+                <div class="col-md-6 mb-3">
+                    <label for="station_name" class="form-label">
+                        Tên trạm <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control @(ModelState.IsValid ? "" : "is-invalid")" 
+                           id="station_name" asp-for="Station.Name" placeholder="VD: Trạm Hà Nội 1" required>
+                    <span asp-validation-for="Station.Name" class="text-danger"></span>
+                </div>
+
+                <!-- Tỉnh/Thành phố -->
+                <div class="col-md-6 mb-3">
+                    <label for="station_state" class="form-label">
+                        Tỉnh/Thành phố <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control" id="station_state" asp-for="Station.State" 
+                           placeholder="VD: Hà Nội" required>
+                </div>
+
+                <!-- Địa chỉ -->
+                <div class="col-md-12 mb-3">
+                    <label for="station_address" class="form-label">
+                        Địa chỉ <span class="text-danger">*</span>
+                    </label>
+                    <textarea class="form-control" id="station_address" asp-for="Station.Address" 
+                              rows="3" placeholder="VD: 123 Đường Lê Lợi, Quận Hoàn Kiếm" required></textarea>
+                </div>
+
+                <!-- Buttons -->
+                <div class="col-12">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-admin-primary">
+                            <i class="fas fa-plus me-2"></i>Thêm trạm
+                        </button>
+                        <a href="/Admin/Station/Index" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Quay lại
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto dismiss alerts
+        document.querySelectorAll('.alert').forEach(alert => {
+            setTimeout(() => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 5000);
+        });
+    </script>
+}
+

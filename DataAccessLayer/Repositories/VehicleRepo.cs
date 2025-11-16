@@ -16,7 +16,7 @@ namespace DataAccessLayer.Repositories
         {
         }
 
-        public async Task<IEnumerable<Vehicle>> SearchVehiclesAsync(string? name, string? brand, string? vehicleType, VehicleStatus? status)
+        public async Task<IEnumerable<Vehicle>> SearchVehiclesAsync(string? name, string? brand, VehicleStatus? status)
         {
             IQueryable<Vehicle> query = _dbSet.Where(x => !x.IsDeleted);
             if (!string.IsNullOrEmpty(name))
@@ -27,11 +27,6 @@ namespace DataAccessLayer.Repositories
             if (!string.IsNullOrEmpty(brand))
             {
                 query = query.Where(v => v.Brand.Contains(brand));
-            }
-
-            if (!string.IsNullOrEmpty(vehicleType))
-            {
-                query = query.Where(v => v.VehicleType.Equals(vehicleType, StringComparison.OrdinalIgnoreCase));
             }
 
             if (status.HasValue && Enum.IsDefined(typeof(VehicleStatus), status.Value))

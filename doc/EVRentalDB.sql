@@ -54,6 +54,8 @@ CREATE TABLE [Vehicle] (
     Features NVARCHAR(MAX) NULL, -- JSON: {"gps":true,"insurance":true}
     ImageUrl NVARCHAR(500) NULL,
     MaxDistance INT NOT NULL, -- Maximum distance in km
+    SeatCapacity INT NOT NULL, -- Số chỗ ngồi
+    BatteryCapacity DECIMAL(10,2) NOT NULL, -- Dung lượng pin (kWh)
     CreatedAt DATETIME NOT NULL DEFAULT GETDATE(),
     UpdatedAt DATETIME NULL,
     CONSTRAINT FK_Vehicle_Station FOREIGN KEY (StationId) REFERENCES [Station](Id) ON DELETE CASCADE

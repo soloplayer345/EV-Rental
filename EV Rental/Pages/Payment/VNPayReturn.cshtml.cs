@@ -2,11 +2,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using BusinessLayer.DTOs;
-using DataAccessLayer.Entities;
-using DataAccessLayer.Interfaces;
 using EV_Rental.Helpers;
+using DataAccessLayer.Enums;
 
 namespace EV_Rental.Pages.Payment
 {
@@ -14,26 +13,26 @@ namespace EV_Rental.Pages.Payment
     public class VNPayReturnModel : PageModel
     {
         private readonly VNPaySettings _vnPaySettings;
-        private readonly PaymentService _paymentService;
-        private readonly RentalService _rentalService;
-        private readonly VehicleService _vehicleService;
+        private readonly IPaymentService _paymentService;
+        private readonly IRentalService _rentalService;
+        private readonly IVehicleService _vehicleService;
+        private readonly IAccountService _accountService;
         private readonly IEmailSender _emailSender;
-        private readonly IAccountRepo _accountRepo;
 
         public VNPayReturnModel(
             IOptions<VNPaySettings> vnPaySettings, 
-            PaymentService paymentService,
-            RentalService rentalService,
-            VehicleService vehicleService,
-            IEmailSender emailSender,
-            IAccountRepo accountRepo)
+            IPaymentService paymentService,
+            IRentalService rentalService,
+            IVehicleService vehicleService,
+            IAccountService accountService,
+            IEmailSender emailSender)
         {
             _vnPaySettings = vnPaySettings.Value;
             _paymentService = paymentService;
             _rentalService = rentalService;
             _vehicleService = vehicleService;
+            _accountService = accountService;
             _emailSender = emailSender;
-            _accountRepo = accountRepo;
         }
 
         public bool Success { get; set; }
@@ -98,7 +97,7 @@ namespace EV_Rental.Pages.Payment
                             // Send OTP email to renter
                             try
                             {
-                                var renterAccount = await _accountRepo.GetByIdAsync(rental.RenterId);
+                                var renterAccount = await _accountService.GetByIdAsync(rental.RenterId);
                                 if (renterAccount != null)
                                 {
                                     await SendOtpEmailAsync(renterAccount.Email, renterAccount.FullName, rental);
@@ -172,7 +171,7 @@ namespace EV_Rental.Pages.Payment
                         try
                         {
                             var rental = await _rentalService.GetRentalByIdAsync(rentalId);
-                            if (rental != null && rental.Status == DataAccessLayer.Enums.RentalRecordStatus.Pending)
+                            if (rental != null && rental.Status == RentalRecordStatus.Pending)
                             {
                                 await _rentalService.CancelRentalAsync(rentalId, rental.RenterId);
                             }
@@ -332,7 +331,7 @@ namespace EV_Rental.Pages.Payment
         .footer {{ background: #1f2937; color: #9ca3af; text-align: center; padding: 25px; font-size: 13px; }}
         .footer p {{ margin: 5px 0; }}
         .divider {{ height: 1px; background: linear-gradient(to right, transparent, #e5e7eb, transparent); margin: 20px 0; }}
-        .status-badge {{ display: inline-block; padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 600; }}
+        .Status-badge {{ display: inline-block; padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 600; }}
     </style>
 </head>
 <body>
@@ -428,3 +427,4 @@ namespace EV_Rental.Pages.Payment
         }
     }
 }
+

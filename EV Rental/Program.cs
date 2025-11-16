@@ -6,6 +6,7 @@ using DataAccessLayer.Repositories;
 using EV_Rental.Middlewares;
 using Microsoft.EntityFrameworkCore;
 using EV_Rental.Helpers;
+using EV_Rental.Hubs;
 
 namespace EV_Rental
 {
@@ -18,6 +19,9 @@ namespace EV_Rental
             // Add services to the container.
             builder.Services.AddRazorPages();
 
+            // Add SignalR
+            builder.Services.AddSignalR();
+
             // Add Session
             builder.Services.AddSession(options =>
             {
@@ -26,21 +30,40 @@ namespace EV_Rental
                 options.Cookie.IsEssential = true;
             });
 
-            //add connection String
+            // Add connection String with Fallback mechanism
+            var connectionString = DatabaseConnectionHelper.GetConnectionStringWithFallback(builder.Configuration);
             builder.Services.AddDbContext<EVRentalDBContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+                options.UseSqlServer(connectionString, sqlOptions =>
+                {
+                    sqlOptions.EnableRetryOnFailure(
+                        maxRetryCount: 3,
+                        maxRetryDelay: TimeSpan.FromSeconds(5),
+                        errorNumbersToAdd: null
+                    );
+                    sqlOptions.CommandTimeout(30);
+                })
             );
 
             // Register Repositories
             builder.Services.AddScoped<IVehicleRepo, VehicleRepo>();
             builder.Services.AddScoped<IAccountRepo, AccountRepo>();
+            builder.Services.AddScoped<IRatingReviewRepo, RatingReviewRepo>();
 
             // Register UnitOfWork and Services
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IAuthService, AuthService>();
-            builder.Services.AddScoped<VehicleService>();
-            builder.Services.AddScoped<RentalService>();
-            builder.Services.AddScoped<PaymentService>();
+            builder.Services.AddScoped<IVehicleService, VehicleService>();
+            builder.Services.AddScoped<IRentalService, RentalService>();
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
+            builder.Services.AddScoped<IAccountService, AccountService>();
+            builder.Services.AddScoped<ICheckInService, CheckInService>();
+            builder.Services.AddScoped<IStationService, StationService>();
+            builder.Services.AddScoped<IRentalRecordService, RentalRecordService>();
+            builder.Services.AddScoped<IReviewService, ReviewService>();
+            builder.Services.AddScoped<IReportService, ReportService>();
+            
+            // Register SignalR wrapper service
+            builder.Services.AddScoped<EV_Rental.Services.VehicleHubService>();
 
             // Bind SMTP settings & register EmailSender
             builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("Smtp"));
@@ -72,6 +95,7 @@ namespace EV_Rental
             app.UseAuthorization();
 
             app.MapRazorPages();
+            app.MapHub<VehicleHub>("/vehicleHub"); // Map SignalR Hub
 
             app.Run();
         }

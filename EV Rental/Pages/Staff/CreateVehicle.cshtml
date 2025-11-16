@@ -1,66 +1,168 @@
-﻿@page
+@page
 @model CreateVehicleModel
 @{
     ViewData["Title"] = "Thêm Xe Điện Mới";
 }
 
-<h2 class="mb-4">Thêm Xe Điện Mới</h2>
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <!-- Header -->
+            <div class="mb-4">
+                <h1 class="fw-bold mb-1">Thêm Xe Điện Mới</h1>
+                <p class="text-muted">Nhập thông tin chi tiết của xe mới</p>
+            </div>
 
-<form method="post" enctype="multipart/form-data" class="card p-4 shadow-sm">
-    <div class="mb-3">
-        <label class="form-label">Tên xe</label>
-        <input asp-for="Vehicle.Name" class="form-control" />
+            <form method="post" enctype="multipart/form-data" class="card shadow-sm">
+                <!-- Basic Information -->
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Thông tin cơ bản</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Tên xe <span class="text-danger">*</span></label>
+                            <input asp-for="NewVehicle.Name" class="form-control" required />
+                            <small class="text-muted">Ví dụ: Tesla Model 3, BMW i3</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Hãng xe <span class="text-danger">*</span></label>
+                            <input asp-for="NewVehicle.Brand" class="form-control" required />
+                            <small class="text-muted">Ví dụ: Tesla, BMW, Audi</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Biển số xe <span class="text-danger">*</span></label>
+                            <input asp-for="NewVehicle.PlateNumber" class="form-control" placeholder="Ví dụ: 30A-12345" required />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Kiểu dáng xe <span class="text-danger">*</span></label>
+                            <input asp-for="NewVehicle.Model" class="form-control" placeholder="Ví dụ: SUV, Sedan" required />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Loại xe <span class="text-danger">*</span></label>
+                            <input asp-for="NewVehicle.VehicleType" class="form-control" placeholder="Ví dụ: Electric" required />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Quãng đường tối đa (km)</label>
+                            <input asp-for="NewVehicle.MaxDistance" class="form-control" type="number" placeholder="Ví dụ: 500" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pricing -->
+                <div class="card-header bg-success text-white mt-3">
+                    <h5 class="mb-0"><i class="bi bi-cash-coin"></i> Giá cả</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Giá/Giờ (VNĐ) <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input asp-for="NewVehicle.PricePerHour" class="form-control" type="number" step="1000" required />
+                                <span class="input-group-text">đ</span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Giá/Ngày (VNĐ) <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input asp-for="NewVehicle.PricePerDay" class="form-control" type="number" step="1000" required />
+                                <span class="input-group-text">đ</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Features -->
+                <div class="card-header bg-warning text-dark mt-3">
+                    <h5 class="mb-0"><i class="bi bi-star"></i> Tính năng và tiện nghi</h5>
+                </div>
+                <div class="card-body">
+                    <label class="form-label fw-bold">Tính năng xe</label>
+                    <textarea asp-for="NewVehicle.Features" class="form-control" rows="3" placeholder="Nhập các tính năng xe, mỗi dòng một tính năng"></textarea>
+                    <small class="text-muted">Ví dụ: Hệ thống định vị GPS, Camera 360, Sạc nhanh DC</small>
+                </div>
+
+                <!-- Image -->
+                <div class="card-header bg-info text-white mt-3">
+                    <h5 class="mb-0"><i class="bi bi-image"></i> Ảnh xe</h5>
+                </div>
+                <div class="card-body">
+                    <label class="form-label fw-bold">Tải lên ảnh xe <span class="text-danger">*</span></label>
+                    <div class="mb-3">
+                        <input asp-for="NewVehicle.ImageUrl" type="file" class="form-control" accept="image/*" required />
+                        <small class="text-muted d-block mt-2">Định dạng: JPG, PNG. Kích thước tối đa: 5MB</small>
+                    </div>
+                    <div id="imagePreview">
+                        <small class="text-muted">Ảnh xem trước sẽ hiển thị ở đây</small>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="card-footer bg-light">
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a asp-page="StaffIndex" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Quay lại
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-plus-circle"></i> Thêm xe
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
+</div>
 
-    <div class="mb-3">
-        <label class="form-label">Hãng xe</label>
-        <input asp-for="Vehicle.Brand" class="form-control" />
-    </div>
+<style>
+    .form-label {
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
 
-    <div class="mb-3">
-        <label class="form-label">Biển số xe</label>
-        <input asp-for="Vehicle.PlateNumber" class="form-control" />
-    </div>
+    .text-danger {
+        font-weight: bold;
+    }
 
-    <div class="mb-3">
-        <label class="form-label">Kiểu dáng xe</label>
-        <input asp-for="Vehicle.Model" class="form-control" />
-    </div>
+    .card-header {
+        border-bottom: 2px solid rgba(0,0,0,0.1);
+    }
 
-    <div class="mb-3">
-        <label class="form-label">Loại xe</label>
-        <input asp-for="Vehicle.VehicleType" class="form-control" />
-    </div>
+    .input-group-text {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+    }
 
-    <div class="mb-3">
-        <label class="form-label">Giá/Giờ (VNĐ)</label>
-        <input asp-for="Vehicle.PricePerHour" class="form-control" type="number" />
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Giá/Ngày (VNĐ)</label>
-        <input asp-for="Vehicle.PricePerDay" class="form-control" />
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Tính năng xe</label>
-        <input asp-for="Vehicle.Features" class="form-control" />
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Ảnh xe</label>
-        <input asp-for="Vehicle.ImageUrl" type="file" class="form-control" />
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Quãng đường tối đa</label>
-        <input asp-for="Vehicle.MaxDistance" class="form-control" />
-    </div>
-
-    <button type="submit" class="btn btn-primary">Thêm xe</button>
-    <a asp-page="Index" class="btn btn-secondary ms-2">Hủy</a>
-</form>
+    textarea.form-control {
+        border: 1px solid #dee2e6;
+        resize: vertical;
+    }
+</style>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.querySelector('input[type="file"]');
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const preview = document.getElementById('imagePreview');
+                        preview.innerHTML = `<img src="${event.target.result}" alt="Preview" style="max-width: 200px; border-radius: 4px;">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+    </script>
 }
+
+
+

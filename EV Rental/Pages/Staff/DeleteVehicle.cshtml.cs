@@ -1,5 +1,5 @@
-using DataAccessLayer.Entities;
-using DataAccessLayer.Interfaces;
+using BusinessLayer.DTOs;
+using BusinessLayer.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -7,30 +7,28 @@ namespace EV_Rental.Pages.Staff
 {
     public class DeleteVehicleModel : PageModel
     {
-        private readonly IVehicleRepo _vehicleRepo;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IVehicleService _vehicleService;
 
-        public DeleteVehicleModel(IVehicleRepo vehicleRepo, IUnitOfWork unitOfWork)
+        public DeleteVehicleModel(IVehicleService vehicleService)
         {
-            _vehicleRepo = vehicleRepo;
-            _unitOfWork = unitOfWork;
+            _vehicleService = vehicleService;
         }
 
         [BindProperty]
-        public Vehicle Vehicle { get; set; } = new();
+        public VehicleDto Vehicle { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
-            Vehicle = await _vehicleRepo.GetByIdAsync(id);
+            Vehicle = await _vehicleService.GetVehicleByIdAsync(id);
             if (Vehicle == null) return RedirectToPage("Index");
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
-            await _vehicleRepo.Delete(Vehicle);
-            await _unitOfWork.SaveChangesAsync();
+            await _vehicleService.DeleteVehicleAsync(Vehicle.Id);
             return RedirectToPage("Index");
         }
     }
 }
+

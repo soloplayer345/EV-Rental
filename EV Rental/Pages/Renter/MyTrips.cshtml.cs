@@ -1,5 +1,6 @@
-using BusinessLayer.Services;
-using DataAccessLayer.Entities;
+using BusinessLayer.Interfaces;
+using BusinessLayer.DTOs;
+using BusinessLayer.Mapping;
 using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -8,19 +9,19 @@ namespace EV_Rental.Pages.Renter
 {
     public class MyTripsModel : PageModel
     {
-        private readonly RentalService _rentalService;
-        private readonly VehicleService _vehicleService;
+        private readonly IRentalService _rentalService;
+        private readonly IVehicleService _vehicleService;
 
-        public MyTripsModel(RentalService rentalService, VehicleService vehicleService)
+        public MyTripsModel(IRentalService rentalService, IVehicleService vehicleService)
         {
             _rentalService = rentalService;
             _vehicleService = vehicleService;
         }
 
-        public List<RentalRecord> Rentals { get; set; } = new List<RentalRecord>();
-        public Dictionary<int, Vehicle> VehicleDict { get; set; } = new Dictionary<int, Vehicle>();
-        public Dictionary<int, Station> PickupStationDict { get; set; } = new Dictionary<int, Station>();
-        public Dictionary<int, Station> ReturnStationDict { get; set; } = new Dictionary<int, Station>();
+        public List<RentalRecordDto> Rentals { get; set; } = new List<RentalRecordDto>();
+        public Dictionary<int, VehicleDto> VehicleDict { get; set; } = new Dictionary<int, VehicleDto>();
+        public Dictionary<int, StationDto> PickupStationDict { get; set; } = new Dictionary<int, StationDto>();
+        public Dictionary<int, StationDto> ReturnStationDict { get; set; } = new Dictionary<int, StationDto>();
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -37,7 +38,8 @@ namespace EV_Rental.Pages.Renter
             }
 
             // Lấy danh sách rental của user
-            Rentals = await _rentalService.GetRentalsByRenterIdAsync(user.AccountId);
+            var rentalEntities = await _rentalService.GetRentalsByRenterIdAsync(user.AccountId);
+            Rentals = RentalRecordMapper.ToDtoList(rentalEntities);
 
             // Lấy thông tin xe và trạm
             var vehicles = await _vehicleService.GetVehiclesAsync();
@@ -48,9 +50,9 @@ namespace EV_Rental.Pages.Renter
             foreach (var station in stations)
             {
                 if (!PickupStationDict.ContainsKey(station.Id))
-                    PickupStationDict[station.Id] = new Station { Id = station.Id, Name = station.Name, Address = station.Address, State = station.State };
+                    PickupStationDict[station.Id] = station;
                 if (!ReturnStationDict.ContainsKey(station.Id))
-                    ReturnStationDict[station.Id] = new Station { Id = station.Id, Name = station.Name, Address = station.Address, State = station.State };
+                    ReturnStationDict[station.Id] = station;
             }
 
             return Page();
@@ -86,3 +88,4 @@ namespace EV_Rental.Pages.Renter
         }
     }
 }
+

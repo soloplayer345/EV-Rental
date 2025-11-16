@@ -1,0 +1,264 @@
+@page
+@model EV_Rental.Pages.Admin.Problems.IndexModel
+@{
+    ViewData["Title"] = "Quản lý Báo cáo Sự cố";
+    Layout = "~/Pages/Shared/_AdminLayout.cshtml";
+}
+
+<!-- Page Header -->
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1><i class="fas fa-exclamation-triangle me-2"></i>Quản lý Báo cáo Sự cố</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Admin/Dashboard">Trang chủ</a></li>
+                <li class="breadcrumb-item active">Báo cáo Sự cố</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- Alerts -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-muted mb-1 small">Tổng số sự cố</p>
+                        <h3 class="mb-0 fw-bold">@Model.Problems.Count</h3>
+                    </div>
+                    <div class="bg-danger bg-opacity-10 p-3 rounded">
+                        <i class="fas fa-exclamation-triangle text-danger fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-muted mb-1 small">Tổng phạt</p>
+                        <h3 class="mb-0 fw-bold">@Model.Problems.Sum(p => p.PenaltyAmount).ToString("N0") ₫</h3>
+                    </div>
+                    <div class="bg-warning bg-opacity-10 p-3 rounded">
+                        <i class="fas fa-dollar-sign text-warning fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Section -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label for="incidentType" class="form-label">Loại sự cố</label>
+                <select class="form-select" id="incidentType" name="incidentType">
+                    <option value="">Tất cả</option>
+                    <option value="damage" selected="@(Model.IncidentType == "damage")">Hư hỏng</option>
+                    <option value="late_return" selected="@(Model.IncidentType == "late_return")">Trả muộn</option>
+                    <option value="no_show" selected="@(Model.IncidentType == "no_show")">Không đến nhận xe</option>
+                    <option value="nonpayment" selected="@(Model.IncidentType == "nonpayment")">Không thanh toán</option>
+                    <option value="other" selected="@(Model.IncidentType == "other")">Khác</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="search" class="form-label">Tìm kiếm</label>
+                <input type="text" class="form-control" id="search" name="search" 
+                       placeholder="Tên khách hàng, tên xe, mô tả..." value="@Model.SearchTerm">
+            </div>
+            <div class="col-md-2 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-admin-primary flex-grow-1">
+                    <i class="fas fa-search me-1"></i>Lọc
+                </button>
+                <a href="/Admin/Problems/Index" class="btn btn-outline-secondary">
+                    <i class="fas fa-redo"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Problems Table -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-list me-2"></i>Danh sách báo cáo sự cố</h5>
+    </div>
+    <div class="table-responsive">
+        @if (Model.Problems.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Đơn thuê</th>
+                        <th>Khách hàng</th>
+                        <th>Xe</th>
+                        <th>Loại sự cố</th>
+                        <th>Mô tả</th>
+                        <th>Phí phạt</th>
+                        <th>Ngày tạo</th>
+                        <th class="text-center">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var problem in Model.Problems)
+                    {
+                        <tr>
+                            <td><strong>#@problem.Id</strong></td>
+                            <td>
+                                <a href="/Admin/RentalRecord/Detail/@problem.RentalId" class="text-decoration-none">
+                                    #@problem.RentalId
+                                </a>
+                            </td>
+                            <td>@problem.RenterName</td>
+                            <td>@problem.VehicleName</td>
+                            <td>
+                                @switch (problem.IncidentType)
+                                {
+                                    case "damage":
+                                        <span class="badge bg-danger">Hư hỏng</span>
+                                        break;
+                                    case "late_return":
+                                        <span class="badge bg-warning">Trả muộn</span>
+                                        break;
+                                    case "no_show":
+                                        <span class="badge bg-secondary">Không đến</span>
+                                        break;
+                                    case "nonpayment":
+                                        <span class="badge bg-dark">Không thanh toán</span>
+                                        break;
+                                    default:
+                                        <span class="badge bg-info">Khác</span>
+                                        break;
+                                }
+                            </td>
+                            <td>
+                                <small>@(problem.Description.Length > 50 ? problem.Description.Substring(0, 50) + "..." : problem.Description)</small>
+                            </td>
+                            <td class="text-danger fw-bold">@problem.PenaltyAmount.ToString("N0") ₫</td>
+                            <td><small>@problem.CreateDate.ToString("dd/MM/yyyy HH:mm")</small></td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button" class="btn btn-outline-primary" 
+                                            onclick="viewProblemDetail(@problem.Id)" title="Xem chi tiết">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-success" 
+                                            onclick="setVehicleMaintenance(@problem.RentalId)" title="Điều xe bảo trì">
+                                        <i class="fas fa-wrench"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger" 
+                                            onclick="banUser(@problem.RentalId)" title="Khóa tài khoản">
+                                        <i class="fas fa-ban"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="p-5 text-center">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <p class="text-muted">Không tìm thấy báo cáo sự cố nào</p>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Problem Detail Modal -->
+<div class="modal fade" id="problemDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chi tiết báo cáo sự cố</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="problemDetailContent">
+                <!-- Content loaded via AJAX -->
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function viewProblemDetail(problemId) {
+        // Load problem detail via AJAX
+        fetch(`/Admin/Problems/Index?handler=ProblemDetail&id=${problemId}`)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('problemDetailContent').innerHTML = html;
+                new bootstrap.Modal(document.getElementById('problemDetailModal')).show();
+            });
+    }
+
+    function setVehicleMaintenance(rentalId) {
+        if (confirm('Bạn có chắc chắn muốn điều xe này đi bảo trì?')) {
+            fetch(`/Admin/Problems/Index?handler=SetMaintenance&rentalId=${rentalId}`, {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Đã chuyển xe sang trạng thái bảo trì');
+                    location.reload();
+                } else {
+                    alert('Có lỗi xảy ra: ' + data.message);
+                }
+            });
+        }
+    }
+
+    function banUser(rentalId) {
+        if (confirm('Bạn có chắc chắn muốn khóa tài khoản khách hàng này?')) {
+            fetch(`/Admin/Problems/Index?handler=BanUser&rentalId=${rentalId}`, {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Đã khóa tài khoản khách hàng');
+                    location.reload();
+                } else {
+                    alert('Có lỗi xảy ra: ' + data.message);
+                }
+            });
+        }
+    }
+</script>
+}
+

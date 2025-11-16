@@ -1,0 +1,661 @@
+@page
+@model EV_Rental.Pages.Renter.CreateReviewModel
+@{
+    ViewData["Title"] = "Đánh Giá Chuyến Đi";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <h1 class="logo">🔋 Hệ Thống Thuê Xe Điện</h1>
+                <nav class="nav">
+                    <a href="/Renter/Index" class="nav-link">Trang Chủ</a>
+                    <a href="/Renter/MyTrips" class="nav-link">Chuyến Đi Của Tôi</a>
+                    <a href="#" class="nav-link">Trạm Xe</a>
+                    <a href="#" class="nav-link">Hồ Sơ</a>
+                    <a href="/Account/Logout" class="nav-link">Đăng Xuất</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <section class="review-section">
+        <div class="container">
+            <div class="page-header">
+                <h2 class="page-title">
+                    <i class="fas fa-star"></i> Đánh Giá Chuyến Đi
+                </h2>
+                <p class="page-subtitle">Chia sẻ trải nghiệm của bạn với chúng tôi</p>
+            </div>
+
+            @if (Model.ExistingReview != null)
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <strong>Bạn đã đánh giá chuyến đi này</strong>
+                        <p style="margin: 0.5rem 0 0 0;">
+                            Đánh giá: @Model.ExistingReview.Rating <i class="fas fa-star" style="color: #fbbf24;"></i> • @Model.ExistingReview.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                        </p>
+                    </div>
+                </div>
+            }
+
+            <div class="review-container">
+                <!-- Vehicle Info Card -->
+                @if (Model.Vehicle != null && Model.Rental != null)
+                {
+                    <div class="vehicle-info-card">
+                        <h3 class="card-title">
+                            <i class="fas fa-car"></i> Thông Tin Xe
+                        </h3>
+                        <div class="vehicle-info-content">
+                            @if (!string.IsNullOrEmpty(Model.Vehicle.ImageUrl))
+                            {
+                                <img src="@Model.Vehicle.ImageUrl" alt="@Model.Vehicle.Name" class="vehicle-image">
+                            }
+                            else
+                            {
+                                <div class="vehicle-placeholder">
+                                    <i class="fas fa-car fa-4x"></i>
+                                </div>
+                            }
+                            <div class="vehicle-details">
+                                <h4>@Model.Vehicle.Name</h4>
+                                <p><i class="fas fa-tag"></i> @Model.Vehicle.Brand • @Model.Vehicle.VehicleType</p>
+                                <p><i class="fas fa-id-card"></i> Biển số: @Model.Vehicle.PlateNumber</p>
+                                <p><i class="fas fa-calendar-alt"></i> Ngày thuê: @Model.Rental.StartTime?.ToString("dd/MM/yyyy")</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Review Form -->
+                @if (Model.ExistingReview == null)
+                {
+                    <div class="review-form-card">
+                        <h3 class="card-title">
+                            <i class="fas fa-pen"></i> Viết Đánh Giá
+                        </h3>
+                        
+                        <form method="post" class="review-form">
+                            <input type="hidden" asp-for="ReviewRequest.RentalId" />
+                            
+                            @if (!ViewData.ModelState.IsValid)
+                            {
+                                <div class="alert alert-error">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <div asp-validation-summary="All"></div>
+                                </div>
+                            }
+
+                            <!-- Rating -->
+                            <div class="form-group">
+                                <label for="rating" class="form-label">
+                                    <i class="fas fa-star"></i> Đánh giá của bạn <span class="required">*</span>
+                                </label>
+                                <div class="star-rating">
+                                    <input type="radio" id="star5" name="ReviewRequest.Rating" value="5" required />
+                                    <label for="star5" title="5 sao - Xuất sắc">
+                                        <i class="fas fa-star"></i>
+                                    </label>
+                                    
+                                    <input type="radio" id="star4" name="ReviewRequest.Rating" value="4" />
+                                    <label for="star4" title="4 sao - Rất tốt">
+                                        <i class="fas fa-star"></i>
+                                    </label>
+                                    
+                                    <input type="radio" id="star3" name="ReviewRequest.Rating" value="3" />
+                                    <label for="star3" title="3 sao - Tốt">
+                                        <i class="fas fa-star"></i>
+                                    </label>
+                                    
+                                    <input type="radio" id="star2" name="ReviewRequest.Rating" value="2" />
+                                    <label for="star2" title="2 sao - Trung bình">
+                                        <i class="fas fa-star"></i>
+                                    </label>
+                                    
+                                    <input type="radio" id="star1" name="ReviewRequest.Rating" value="1" />
+                                    <label for="star1" title="1 sao - Kém">
+                                        <i class="fas fa-star"></i>
+                                    </label>
+                                </div>
+                                <p class="rating-text" id="ratingText">Chọn số sao để đánh giá</p>
+                                <span asp-validation-for="ReviewRequest.Rating" class="text-danger"></span>
+                            </div>
+
+                            <!-- Comment -->
+                            <div class="form-group">
+                                <label for="comment" class="form-label">
+                                    <i class="fas fa-comment"></i> Nhận xét của bạn
+                                </label>
+                                <textarea 
+                                    asp-for="ReviewRequest.Comment" 
+                                    class="form-control" 
+                                    id="comment" 
+                                    rows="6" 
+                                    placeholder="Chia sẻ trải nghiệm của bạn về chuyến đi này... (tùy chọn)"
+                                    maxlength="1000"></textarea>
+                                <div class="char-counter">
+                                    <span id="charCount">0</span>/1000 ký tự
+                                </div>
+                                <span asp-validation-for="ReviewRequest.Comment" class="text-danger"></span>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="form-actions">
+                                <a href="/Renter/MyTrips" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Quay Lại
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane"></i> Gửi Đánh Giá
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                }
+                else
+                {
+                    <div class="existing-review-card">
+                        <h3 class="card-title">
+                            <i class="fas fa-comment-dots"></i> Đánh Giá Của Bạn
+                        </h3>
+                        <div class="existing-review-content">
+                            <div class="review-rating">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= Model.ExistingReview.Rating)
+                                    {
+                                        <i class="fas fa-star star-filled"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="far fa-star star-empty"></i>
+                                    }
+                                }
+                                <span class="rating-value">@Model.ExistingReview.Rating/5</span>
+                            </div>
+                            <div class="review-comment">
+                                <p>@Model.ExistingReview.Comment</p>
+                            </div>
+                            <div class="review-date">
+                                <i class="fas fa-clock"></i> Đánh giá lúc: @Model.ExistingReview.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <a href="/Renter/MyTrips" class="btn btn-primary">
+                                <i class="fas fa-arrow-left"></i> Quay Lại Chuyến Đi
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Hệ Thống Thuê Xe Điện. Bản quyền thuộc về chúng tôi.</p>
+        </div>
+    </footer>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            color: #2563eb;
+            font-weight: 700;
+        }
+
+        .nav {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #666;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #2563eb;
+        }
+
+        /* Review Section */
+        .review-section {
+            padding: 3rem 0;
+            min-height: calc(100vh - 200px);
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-title i {
+            color: #fbbf24;
+        }
+
+        .page-subtitle {
+            color: #6b7280;
+            font-size: 1.1rem;
+        }
+
+        /* Alert */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .alert i {
+            font-size: 1.25rem;
+            margin-top: 0.2rem;
+        }
+
+        .alert-info {
+            background-color: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+
+        .alert-error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .review-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Cards */
+        .vehicle-info-card,
+        .review-form-card,
+        .existing-review-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .card-title i {
+            color: #2563eb;
+            margin-right: 0.5rem;
+        }
+
+        /* Vehicle Info */
+        .vehicle-info-content {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .vehicle-image {
+            width: 200px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .vehicle-placeholder {
+            width: 200px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+            border-radius: 8px;
+            color: #667eea;
+        }
+
+        .vehicle-details {
+            flex: 1;
+        }
+
+        .vehicle-details h4 {
+            font-size: 1.5rem;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .vehicle-details p {
+            color: #6b7280;
+            margin: 0.5rem 0;
+        }
+
+        .vehicle-details i {
+            color: #2563eb;
+            margin-right: 0.5rem;
+        }
+
+        /* Form */
+        .review-form {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 1rem;
+        }
+
+        .form-label i {
+            color: #2563eb;
+            margin-right: 0.5rem;
+        }
+
+        .required {
+            color: #dc2626;
+        }
+
+        /* Star Rating */
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            cursor: pointer;
+            font-size: 3rem;
+            color: #d1d5db;
+            transition: all 0.3s;
+        }
+
+        .star-rating label:hover,
+        .star-rating label:hover ~ label,
+        .star-rating input:checked ~ label {
+            color: #fbbf24;
+            transform: scale(1.1);
+        }
+
+        .rating-text {
+            color: #6b7280;
+            font-style: italic;
+            margin-top: 0.5rem;
+        }
+
+        /* Form Control */
+        .form-control {
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .char-counter {
+            text-align: right;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        /* Existing Review */
+        .existing-review-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .review-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 2rem;
+        }
+
+        .star-filled {
+            color: #fbbf24;
+        }
+
+        .star-empty {
+            color: #d1d5db;
+        }
+
+        .rating-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-left: 0.5rem;
+        }
+
+        .review-comment {
+            padding: 1.5rem;
+            background: #f9fafb;
+            border-radius: 8px;
+            border-left: 4px solid #2563eb;
+        }
+
+        .review-comment p {
+            color: #1f2937;
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        .review-date {
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+
+        .review-date i {
+            margin-right: 0.5rem;
+        }
+
+        /* Buttons */
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #4b5563;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #1f2937;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        .text-danger {
+            color: #dc2626;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .page-title {
+                font-size: 1.8rem;
+            }
+
+            .vehicle-info-content {
+                flex-direction: column;
+            }
+
+            .vehicle-image,
+            .vehicle-placeholder {
+                width: 100%;
+                height: 200px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .star-rating label {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+
+    <script>
+        // Rating text update
+        const ratingInputs = document.querySelectorAll('input[name="ReviewRequest.Rating"]');
+        const ratingText = document.getElementById('ratingText');
+        
+        const ratingTexts = {
+            1: '1 sao - Kém',
+            2: '2 sao - Trung bình',
+            3: '3 sao - Tốt',
+            4: '4 sao - Rất tốt',
+            5: '5 sao - Xuất sắc'
+        };
+
+        ratingInputs.forEach(input => {
+            input.addEventListener('change', () => {
+                ratingText.textContent = ratingTexts[input.value];
+                ratingText.style.color = '#2563eb';
+                ratingText.style.fontWeight = '600';
+            });
+        });
+
+        // Character counter
+        const commentTextarea = document.getElementById('comment');
+        const charCount = document.getElementById('charCount');
+
+        if (commentTextarea && charCount) {
+            commentTextarea.addEventListener('input', () => {
+                const count = commentTextarea.value.length;
+                charCount.textContent = count;
+                
+                if (count > 950) {
+                    charCount.style.color = '#dc2626';
+                } else {
+                    charCount.style.color = '#6b7280';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

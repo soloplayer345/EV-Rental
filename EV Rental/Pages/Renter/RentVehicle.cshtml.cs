@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using BusinessLayer.Services;
+using BusinessLayer.Interfaces;
 using BusinessLayer.DTOs;
-using DataAccessLayer.Entities;
 using DataAccessLayer.Enums;
 using EV_Rental.Helpers;
 
@@ -10,16 +9,16 @@ namespace EV_Rental.Pages.Renter
 {
     public class RentVehicleModel : PageModel
     {
-        private readonly VehicleService _vehicleService;
-        private readonly RentalService _rentalService;
+        private readonly IVehicleService _vehicleService;
+        private readonly IRentalService _rentalService;
 
-        public RentVehicleModel(VehicleService vehicleService, RentalService rentalService)
+        public RentVehicleModel(IVehicleService vehicleService, IRentalService rentalService)
         {
             _vehicleService = vehicleService;
             _rentalService = rentalService;
         }
 
-        public Vehicle? Vehicle { get; set; }
+        public VehicleDto? Vehicle { get; set; }
         public List<StationDto> AllStations { get; set; } = new List<StationDto>();
         public string? ErrorMessage { get; set; }
 
@@ -97,3 +96,4 @@ namespace EV_Rental.Pages.Renter
         }
     }
 }
+

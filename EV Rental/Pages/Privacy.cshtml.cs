@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace EV_Rental.Pages
@@ -18,3 +18,4 @@ namespace EV_Rental.Pages
     }
 
 }
+

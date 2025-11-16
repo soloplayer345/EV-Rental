@@ -244,22 +244,25 @@
                                     {
                                         @if (rental.Status == DataAccessLayer.Enums.RentalRecordStatus.Pending)
                                         {
-                                            <button class="btn btn-primary" onclick="window.location.href='/Payment/VNPayReturn?rentalId=@rental.Id'">
+                                            <button class="btn btn-primary" onclick="window.location.href='/Renter/Payment?rentalId=@rental.Id'">
                                                 <i class="fas fa-credit-card"></i> Thanh Toán
                                             </button>
                                         }
-                                        <form method="post" asp-page-handler="CancelRental" style="display: inline;">
-                                            <input type="hidden" name="rentalId" value="@rental.Id" />
-                                            <button type="submit" class="btn btn-danger" onclick="return confirm('Bạn có chắc chắn muốn hủy đơn thuê này không?')">
-                                                <i class="fas fa-times"></i> Hủy Đơn
-                                            </button>
-                                        </form>
+                                        <a href="/Renter/CancelRentalPolicy?rentalId=@rental.Id" class="btn btn-danger">
+                                            <i class="fas fa-times"></i> Hủy Đơn
+                                        </a>
                                     }
                                     else if (rental.Status == DataAccessLayer.Enums.RentalRecordStatus.Completed)
                                     {
-                                        <button class="btn btn-secondary">
+                                        @if (rental.ExtraFees > 0)
+                                        {
+                                            <button class="btn btn-primary" onclick="window.location.href='/Renter/Payment?rentalId=@rental.Id'">
+                                                <i class="fas fa-credit-card"></i> Thanh Toán Phí Phạt
+                                            </button>
+                                        }
+                                        @* <button class="btn btn-secondary" onclick="window.location.href='/Renter/CreateReview?rentalId=@rental.Id'">
                                             <i class="fas fa-star"></i> Đánh Giá
-                                        </button>
+                                        </button> *@
                                     }
                                     <button class="btn btn-outline" onclick="window.location.href='/Renter/TripDetail/@rental.Id'">
                                         <i class="fas fa-info-circle"></i> Chi Tiết
@@ -447,27 +450,27 @@
             font-size: 0.9rem;
         }
 
-        .status-pending {
+        .Status-pending {
             background-color: #fbbf24;
             color: #78350f;
         }
 
-        .status-confirmed {
+        .Status-confirmed {
             background-color: #60a5fa;
             color: #1e3a8a;
         }
 
-        .status-active {
+        .Status-active {
             background-color: #34d399;
             color: #064e3b;
         }
 
-        .status-completed {
+        .Status-completed {
             background-color: #a78bfa;
             color: #4c1d95;
         }
 
-        .status-cancelled {
+        .Status-cancelled {
             background-color: #f87171;
             color: #7f1d1d;
         }
@@ -835,3 +838,4 @@
     </style>
 </body>
 </html>
+

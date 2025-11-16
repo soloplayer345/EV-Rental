@@ -122,7 +122,7 @@ namespace EV_Rental.Helpers
 
         private class VnPayCompare : IComparer<string>
         {
-            public int Compare(string x, string y)
+            public int Compare(string? x, string? y)
             {
                 if (x == y) return 0;
                 if (x == null) return -1;
