@@ -67,6 +67,7 @@ namespace EV_Rental
             builder.Services.AddScoped<IRentalRecordService, RentalRecordService>();
             builder.Services.AddScoped<IReviewService, ReviewService>();
             builder.Services.AddScoped<IReportService, ReportService>();
+            builder.Services.AddScoped<AccountService>();
 
             // Register SignalR wrapper service
             builder.Services.AddScoped<EV_Rental.Services.VehicleHubService>();

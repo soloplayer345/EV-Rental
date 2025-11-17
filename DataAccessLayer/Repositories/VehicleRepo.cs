@@ -57,5 +57,12 @@ namespace DataAccessLayer.Repositories
 
             return vehicle;
         }
+
+        public async Task<IEnumerable<Vehicle>> GetAll()
+        {
+            return await _dbContext
+                .Vehicles.Include(v => v.Station) // để lấy thông tin trạm
+                .ToListAsync();
+        }
     }
 }

@@ -1,10 +1,11 @@
-﻿using DataAccessLayer.Interfaces;
+﻿using System.Linq.Expressions;
+using DataAccessLayer.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace DataAccessLayer.Repositories
 {
-    public class GenericRepo<TModel> : IGenericRepo<TModel> where TModel : BaseEntity
+    public class GenericRepo<TModel> : IGenericRepo<TModel>
+        where TModel : BaseEntity
     {
         protected readonly DbSet<TModel> _dbSet;
         protected readonly EVRentalDBContext _dbContext;
@@ -25,7 +26,7 @@ namespace DataAccessLayer.Repositories
 
             model.CreateDate = DateTime.UtcNow;
             model.UpdateDate = DateTime.UtcNow;
-            
+
             // Only set IsDeleted if the property exists and is not ignored
             if (!IsPropertyIgnored<TModel>("IsDeleted"))
             {
@@ -53,12 +54,10 @@ namespace DataAccessLayer.Repositories
         {
             // Check if the entity has IsDeleted property
             var isDeletedProperty = typeof(TModel).GetProperty("IsDeleted");
-            
+
             if (isDeletedProperty != null && !IsPropertyIgnored<TModel>("IsDeleted"))
             {
-                return await _dbSet
-                    .Where(x => !x.IsDeleted)
-                    .ToListAsync();
+                return await _dbSet.Where(x => !x.IsDeleted).ToListAsync();
             }
             else
             {
@@ -70,11 +69,13 @@ namespace DataAccessLayer.Repositories
         /// <summary>
         /// Helper method to check if a property is ignored in EF Core
         /// </summary>
-        private bool IsPropertyIgnored<T>(string propertyName) where T : class
+        private bool IsPropertyIgnored<T>(string propertyName)
+            where T : class
         {
             var entityType = _dbContext.Model.FindEntityType(typeof(T));
-            if (entityType == null) return true;
-            
+            if (entityType == null)
+                return true;
+
             var property = entityType.FindProperty(propertyName);
             return property == null;
         }
@@ -88,7 +89,7 @@ namespace DataAccessLayer.Repositories
                 throw new ArgumentException("ID must be greater than 0", nameof(id));
 
             TModel? model = await _dbSet.FindAsync(id);
-            
+
             if (model == null)
             {
                 throw new KeyNotFoundException($"{typeof(TModel).Name} with ID {id} not found");
@@ -99,7 +100,7 @@ namespace DataAccessLayer.Repositories
             {
                 throw new KeyNotFoundException($"{typeof(TModel).Name} with ID {id} not found");
             }
-            
+
             return model;
         }
 
@@ -114,7 +115,9 @@ namespace DataAccessLayer.Repositories
             // Check if IsDeleted is available and not ignored
             if (IsPropertyIgnored<TModel>("IsDeleted"))
             {
-                throw new InvalidOperationException($"{typeof(TModel).Name} does not support soft delete");
+                throw new InvalidOperationException(
+                    $"{typeof(TModel).Name} does not support soft delete"
+                );
             }
 
             if (model.IsDeleted)
@@ -140,16 +143,17 @@ namespace DataAccessLayer.Repositories
             }
 
             model.UpdateDate = DateTime.UtcNow;
-            
+
             // Detach any existing tracked instance with the same key
-            var existingEntity = _dbContext.ChangeTracker.Entries<TModel>()
+            var existingEntity = _dbContext
+                .ChangeTracker.Entries<TModel>()
                 .FirstOrDefault(e => e.Entity.Id == model.Id && e.Entity != model);
-            
+
             if (existingEntity != null)
             {
                 _dbContext.Entry(existingEntity.Entity).State = EntityState.Detached;
             }
-            
+
             _dbSet.Update(model);
         }
 
@@ -159,7 +163,7 @@ namespace DataAccessLayer.Repositories
         public virtual IQueryable<TModel> GetAllQueryable(string includeProperties = "")
         {
             IQueryable<TModel> query;
-            
+
             // Check if IsDeleted is available and not ignored
             if (!IsPropertyIgnored<TModel>("IsDeleted"))
             {
@@ -172,9 +176,12 @@ namespace DataAccessLayer.Repositories
 
             if (!string.IsNullOrWhiteSpace(includeProperties))
             {
-                foreach (var includeProperty in includeProperties.Split(
-                    new char[] { ',' }, 
-                    StringSplitOptions.RemoveEmptyEntries))
+                foreach (
+                    var includeProperty in includeProperties.Split(
+                        new char[] { ',' },
+                        StringSplitOptions.RemoveEmptyEntries
+                    )
+                )
                 {
                     query = query.Include(includeProperty.Trim());
                 }
@@ -186,13 +193,16 @@ namespace DataAccessLayer.Repositories
         /// <summary>
         /// Tìm một entity dựa theo điều kiện, có thể include navigation properties
         /// </summary>
-        public async Task<TModel> FindOneAsync(Expression<Func<TModel, bool>> predicate, string includeProperties = "")
+        public async Task<TModel> FindOneAsync(
+            Expression<Func<TModel, bool>> predicate,
+            string includeProperties = ""
+        )
         {
             if (predicate == null)
                 throw new ArgumentNullException(nameof(predicate));
 
             IQueryable<TModel> query;
-            
+
             // Check if IsDeleted is available and not ignored
             if (!IsPropertyIgnored<TModel>("IsDeleted"))
             {
@@ -205,19 +215,24 @@ namespace DataAccessLayer.Repositories
 
             if (!string.IsNullOrWhiteSpace(includeProperties))
             {
-                foreach (var includeProperty in includeProperties.Split(
-                    new char[] { ',' }, 
-                    StringSplitOptions.RemoveEmptyEntries))
+                foreach (
+                    var includeProperty in includeProperties.Split(
+                        new char[] { ',' },
+                        StringSplitOptions.RemoveEmptyEntries
+                    )
+                )
                 {
                     query = query.Include(includeProperty.Trim());
                 }
             }
 
             var result = await query.FirstOrDefaultAsync(predicate);
-            
+
             if (result == null)
             {
-                throw new KeyNotFoundException($"{typeof(TModel).Name} not found with the specified criteria");
+                throw new KeyNotFoundException(
+                    $"{typeof(TModel).Name} not found with the specified criteria"
+                );
             }
 
             return result;
