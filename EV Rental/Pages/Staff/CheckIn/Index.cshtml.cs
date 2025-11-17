@@ -26,7 +26,7 @@ namespace EV_Rental.Pages.Staff.CheckIn
             }
 
             var user = SessionHelper.GetUserSession(HttpContext.Session);
-            if (user?.Role != DataAccessLayer.Enums.AccountRole.Staff)
+            if (user?.Role != DataAccessLayer.Entities.AccountRole.Staff)
             {
                 return RedirectToPage("/Index");
             }

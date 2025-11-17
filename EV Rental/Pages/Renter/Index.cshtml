@@ -168,19 +168,19 @@
                                 <div class="vehicle-status">
                                     @switch(vehicle.Status)
                                     {
-                                        case DataAccessLayer.Enums.VehicleStatus.Available:
+                                        case DataAccessLayer.Entities.VehicleStatus.Available:
                                             <span class="status-badge status-available">✓ Có sẵn</span>
                                             break;
-                                        case DataAccessLayer.Enums.VehicleStatus.WaitingForPickup:
+                                        case DataAccessLayer.Entities.VehicleStatus.WaitingForPickup:
                                             <span class="status-badge status-pending">⏳ Chờ nhận</span>
                                             break;
-                                        case DataAccessLayer.Enums.VehicleStatus.Rented:
+                                        case DataAccessLayer.Entities.VehicleStatus.Rented:
                                             <span class="status-badge status-rented">⊗ Đã cho thuê</span>
                                             break;
-                                        case DataAccessLayer.Enums.VehicleStatus.Maintenance:
+                                        case DataAccessLayer.Entities.VehicleStatus.Maintenance:
                                             <span class="status-badge status-maintenance">⚙ Bảo trì</span>
                                             break;
-                                        case DataAccessLayer.Enums.VehicleStatus.Charging:
+                                        case DataAccessLayer.Entities.VehicleStatus.Charging:
                                             <span class="status-badge status-charging">⚡ Sạc pin</span>
                                             break;
                                         default:
@@ -188,7 +188,7 @@
                                             break;
                                     }
                                 </div>
-                                @if (vehicle.Status == DataAccessLayer.Enums.VehicleStatus.Available)
+                                @if (vehicle.Status == DataAccessLayer.Entities.VehicleStatus.Available)
                                 {
                                     <button class="btn-rent" onclick="window.location.href='/Renter/VehicleDetail/@vehicle.Id'">Thuê Ngay</button>
                                 }

@@ -614,26 +614,26 @@
         };
     }
 
-    private string GetStatusBadgeClass(DataAccessLayer.Enums.RentalRecordStatus status)
+    private string GetStatusBadgeClass(DataAccessLayer.Entities.RentalRecordStatus status)
     {
         return status switch
         {
-            DataAccessLayer.Enums.RentalRecordStatus.Pending => "bg-warning",
-            DataAccessLayer.Enums.RentalRecordStatus.Active => "bg-success",
-            DataAccessLayer.Enums.RentalRecordStatus.Completed => "bg-info",
-            DataAccessLayer.Enums.RentalRecordStatus.Cancelled => "bg-danger",
+            DataAccessLayer.Entities.RentalRecordStatus.Pending => "bg-warning",
+            DataAccessLayer.Entities.RentalRecordStatus.Active => "bg-success",
+            DataAccessLayer.Entities.RentalRecordStatus.Completed => "bg-info",
+            DataAccessLayer.Entities.RentalRecordStatus.Cancelled => "bg-danger",
             _ => "bg-secondary"
         };
     }
 
-    private string GetStatusText(DataAccessLayer.Enums.RentalRecordStatus status)
+    private string GetStatusText(DataAccessLayer.Entities.RentalRecordStatus status)
     {
         return status switch
         {
-            DataAccessLayer.Enums.RentalRecordStatus.Pending => "Chờ Xử Lý",
-            DataAccessLayer.Enums.RentalRecordStatus.Active => "Đang Thuê",
-            DataAccessLayer.Enums.RentalRecordStatus.Completed => "Hoàn Thành",
-            DataAccessLayer.Enums.RentalRecordStatus.Cancelled => "Đã Hủy",
+            DataAccessLayer.Entities.RentalRecordStatus.Pending => "Chờ Xử Lý",
+            DataAccessLayer.Entities.RentalRecordStatus.Active => "Đang Thuê",
+            DataAccessLayer.Entities.RentalRecordStatus.Completed => "Hoàn Thành",
+            DataAccessLayer.Entities.RentalRecordStatus.Cancelled => "Đã Hủy",
             _ => "Không xác định"
         };
     }

@@ -149,20 +149,20 @@
                                 @{
                                     var statusClass = record.Status switch
                                     {
-                                        DataAccessLayer.Enums.RentalRecordStatus.Pending => "badge-pending",
-                                        DataAccessLayer.Enums.RentalRecordStatus.Confirmed => "badge-info",
-                                        DataAccessLayer.Enums.RentalRecordStatus.Active => "badge-warning",
-                                        DataAccessLayer.Enums.RentalRecordStatus.Completed => "badge-active",
-                                        DataAccessLayer.Enums.RentalRecordStatus.Cancelled => "badge-inactive",
+                                        DataAccessLayer.Entities.RentalRecordStatus.Pending => "badge-pending",
+                                        DataAccessLayer.Entities.RentalRecordStatus.Confirmed => "badge-info",
+                                        DataAccessLayer.Entities.RentalRecordStatus.Active => "badge-warning",
+                                        DataAccessLayer.Entities.RentalRecordStatus.Completed => "badge-active",
+                                        DataAccessLayer.Entities.RentalRecordStatus.Cancelled => "badge-inactive",
                                         _ => "badge-secondary"
                                     };
                                     var statusText = record.Status switch
                                     {
-                                        DataAccessLayer.Enums.RentalRecordStatus.Pending => "Chờ thanh toán",
-                                        DataAccessLayer.Enums.RentalRecordStatus.Confirmed => "Đã thanh toán",
-                                        DataAccessLayer.Enums.RentalRecordStatus.Active => "Đang thuê",
-                                        DataAccessLayer.Enums.RentalRecordStatus.Completed => "Hoàn thành",
-                                        DataAccessLayer.Enums.RentalRecordStatus.Cancelled => "Đã hủy",
+                                        DataAccessLayer.Entities.RentalRecordStatus.Pending => "Chờ thanh toán",
+                                        DataAccessLayer.Entities.RentalRecordStatus.Confirmed => "Đã thanh toán",
+                                        DataAccessLayer.Entities.RentalRecordStatus.Active => "Đang thuê",
+                                        DataAccessLayer.Entities.RentalRecordStatus.Completed => "Hoàn thành",
+                                        DataAccessLayer.Entities.RentalRecordStatus.Cancelled => "Đã hủy",
                                         _ => record.Status.ToString()
                                     };
                                 }

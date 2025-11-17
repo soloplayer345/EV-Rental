@@ -66,20 +66,20 @@
                         string statusClass = rental.Status.ToString().ToLower();
                         string statusText = rental.Status switch
                         {
-                            DataAccessLayer.Enums.RentalRecordStatus.Pending => "Chờ Thanh Toán",
-                            DataAccessLayer.Enums.RentalRecordStatus.Confirmed => "Đã Xác Nhận",
-                            DataAccessLayer.Enums.RentalRecordStatus.Active => "Đang Thuê",
-                            DataAccessLayer.Enums.RentalRecordStatus.Completed => "Đã Hoàn Thành",
-                            DataAccessLayer.Enums.RentalRecordStatus.Cancelled => "Đã Hủy",
+                            DataAccessLayer.Entities.RentalRecordStatus.Pending => "Chờ Thanh Toán",
+                            DataAccessLayer.Entities.RentalRecordStatus.Confirmed => "Đã Xác Nhận",
+                            DataAccessLayer.Entities.RentalRecordStatus.Active => "Đang Thuê",
+                            DataAccessLayer.Entities.RentalRecordStatus.Completed => "Đã Hoàn Thành",
+                            DataAccessLayer.Entities.RentalRecordStatus.Cancelled => "Đã Hủy",
                             _ => "Không Xác Định"
                         };
                         string statusIcon = rental.Status switch
                         {
-                            DataAccessLayer.Enums.RentalRecordStatus.Pending => "fa-clock",
-                            DataAccessLayer.Enums.RentalRecordStatus.Confirmed => "fa-check-circle",
-                            DataAccessLayer.Enums.RentalRecordStatus.Active => "fa-car",
-                            DataAccessLayer.Enums.RentalRecordStatus.Completed => "fa-flag-checkered",
-                            DataAccessLayer.Enums.RentalRecordStatus.Cancelled => "fa-times-circle",
+                            DataAccessLayer.Entities.RentalRecordStatus.Pending => "fa-clock",
+                            DataAccessLayer.Entities.RentalRecordStatus.Confirmed => "fa-check-circle",
+                            DataAccessLayer.Entities.RentalRecordStatus.Active => "fa-car",
+                            DataAccessLayer.Entities.RentalRecordStatus.Completed => "fa-flag-checkered",
+                            DataAccessLayer.Entities.RentalRecordStatus.Cancelled => "fa-times-circle",
                             _ => "fa-question-circle"
                         };
 
@@ -186,7 +186,7 @@
                                         </div>
                                     </div>
 
-                                    @if (rental.Status == DataAccessLayer.Enums.RentalRecordStatus.Active || rental.Status == DataAccessLayer.Enums.RentalRecordStatus.Confirmed)
+                                    @if (rental.Status == DataAccessLayer.Entities.RentalRecordStatus.Active || rental.Status == DataAccessLayer.Entities.RentalRecordStatus.Confirmed)
                                     {
                                         <div class="otp-section">
                                             <i class="fas fa-key"></i>
@@ -240,9 +240,9 @@
                                     <i class="fas fa-clock"></i> Đặt ngày @rental.CreateDate.ToString("dd/MM/yyyy HH:mm")
                                 </div>
                                 <div class="trip-actions">
-                                    @if (rental.Status == DataAccessLayer.Enums.RentalRecordStatus.Pending || rental.Status == DataAccessLayer.Enums.RentalRecordStatus.Confirmed)
+                                    @if (rental.Status == DataAccessLayer.Entities.RentalRecordStatus.Pending || rental.Status == DataAccessLayer.Entities.RentalRecordStatus.Confirmed)
                                     {
-                                        @if (rental.Status == DataAccessLayer.Enums.RentalRecordStatus.Pending)
+                                        @if (rental.Status == DataAccessLayer.Entities.RentalRecordStatus.Pending)
                                         {
                                             <button class="btn btn-primary" onclick="window.location.href='/Renter/Payment?rentalId=@rental.Id'">
                                                 <i class="fas fa-credit-card"></i> Thanh Toán
@@ -252,7 +252,7 @@
                                             <i class="fas fa-times"></i> Hủy Đơn
                                         </a>
                                     }
-                                    else if (rental.Status == DataAccessLayer.Enums.RentalRecordStatus.Completed)
+                                    else if (rental.Status == DataAccessLayer.Entities.RentalRecordStatus.Completed)
                                     {
                                         @if (rental.ExtraFees > 0)
                                         {

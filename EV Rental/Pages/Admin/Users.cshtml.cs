@@ -1,9 +1,8 @@
+using BusinessLayer.DTOs;
 using BusinessLayer.Services;
-using DataAccessLayer.Enums;
 using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using BusinessLayer.DTOs;
 
 namespace EV_Rental.Pages.Admin
 {
@@ -49,8 +48,8 @@ namespace EV_Rental.Pages.Admin
 
             // Get all users using service
             var searchResult = await _accountService.SearchAccountsAsync(
-                SearchTerm, 
-                RoleFilter.HasValue ? (AccountRole)RoleFilter.Value : null, 
+                SearchTerm,
+                RoleFilter.HasValue ? (AccountRole)RoleFilter.Value : null,
                 StatusFilter
             );
             Users = searchResult.ToList();
@@ -75,21 +74,23 @@ namespace EV_Rental.Pages.Admin
                     return new JsonResult(new { success = false, message = "Không tìm thấy user" });
                 }
 
-                return new JsonResult(new
-                {
-                    success = true,
-                    user = new
+                return new JsonResult(
+                    new
                     {
-                        id = user.Id,
-                        fullName = user.FullName,
-                        email = user.Email,
-                        phone = user.Phone,
-                        role = (int)user.Role,
-                        isActive = user.IsActive,
-                        createdAt = user.CreateDate,
-                        updatedAt = user.UpdateDate ?? user.CreateDate
+                        success = true,
+                        user = new
+                        {
+                            id = user.Id,
+                            fullName = user.FullName,
+                            email = user.Email,
+                            phone = user.Phone,
+                            role = (int)user.Role,
+                            isActive = user.IsActive,
+                            createdAt = user.CreateDate,
+                            updatedAt = user.UpdateDate ?? user.CreateDate,
+                        },
                     }
-                });
+                );
             }
             catch (Exception ex)
             {
@@ -97,15 +98,25 @@ namespace EV_Rental.Pages.Admin
             }
         }
 
-        public async Task<IActionResult> OnPostAddUserAsync([FromForm] string FullName, [FromForm] string Email, 
-            [FromForm] string Phone, [FromForm] int Role, [FromForm] string Password, 
-            [FromForm] string ConfirmPassword, [FromForm] bool IsActive)
+        public async Task<IActionResult> OnPostAddUserAsync(
+            [FromForm] string FullName,
+            [FromForm] string Email,
+            [FromForm] string Phone,
+            [FromForm] int Role,
+            [FromForm] string Password,
+            [FromForm] string ConfirmPassword,
+            [FromForm] bool IsActive
+        )
         {
             try
             {
                 // Validate input
-                if (string.IsNullOrWhiteSpace(FullName) || string.IsNullOrWhiteSpace(Email) || 
-                    string.IsNullOrWhiteSpace(Phone) || string.IsNullOrWhiteSpace(Password))
+                if (
+                    string.IsNullOrWhiteSpace(FullName)
+                    || string.IsNullOrWhiteSpace(Email)
+                    || string.IsNullOrWhiteSpace(Phone)
+                    || string.IsNullOrWhiteSpace(Password)
+                )
                 {
                     TempData["ErrorMessage"] = "Vui lòng điền đầy đủ thông tin";
                     return RedirectToPage();
@@ -129,7 +140,7 @@ namespace EV_Rental.Pages.Admin
                     Phone = Phone,
                     PasswordHash = passwordHash,
                     Role = (AccountRole)Role,
-                    IsActive = true // Admin thêm user tự động active
+                    IsActive = true, // Admin thêm user tự động active
                 };
 
                 await _accountService.AddAccountAsync((dynamic)newUser);
@@ -149,8 +160,14 @@ namespace EV_Rental.Pages.Admin
             }
         }
 
-        public async Task<IActionResult> OnPostEditUserAsync([FromForm] int UserId, [FromForm] string FullName, 
-            [FromForm] string Email, [FromForm] string Phone, [FromForm] int Role, [FromForm] bool IsActive)
+        public async Task<IActionResult> OnPostEditUserAsync(
+            [FromForm] int UserId,
+            [FromForm] string FullName,
+            [FromForm] string Email,
+            [FromForm] string Phone,
+            [FromForm] int Role,
+            [FromForm] bool IsActive
+        )
         {
             try
             {
@@ -172,7 +189,7 @@ namespace EV_Rental.Pages.Admin
                     Role = (AccountRole)Role,
                     IsActive = IsActive,
                     CreateDate = user.CreateDate,
-                    UpdateDate = DateTime.Now
+                    UpdateDate = DateTime.Now,
                 };
 
                 await _accountService.UpdateAccountAsync(accountEntity);
@@ -197,12 +214,17 @@ namespace EV_Rental.Pages.Admin
             }
         }
 
-        public async Task<IActionResult> OnPostToggleStatusAsync([FromForm] int userId, [FromForm] bool isActive)
+        public async Task<IActionResult> OnPostToggleStatusAsync(
+            [FromForm] int userId,
+            [FromForm] bool isActive
+        )
         {
             try
             {
                 await _accountService.ToggleAccountStatusAsync(userId, isActive);
-                return new JsonResult(new { success = true, message = "Cập nhật trạng thái thành công" });
+                return new JsonResult(
+                    new { success = true, message = "Cập nhật trạng thái thành công" }
+                );
             }
             catch (KeyNotFoundException ex)
             {
@@ -232,4 +254,3 @@ namespace EV_Rental.Pages.Admin
         }
     }
 }
-

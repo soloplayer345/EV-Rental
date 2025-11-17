@@ -77,7 +77,7 @@ namespace EV_Rental.Helpers
         public static bool IsAdmin(ISession session)
         {
             var user = GetUserSession(session);
-            return user?.Role == DataAccessLayer.Enums.AccountRole.Admin;
+            return user?.Role == DataAccessLayer.Entities.AccountRole.Admin;
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace EV_Rental.Helpers
         public static bool IsStaff(ISession session)
         {
             var user = GetUserSession(session);
-            return user?.Role == DataAccessLayer.Enums.AccountRole.Staff;
+            return user?.Role == DataAccessLayer.Entities.AccountRole.Staff;
         }
 
         /// <summary>
@@ -95,7 +95,7 @@ namespace EV_Rental.Helpers
         public static bool IsRenter(ISession session)
         {
             var user = GetUserSession(session);
-            return user?.Role == DataAccessLayer.Enums.AccountRole.Renter;
+            return user?.Role == DataAccessLayer.Entities.AccountRole.Renter;
         }
 
         /// <summary>

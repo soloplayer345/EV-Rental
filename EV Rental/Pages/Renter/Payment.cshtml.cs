@@ -1,11 +1,10 @@
+using BusinessLayer.DTOs;
+using BusinessLayer.Interfaces;
+using BusinessLayer.Services;
+using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
-using BusinessLayer.Services;
-using BusinessLayer.Interfaces;
-using BusinessLayer.DTOs;
-using DataAccessLayer.Enums;
-using EV_Rental.Helpers;
 
 namespace EV_Rental.Pages.Renter
 {
@@ -26,7 +25,8 @@ namespace EV_Rental.Pages.Renter
             IAccountService accountService,
             IOptions<VNPaySettings> vnPaySettings,
             IOptions<MoMoSettings> momoSettings,
-            IEmailSender emailSender)
+            IEmailSender emailSender
+        )
         {
             _vehicleService = vehicleService;
             _rentalService = rentalService;
@@ -76,9 +76,10 @@ namespace EV_Rental.Pages.Renter
             }
 
             // Check if rental needs payment (Pending OR Completed with ExtraFees)
-            bool needsPayment = rental.Status == RentalRecordStatus.Pending || 
-                               (rental.Status == RentalRecordStatus.Completed && rental.ExtraFees > 0);
-            
+            bool needsPayment =
+                rental.Status == RentalRecordStatus.Pending
+                || (rental.Status == RentalRecordStatus.Completed && rental.ExtraFees > 0);
+
             if (!needsPayment)
             {
                 ErrorMessage = "Đơn thuê này không cần thanh toán.";
@@ -92,10 +93,13 @@ namespace EV_Rental.Pages.Renter
 
             // Load station names
             var stations = await _rentalService.GetAllStationsAsync();
-            PickupStationName = stations.FirstOrDefault(s => s.Id == rental.PickupStationId)?.Name ?? "N/A";
-            ReturnStationName = rental.ReturnStationId.HasValue && stations.Any(s => s.Id == rental.ReturnStationId.Value)
-                ? stations.First(s => s.Id == rental.ReturnStationId.Value).Name
-                : "N/A";
+            PickupStationName =
+                stations.FirstOrDefault(s => s.Id == rental.PickupStationId)?.Name ?? "N/A";
+            ReturnStationName =
+                rental.ReturnStationId.HasValue
+                && stations.Any(s => s.Id == rental.ReturnStationId.Value)
+                    ? stations.First(s => s.Id == rental.ReturnStationId.Value).Name
+                    : "N/A";
 
             return Page();
         }
@@ -127,9 +131,10 @@ namespace EV_Rental.Pages.Renter
             }
 
             // Check if rental needs payment (Pending OR Completed with ExtraFees)
-            bool needsPayment = rental.Status == RentalRecordStatus.Pending || 
-                               (rental.Status == RentalRecordStatus.Completed && rental.ExtraFees > 0);
-            
+            bool needsPayment =
+                rental.Status == RentalRecordStatus.Pending
+                || (rental.Status == RentalRecordStatus.Completed && rental.ExtraFees > 0);
+
             if (!needsPayment)
             {
                 TempData["ErrorMessage"] = "Đơn thuê này không cần thanh toán.";
@@ -139,7 +144,7 @@ namespace EV_Rental.Pages.Renter
             // Determine amount to pay (full amount for Pending, only ExtraFees for Completed)
             decimal totalAmount;
             string paymentDescription;
-            
+
             if (rental.Status == RentalRecordStatus.Pending)
             {
                 totalAmount = rental.TotalPrice;
@@ -175,16 +180,19 @@ namespace EV_Rental.Pages.Renter
                 catch (Exception ex)
                 {
                     ErrorMessage = $"Không thể tạo thanh toán MoMo: {ex.Message}";
-                    
+
                     // Reload data for display
                     RentalRecord = BusinessLayer.Mapping.RentalRecordMapper.ToDto(rental);
                     Vehicle = vehicle;
                     var stations = await _rentalService.GetAllStationsAsync();
-                    PickupStationName = stations.FirstOrDefault(s => s.Id == rental.PickupStationId)?.Name ?? "N/A";
-                    ReturnStationName = rental.ReturnStationId.HasValue && stations.Any(s => s.Id == rental.ReturnStationId.Value)
-                        ? stations.First(s => s.Id == rental.ReturnStationId.Value).Name
-                        : "N/A";
-                    
+                    PickupStationName =
+                        stations.FirstOrDefault(s => s.Id == rental.PickupStationId)?.Name ?? "N/A";
+                    ReturnStationName =
+                        rental.ReturnStationId.HasValue
+                        && stations.Any(s => s.Id == rental.ReturnStationId.Value)
+                            ? stations.First(s => s.Id == rental.ReturnStationId.Value).Name
+                            : "N/A";
+
                     return Page();
                 }
             }
@@ -200,16 +208,19 @@ namespace EV_Rental.Pages.Renter
             else
             {
                 ErrorMessage = "Phương thức thanh toán không hợp lệ.";
-                
+
                 // Reload data for display
                 RentalRecord = BusinessLayer.Mapping.RentalRecordMapper.ToDto(rental);
                 Vehicle = vehicle;
                 var stations = await _rentalService.GetAllStationsAsync();
-                PickupStationName = stations.FirstOrDefault(s => s.Id == rental.PickupStationId)?.Name ?? "N/A";
-                ReturnStationName = rental.ReturnStationId.HasValue && stations.Any(s => s.Id == rental.ReturnStationId.Value)
-                    ? stations.First(s => s.Id == rental.ReturnStationId.Value).Name
-                    : "N/A";
-                
+                PickupStationName =
+                    stations.FirstOrDefault(s => s.Id == rental.PickupStationId)?.Name ?? "N/A";
+                ReturnStationName =
+                    rental.ReturnStationId.HasValue
+                    && stations.Any(s => s.Id == rental.ReturnStationId.Value)
+                        ? stations.First(s => s.Id == rental.ReturnStationId.Value).Name
+                        : "N/A";
+
                 return Page();
             }
         }
@@ -239,12 +250,19 @@ namespace EV_Rental.Pages.Renter
             vnpay.AddRequestData("vnp_ReturnUrl", _vnPaySettings.ReturnUrl);
             vnpay.AddRequestData("vnp_TxnRef", orderId);
 
-            var paymentUrl = vnpay.CreateRequestUrl(_vnPaySettings.PaymentUrl, _vnPaySettings.HashSecret);
+            var paymentUrl = vnpay.CreateRequestUrl(
+                _vnPaySettings.PaymentUrl,
+                _vnPaySettings.HashSecret
+            );
 
             return paymentUrl;
         }
 
-        private async Task<string> CreateMoMoPaymentUrl(string orderId, decimal amount, string orderInfo)
+        private async Task<string> CreateMoMoPaymentUrl(
+            string orderId,
+            decimal amount,
+            string orderInfo
+        )
         {
             // Remove Vietnamese characters for MoMo compatibility
             var cleanOrderInfo = RemoveVietnameseTones(orderInfo);
@@ -275,10 +293,16 @@ namespace EV_Rental.Pages.Renter
 
                 if (remoteIpAddress != null)
                 {
-                    if (remoteIpAddress.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+                    if (
+                        remoteIpAddress.AddressFamily
+                        == System.Net.Sockets.AddressFamily.InterNetworkV6
+                    )
                     {
-                        remoteIpAddress = System.Net.Dns.GetHostEntry(remoteIpAddress).AddressList
-                            .FirstOrDefault(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+                        remoteIpAddress = System
+                            .Net.Dns.GetHostEntry(remoteIpAddress)
+                            .AddressList.FirstOrDefault(x =>
+                                x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork
+                            );
                     }
 
                     if (remoteIpAddress != null)
@@ -297,7 +321,8 @@ namespace EV_Rental.Pages.Renter
 
         private string RemoveVietnameseTones(string text)
         {
-            if (string.IsNullOrEmpty(text)) return text;
+            if (string.IsNullOrEmpty(text))
+                return text;
 
             var vietnameseSigns = new string[]
             {
@@ -315,7 +340,7 @@ namespace EV_Rental.Pages.Renter
                 "đ",
                 "Đ",
                 "ýỳỵỷỹ",
-                "ÝỲỴỶỸ"
+                "ÝỲỴỶỸ",
             };
 
             for (int i = 1; i < vietnameseSigns.Length; i++)

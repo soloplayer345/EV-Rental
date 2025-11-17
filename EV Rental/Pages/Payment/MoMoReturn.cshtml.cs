@@ -1,11 +1,10 @@
+using BusinessLayer.DTOs;
+using BusinessLayer.Interfaces;
+using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
-using BusinessLayer.Interfaces;
-using BusinessLayer.DTOs;
-using EV_Rental.Helpers;
-using DataAccessLayer.Enums;
 
 namespace EV_Rental.Pages.Payment
 {
@@ -25,7 +24,8 @@ namespace EV_Rental.Pages.Payment
             IRentalService rentalService,
             IVehicleService vehicleService,
             IAccountService accountService,
-            IEmailSender emailSender)
+            IEmailSender emailSender
+        )
         {
             _momoSettings = momoSettings.Value;
             _paymentService = paymentService;
@@ -38,7 +38,7 @@ namespace EV_Rental.Pages.Payment
         public async Task<IActionResult> OnGetAsync()
         {
             Console.WriteLine("=== MOMO CALLBACK RECEIVED ===");
-            
+
             var partnerCode = Request.Query["partnerCode"].ToString();
             var orderId = Request.Query["orderId"].ToString();
             var requestId = Request.Query["requestId"].ToString();
@@ -71,101 +71,143 @@ namespace EV_Rental.Pages.Payment
             {
                 Console.WriteLine("[SUCCESS] Payment successful, confirming rental...");
                 var rentalIdStr = HttpContext.Session.GetString($"PendingRentalId_{orderId}");
-                Console.WriteLine($"[SESSION] PendingRentalId found: {!string.IsNullOrEmpty(rentalIdStr)}");
-                
-                if (!string.IsNullOrEmpty(rentalIdStr) && int.TryParse(rentalIdStr, out int rentalId))
+                Console.WriteLine(
+                    $"[SESSION] PendingRentalId found: {!string.IsNullOrEmpty(rentalIdStr)}"
+                );
+
+                if (
+                    !string.IsNullOrEmpty(rentalIdStr)
+                    && int.TryParse(rentalIdStr, out int rentalId)
+                )
                 {
                     Console.WriteLine($"[RENTAL] Confirming rental #{rentalId}...");
                     var confirmResult = await _rentalService.ConfirmPendingRentalAsync(rentalId);
-                    Console.WriteLine($"[RENTAL] Result: {confirmResult.Success}, Message: {confirmResult.Message}");
-                    
+                    Console.WriteLine(
+                        $"[RENTAL] Result: {confirmResult.Success}, Message: {confirmResult.Message}"
+                    );
+
                     if (confirmResult.Success && confirmResult.Data != null)
                     {
                         var rental = confirmResult.Data;
-                        
+
                         // Create payment record
-                        await _paymentService.CreatePaymentForRentalAsync(rental.Id, amountDecimal, "momo", orderId);
-                        Console.WriteLine($"[PAYMENT] Payment record created for rental #{rental.Id}");
-                        
+                        await _paymentService.CreatePaymentForRentalAsync(
+                            rental.Id,
+                            amountDecimal,
+                            "momo",
+                            orderId
+                        );
+                        Console.WriteLine(
+                            $"[PAYMENT] Payment record created for rental #{rental.Id}"
+                        );
+
                         // Send OTP email
                         try
                         {
-                            var renterAccount = await _accountService.GetAccountByIdAsync(rental.RenterId);
+                            var renterAccount = await _accountService.GetAccountByIdAsync(
+                                rental.RenterId
+                            );
                             if (renterAccount != null && !string.IsNullOrEmpty(renterAccount.Email))
                             {
-                                await SendOtpEmailAsync(renterAccount.Email, renterAccount.FullName, rental);
-                                Console.WriteLine($"[EMAIL] OTP email sent to {renterAccount.Email}");
+                                await SendOtpEmailAsync(
+                                    renterAccount.Email,
+                                    renterAccount.FullName,
+                                    rental
+                                );
+                                Console.WriteLine(
+                                    $"[EMAIL] OTP email sent to {renterAccount.Email}"
+                                );
                             }
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine($"[EMAIL ERROR] Failed to send OTP email: {ex.Message}");
+                            Console.WriteLine(
+                                $"[EMAIL ERROR] Failed to send OTP email: {ex.Message}"
+                            );
                             // Continue even if email fails
                         }
-                        
+
                         // Clear session
                         HttpContext.Session.Remove($"PendingRentalId_{orderId}");
                         Console.WriteLine("[SUCCESS] Redirecting to success page");
-                        
-                        return RedirectToPage("/Payment/PaymentSuccess", new
-                        {
-                            transactionId = transId,
-                            orderId = orderId,
-                            paymentMethod = "MoMo",
-                            orderDescription = orderInfo,
-                            amount = amountDecimal,
-                            paymentTime = paymentTime.ToString("yyyy-MM-ddTHH:mm:ss"),
-                            rentalId = rental.Id,
-                            vehicleId = rental.VehicleId,
-                            otpCode = rental.OtpCode,
-                            startTime = rental.StartTime?.ToString("yyyy-MM-ddTHH:mm:ss"),
-                            endTime = rental.ExpectedEndTime?.ToString("yyyy-MM-ddTHH:mm:ss")
-                        });
+
+                        return RedirectToPage(
+                            "/Payment/PaymentSuccess",
+                            new
+                            {
+                                transactionId = transId,
+                                orderId = orderId,
+                                paymentMethod = "MoMo",
+                                orderDescription = orderInfo,
+                                amount = amountDecimal,
+                                paymentTime = paymentTime.ToString("yyyy-MM-ddTHH:mm:ss"),
+                                rentalId = rental.Id,
+                                vehicleId = rental.VehicleId,
+                                otpCode = rental.OtpCode,
+                                startTime = rental.StartTime?.ToString("yyyy-MM-ddTHH:mm:ss"),
+                                endTime = rental.ExpectedEndTime?.ToString("yyyy-MM-ddTHH:mm:ss"),
+                            }
+                        );
                     }
                     else
                     {
-                        return RedirectToPage("/Payment/PaymentFailure", new
-                        {
-                            message = "Thanh toán thành công nhưng không thể xác nhận đơn thuê: " + confirmResult.Message,
-                            transactionId = transId,
-                            orderId = orderId,
-                            paymentMethod = "MoMo",
-                            orderDescription = orderInfo,
-                            amount = amountDecimal,
-                            paymentTime = paymentTime.ToString("yyyy-MM-ddTHH:mm:ss"),
-                            responseCode = "RENTAL_CONFIRM_FAILED"
-                        });
+                        return RedirectToPage(
+                            "/Payment/PaymentFailure",
+                            new
+                            {
+                                message = "Thanh toán thành công nhưng không thể xác nhận đơn thuê: "
+                                    + confirmResult.Message,
+                                transactionId = transId,
+                                orderId = orderId,
+                                paymentMethod = "MoMo",
+                                orderDescription = orderInfo,
+                                amount = amountDecimal,
+                                paymentTime = paymentTime.ToString("yyyy-MM-ddTHH:mm:ss"),
+                                responseCode = "RENTAL_CONFIRM_FAILED",
+                            }
+                        );
                     }
                 }
-                
-                return RedirectToPage("/Payment/PaymentFailure", new
-                {
-                    message = "Không tìm thấy thông tin đơn thuê chờ thanh toán",
-                    transactionId = transId,
-                    orderId = orderId,
-                    paymentMethod = "MoMo",
-                    orderDescription = orderInfo,
-                    amount = amountDecimal,
-                    paymentTime = paymentTime.ToString("yyyy-MM-ddTHH:mm:ss"),
-                    responseCode = "PENDING_RENTAL_NOT_FOUND"
-                });
+
+                return RedirectToPage(
+                    "/Payment/PaymentFailure",
+                    new
+                    {
+                        message = "Không tìm thấy thông tin đơn thuê chờ thanh toán",
+                        transactionId = transId,
+                        orderId = orderId,
+                        paymentMethod = "MoMo",
+                        orderDescription = orderInfo,
+                        amount = amountDecimal,
+                        paymentTime = paymentTime.ToString("yyyy-MM-ddTHH:mm:ss"),
+                        responseCode = "PENDING_RENTAL_NOT_FOUND",
+                    }
+                );
             }
             else
             {
                 Console.WriteLine($"[FAILURE] Payment failed with code: {resultCode}");
                 var errorMessage = GetMoMoResponseMessage(resultCode);
-                
+
                 // Cancel the pending rental if exists
                 var rentalIdStr = HttpContext.Session.GetString($"PendingRentalId_{orderId}");
-                if (!string.IsNullOrEmpty(rentalIdStr) && int.TryParse(rentalIdStr, out int rentalId))
+                if (
+                    !string.IsNullOrEmpty(rentalIdStr)
+                    && int.TryParse(rentalIdStr, out int rentalId)
+                )
                 {
                     try
                     {
                         var rental = await _rentalService.GetRentalByIdAsync(rentalId);
-                        if (rental != null && rental.Status == DataAccessLayer.Enums.RentalRecordStatus.Pending)
+                        if (
+                            rental != null
+                            && rental.Status == DataAccessLayer.Entities.RentalRecordStatus.Pending
+                        )
                         {
                             await _rentalService.CancelRentalAsync(rentalId, rental.RenterId);
-                            Console.WriteLine($"[CANCELLED] Pending rental #{rentalId} cancelled due to payment failure");
+                            Console.WriteLine(
+                                $"[CANCELLED] Pending rental #{rentalId} cancelled due to payment failure"
+                            );
                         }
                     }
                     catch (Exception ex)
@@ -173,20 +215,23 @@ namespace EV_Rental.Pages.Payment
                         Console.WriteLine($"[ERROR] Failed to cancel pending rental: {ex.Message}");
                     }
                 }
-                
+
                 HttpContext.Session.Remove($"PendingRentalId_{orderId}");
 
-                return RedirectToPage("/Payment/PaymentFailure", new
-                {
-                    message = errorMessage,
-                    transactionId = transId,
-                    orderId = orderId,
-                    paymentMethod = "MoMo",
-                    orderDescription = orderInfo,
-                    amount = amountDecimal,
-                    paymentTime = paymentTime.ToString("yyyy-MM-ddTHH:mm:ss"),
-                    responseCode = resultCode
-                });
+                return RedirectToPage(
+                    "/Payment/PaymentFailure",
+                    new
+                    {
+                        message = errorMessage,
+                        transactionId = transId,
+                        orderId = orderId,
+                        paymentMethod = "MoMo",
+                        orderDescription = orderInfo,
+                        amount = amountDecimal,
+                        paymentTime = paymentTime.ToString("yyyy-MM-ddTHH:mm:ss"),
+                        responseCode = resultCode,
+                    }
+                );
             }
         }
 
@@ -200,24 +245,31 @@ namespace EV_Rental.Pages.Payment
                 "7001" => "Tài khoản không đủ tiền",
                 "1000" => "Lỗi hệ thống",
                 "4100" => "Giao dịch bị từ chối",
-                _ => $"Giao dịch thất bại. Mã: {resultCode}"
+                _ => $"Giao dịch thất bại. Mã: {resultCode}",
             };
         }
 
-        private async Task SendOtpEmailAsync(string toEmail, string customerName, DataAccessLayer.Entities.RentalRecord rentalRecord)
+        private async Task SendOtpEmailAsync(
+            string toEmail,
+            string customerName,
+            DataAccessLayer.Entities.RentalRecord rentalRecord
+        )
         {
             var subject = $"🎉 Mã OTP #{rentalRecord.Id} - Thanh toán thành công - EV Rental";
-            
+
             // Get vehicle info
             var vehicle = await _vehicleService.GetVehicleByIdAsync(rentalRecord.VehicleId);
             var vehicleName = vehicle?.Name ?? "N/A";
-            
+
             // Get station info
             var stations = await _rentalService.GetAllStationsAsync();
-            var pickupStation = stations.FirstOrDefault(s => s.Id == rentalRecord.PickupStationId)?.Name ?? "N/A";
-            var returnStation = stations.FirstOrDefault(s => s.Id == rentalRecord.ReturnStationId)?.Name ?? "N/A";
-            
-            var htmlBody = $@"
+            var pickupStation =
+                stations.FirstOrDefault(s => s.Id == rentalRecord.PickupStationId)?.Name ?? "N/A";
+            var returnStation =
+                stations.FirstOrDefault(s => s.Id == rentalRecord.ReturnStationId)?.Name ?? "N/A";
+
+            var htmlBody =
+                $@"
 <!DOCTYPE html>
 <html>
 <head>
@@ -349,4 +401,3 @@ namespace EV_Rental.Pages.Payment
         }
     }
 }
-

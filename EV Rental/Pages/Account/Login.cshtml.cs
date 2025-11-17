@@ -54,11 +54,11 @@ namespace EV_Rental.Pages.Account
             HttpContext.Session.SetString("UserSession", userJson);
 
             // Redirect dựa theo role
-            if (result.Data?.Role == DataAccessLayer.Enums.AccountRole.Admin)
+            if (result.Data?.Role == DataAccessLayer.Entities.AccountRole.Admin)
             {
                 return RedirectToPage("/Admin/Dashboard");
             }
-            else if (result.Data?.Role == DataAccessLayer.Enums.AccountRole.Staff)
+            else if (result.Data?.Role == DataAccessLayer.Entities.AccountRole.Staff)
             {
                 return RedirectToPage("/Staff/Dashboard");
             }

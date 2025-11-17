@@ -1,9 +1,8 @@
+using BusinessLayer.DTOs;
+using BusinessLayer.Interfaces;
+using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using BusinessLayer.Interfaces;
-using BusinessLayer.DTOs;
-using DataAccessLayer.Enums;
-using EV_Rental.Helpers;
 
 namespace EV_Rental.Pages.Renter
 {
@@ -33,7 +32,7 @@ namespace EV_Rental.Pages.Renter
 
             // Load vehicle
             Vehicle = await _vehicleService.GetVehicleByIdAsync(vehicleId);
-            
+
             if (Vehicle == null)
             {
                 return RedirectToPage("/Renter/Index");
@@ -57,7 +56,8 @@ namespace EV_Rental.Pages.Renter
             DateTime endDate,
             int pickupStationId,
             int returnStationId,
-            string? notes)
+            string? notes
+        )
         {
             // Check if user is logged in
             var accountId = SessionHelper.GetAccountId(HttpContext);
@@ -84,16 +84,18 @@ namespace EV_Rental.Pages.Renter
             }
 
             // Redirect to confirmation page with all parameters
-            return RedirectToPage("/Renter/ConfirmRental", new
-            {
-                vehicleId = vehicleId,
-                startDate = startDate.ToString("yyyy-MM-ddTHH:mm:ss"),
-                endDate = endDate.ToString("yyyy-MM-ddTHH:mm:ss"),
-                pickupStationId = pickupStationId,
-                returnStationId = returnStationId,
-                notes = notes
-            });
+            return RedirectToPage(
+                "/Renter/ConfirmRental",
+                new
+                {
+                    vehicleId = vehicleId,
+                    startDate = startDate.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    endDate = endDate.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    pickupStationId = pickupStationId,
+                    returnStationId = returnStationId,
+                    notes = notes,
+                }
+            );
         }
     }
 }
-

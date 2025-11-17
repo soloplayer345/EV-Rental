@@ -1,4 +1,4 @@
-using DataAccessLayer.Enums;
+using DataAccessLayer.Entities;
 using EV_Rental.Helpers;
 
 namespace EV_Rental.Middlewares

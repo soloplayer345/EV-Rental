@@ -106,19 +106,19 @@
                                         <td>
                                             @switch (vehicle.Status)
                                             {
-                                                case DataAccessLayer.Enums.VehicleStatus.Available:
+                                                case DataAccessLayer.Entities.VehicleStatus.Available:
                                                     <span class="badge bg-success">Sẵn sàng</span>
                                                     break;
-                                                case DataAccessLayer.Enums.VehicleStatus.WaitingForPickup:
+                                                case DataAccessLayer.Entities.VehicleStatus.WaitingForPickup:
                                                     <span class="badge bg-info text-dark">Chờ nhận</span>
                                                     break;
-                                                case DataAccessLayer.Enums.VehicleStatus.Maintenance:
+                                                case DataAccessLayer.Entities.VehicleStatus.Maintenance:
                                                     <span class="badge bg-warning">Bảo trì</span>
                                                     break;
-                                                case DataAccessLayer.Enums.VehicleStatus.Charging:
+                                                case DataAccessLayer.Entities.VehicleStatus.Charging:
                                                     <span class="badge bg-primary">Sạc pin</span>
                                                     break;
-                                                case DataAccessLayer.Enums.VehicleStatus.Rented:
+                                                case DataAccessLayer.Entities.VehicleStatus.Rented:
                                                     <span class="badge bg-secondary">Đã cho thuê</span>
                                                     break;
                                             }

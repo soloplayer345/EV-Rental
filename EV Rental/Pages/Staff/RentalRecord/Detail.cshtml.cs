@@ -4,7 +4,7 @@ using BusinessLayer.Interfaces;
 using BusinessLayer.DTOs;
 using BusinessLayer.Mapping;
 using EV_Rental.Helpers;
-using DataAccessLayer.Enums;
+using DataAccessLayer.Entities;
 
 namespace EV_Rental.Pages.Staff.RentalRecord
 {
@@ -74,7 +74,7 @@ namespace EV_Rental.Pages.Staff.RentalRecord
                     return RedirectToPage("/Staff/Dashboard");
                 }
 
-                record.Status = DataAccessLayer.Enums.RentalRecordStatus.Completed;
+                record.Status = DataAccessLayer.Entities.RentalRecordStatus.Completed;
                 record.ActualEndTime = DateTime.Now;
                 await _rentalRecordService.UpdateRentalRecordAsync(RentalRecordMapper.ToEntity(record));
 
@@ -107,7 +107,7 @@ namespace EV_Rental.Pages.Staff.RentalRecord
                     return RedirectToPage("/Staff/Dashboard");
                 }
 
-                record.Status = DataAccessLayer.Enums.RentalRecordStatus.Cancelled;
+                record.Status = DataAccessLayer.Entities.RentalRecordStatus.Cancelled;
                 await _rentalRecordService.UpdateRentalRecordAsync(RentalRecordMapper.ToEntity(record));
 
                 TempData["SuccessMessage"] = "Hủy đơn thuê thành công!";

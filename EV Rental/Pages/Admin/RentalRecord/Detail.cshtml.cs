@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using BusinessLayer.Interfaces;
 using BusinessLayer.DTOs;
 using BusinessLayer.Mapping;
-using DataAccessLayer.Enums;
+
 
 namespace EV_Rental.Pages.Admin.RentalRecord
 {
@@ -100,7 +100,7 @@ namespace EV_Rental.Pages.Admin.RentalRecord
                     return RedirectToPage("Index");
                 }
 
-                record.Status = DataAccessLayer.Enums.RentalRecordStatus.Cancelled;
+                record.Status = DataAccessLayer.Entities.RentalRecordStatus.Cancelled;
                 await _rentalRecordService.UpdateRentalRecordAsync(RentalRecordMapper.ToEntity(record));
 
                 TempData["SuccessMessage"] = "Hủy đơn thuê thành công!";
@@ -131,7 +131,7 @@ namespace EV_Rental.Pages.Admin.RentalRecord
                     return RedirectToPage("Index");
                 }
 
-                record.Status = DataAccessLayer.Enums.RentalRecordStatus.Completed;
+                record.Status = DataAccessLayer.Entities.RentalRecordStatus.Completed;
                 record.ActualEndTime = DateTime.Now;
                 await _rentalRecordService.UpdateRentalRecordAsync(RentalRecordMapper.ToEntity(record));
 

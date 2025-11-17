@@ -1,10 +1,9 @@
+using BusinessLayer.DTOs;
+using BusinessLayer.Interfaces;
+using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
-using BusinessLayer.Interfaces;
-using BusinessLayer.DTOs;
-using DataAccessLayer.Enums;
-using EV_Rental.Helpers;
 
 namespace EV_Rental.Pages.Renter
 {
@@ -19,13 +18,14 @@ namespace EV_Rental.Pages.Renter
         private readonly IEmailSender _emailSender;
 
         public ConfirmRentalModel(
-            IVehicleService vehicleService, 
+            IVehicleService vehicleService,
             IRentalService rentalService,
             IPaymentService paymentService,
             IAccountService accountService,
             IOptions<VNPaySettings> vnPaySettings,
             IOptions<MoMoSettings> momoSettings,
-            IEmailSender emailSender)
+            IEmailSender emailSender
+        )
         {
             _vehicleService = vehicleService;
             _rentalService = rentalService;
@@ -43,26 +43,26 @@ namespace EV_Rental.Pages.Renter
         public int PickupStationId { get; set; }
         public int ReturnStationId { get; set; }
         public string? Notes { get; set; }
-        
+
         public string PickupStationName { get; set; } = string.Empty;
         public string ReturnStationName { get; set; } = string.Empty;
         public string RentalDuration { get; set; } = string.Empty;
-        
+
         // Cost breakdown
         public decimal BasePrice { get; set; }
         public decimal ReservationFee { get; set; }
         public decimal DepositAmount { get; set; } = 3000000; // 3 triệu VNĐ
         public decimal TotalCost { get; set; }
-        
+
         // Additional info
         public bool HasReservationFee { get; set; }
         public bool IsHourlyRental { get; set; }
         public int RentalDays { get; set; }
         public int RentalHours { get; set; }
         public int DaysUntilPickup { get; set; }
-        
+
         public string? ErrorMessage { get; set; }
-        
+
         [BindProperty]
         public string PaymentMethod { get; set; } = "momo"; // Default: MoMo
 
@@ -72,7 +72,8 @@ namespace EV_Rental.Pages.Renter
             DateTime endDate,
             int pickupStationId,
             int returnStationId,
-            string? notes)
+            string? notes
+        )
         {
             // Check if user is logged in
             var accountId = SessionHelper.GetAccountId(HttpContext);
@@ -91,7 +92,7 @@ namespace EV_Rental.Pages.Renter
 
             // Load vehicle
             Vehicle = await _vehicleService.GetVehicleByIdAsync(vehicleId);
-            
+
             if (Vehicle == null)
             {
                 return RedirectToPage("/Renter/Index");
@@ -106,8 +107,10 @@ namespace EV_Rental.Pages.Renter
 
             // Load station names
             var stations = await _rentalService.GetAllStationsAsync();
-            PickupStationName = stations.FirstOrDefault(s => s.Id == pickupStationId)?.Name ?? "N/A";
-            ReturnStationName = stations.FirstOrDefault(s => s.Id == returnStationId)?.Name ?? "N/A";
+            PickupStationName =
+                stations.FirstOrDefault(s => s.Id == pickupStationId)?.Name ?? "N/A";
+            ReturnStationName =
+                stations.FirstOrDefault(s => s.Id == returnStationId)?.Name ?? "N/A";
 
             // Calculate rental duration
             TimeSpan duration = endDate - startDate;
@@ -162,7 +165,8 @@ namespace EV_Rental.Pages.Renter
             DateTime endDate,
             int pickupStationId,
             int returnStationId,
-            string? notes)
+            string? notes
+        )
         {
             // Check if user is logged in
             var accountId = SessionHelper.GetAccountId(HttpContext);
@@ -180,7 +184,7 @@ namespace EV_Rental.Pages.Renter
             Notes = notes;
 
             Vehicle = await _vehicleService.GetVehicleByIdAsync(vehicleId);
-            
+
             if (Vehicle == null)
             {
                 return RedirectToPage("/Renter/Index");
@@ -188,8 +192,10 @@ namespace EV_Rental.Pages.Renter
 
             // Recalculate all values
             var stations = await _rentalService.GetAllStationsAsync();
-            PickupStationName = stations.FirstOrDefault(s => s.Id == pickupStationId)?.Name ?? "N/A";
-            ReturnStationName = stations.FirstOrDefault(s => s.Id == returnStationId)?.Name ?? "N/A";
+            PickupStationName =
+                stations.FirstOrDefault(s => s.Id == pickupStationId)?.Name ?? "N/A";
+            ReturnStationName =
+                stations.FirstOrDefault(s => s.Id == returnStationId)?.Name ?? "N/A";
 
             TimeSpan duration = endDate - startDate;
             if (duration.TotalDays >= 1)
@@ -210,7 +216,7 @@ namespace EV_Rental.Pages.Renter
             TimeSpan untilPickup = startDate - DateTime.Now;
             DaysUntilPickup = (int)Math.Ceiling(untilPickup.TotalDays);
             HasReservationFee = DaysUntilPickup > 1;
-            
+
             if (HasReservationFee)
             {
                 ReservationFee = Math.Max(BasePrice * 0.1m, 50000);
@@ -230,7 +236,7 @@ namespace EV_Rental.Pages.Renter
                 ReturnStationId = returnStationId,
                 StartTime = startDate,
                 ExpectedEndTime = endDate,
-                Notes = notes
+                Notes = notes,
             };
 
             // Calculate booking cost (don't create rental yet)
@@ -252,8 +258,11 @@ namespace EV_Rental.Pages.Renter
             if (PaymentMethod == "momo")
             {
                 // Create pending rental first (before payment)
-                var pendingRentalResult = await _rentalService.CreatePendingRentalAsync(bookingDto, otpCode);
-                
+                var pendingRentalResult = await _rentalService.CreatePendingRentalAsync(
+                    bookingDto,
+                    otpCode
+                );
+
                 if (!pendingRentalResult.Success || pendingRentalResult.Data == null)
                 {
                     ErrorMessage = $"Không thể tạo đơn thuê: {pendingRentalResult.Message}";
@@ -263,12 +272,19 @@ namespace EV_Rental.Pages.Renter
                 var pendingRental = pendingRentalResult.Data;
 
                 // Store rental ID in session to look up after payment
-                HttpContext.Session.SetString($"PendingRentalId_{transactionRef}", pendingRental.Id.ToString());
+                HttpContext.Session.SetString(
+                    $"PendingRentalId_{transactionRef}",
+                    pendingRental.Id.ToString()
+                );
 
                 // Redirect to MoMo
                 try
                 {
-                    var momoUrl = await CreateMoMoPaymentUrl(transactionRef, TotalCost, $"Thanh toan thue xe {Vehicle?.Name}");
+                    var momoUrl = await CreateMoMoPaymentUrl(
+                        transactionRef,
+                        TotalCost,
+                        $"Thanh toan thue xe {Vehicle?.Name}"
+                    );
                     return Redirect(momoUrl);
                 }
                 catch (Exception ex)
@@ -280,8 +296,11 @@ namespace EV_Rental.Pages.Renter
             else if (PaymentMethod == "vnpay")
             {
                 // Create pending rental first (before payment)
-                var pendingRentalResult = await _rentalService.CreatePendingRentalAsync(bookingDto, otpCode);
-                
+                var pendingRentalResult = await _rentalService.CreatePendingRentalAsync(
+                    bookingDto,
+                    otpCode
+                );
+
                 if (!pendingRentalResult.Success || pendingRentalResult.Data == null)
                 {
                     ErrorMessage = $"Không thể tạo đơn thuê: {pendingRentalResult.Message}";
@@ -291,17 +310,24 @@ namespace EV_Rental.Pages.Renter
                 var pendingRental = pendingRentalResult.Data;
 
                 // Store rental ID in session to look up after payment
-                HttpContext.Session.SetString($"PendingRentalId_{transactionRef}", pendingRental.Id.ToString());
+                HttpContext.Session.SetString(
+                    $"PendingRentalId_{transactionRef}",
+                    pendingRental.Id.ToString()
+                );
 
                 // Redirect to VNPay
-                var vnpayUrl = CreateVNPayPaymentUrl(transactionRef, TotalCost, $"Thanh toan thue xe {Vehicle?.Name}");
+                var vnpayUrl = CreateVNPayPaymentUrl(
+                    transactionRef,
+                    TotalCost,
+                    $"Thanh toan thue xe {Vehicle?.Name}"
+                );
                 return Redirect(vnpayUrl);
             }
             else if (PaymentMethod == "cash")
             {
                 // For cash payment, create rental directly with pending payment status
                 var rentalResult = await _rentalService.CreateRentalAfterPaymentAsync(bookingDto);
-                
+
                 if (!rentalResult.Success)
                 {
                     ErrorMessage = rentalResult.Message;
@@ -313,12 +339,20 @@ namespace EV_Rental.Pages.Renter
                 // Get renter account to send email
                 var renterAccount = await _accountService.GetAccountByIdAsync(accountId.Value);
 
-                if (renterAccount != null && !string.IsNullOrEmpty(renterAccount.Email) && rentalRecord != null)
+                if (
+                    renterAccount != null
+                    && !string.IsNullOrEmpty(renterAccount.Email)
+                    && rentalRecord != null
+                )
                 {
                     try
                     {
                         // Send OTP email
-                        await SendOtpEmailAsync(renterAccount.Email, renterAccount.FullName, rentalRecord);
+                        await SendOtpEmailAsync(
+                            renterAccount.Email,
+                            renterAccount.FullName,
+                            rentalRecord
+                        );
                     }
                     catch (Exception ex)
                     {
@@ -328,7 +362,8 @@ namespace EV_Rental.Pages.Renter
                 }
 
                 // Redirect to success page with cash payment info
-                TempData["SuccessMessage"] = $"Đặt xe thành công! Mã OTP đã được gửi đến email {renterAccount?.Email}. Vui lòng thanh toán bằng tiền mặt khi nhận xe tại trạm.";
+                TempData["SuccessMessage"] =
+                    $"Đặt xe thành công! Mã OTP đã được gửi đến email {renterAccount?.Email}. Vui lòng thanh toán bằng tiền mặt khi nhận xe tại trạm.";
                 TempData["PaymentMethod"] = "cash";
                 TempData["TotalAmount"] = TotalCost.ToString("N0");
                 return RedirectToPage("/Renter/MyTrips");
@@ -343,7 +378,7 @@ namespace EV_Rental.Pages.Renter
         private string CreateVNPayPaymentUrl(string orderId, decimal amount, string orderInfo)
         {
             var vnpay = new VNPayLibrary();
-            
+
             // Lấy IP address
             string ipAddr = GetIpAddress();
             if (string.IsNullOrEmpty(ipAddr))
@@ -365,8 +400,11 @@ namespace EV_Rental.Pages.Renter
             vnpay.AddRequestData("vnp_ReturnUrl", _vnPaySettings.ReturnUrl);
             vnpay.AddRequestData("vnp_TxnRef", orderId);
 
-            var paymentUrl = vnpay.CreateRequestUrl(_vnPaySettings.PaymentUrl, _vnPaySettings.HashSecret);
-            
+            var paymentUrl = vnpay.CreateRequestUrl(
+                _vnPaySettings.PaymentUrl,
+                _vnPaySettings.HashSecret
+            );
+
             // DEBUG: Log URL để kiểm tra
             Console.WriteLine("=== VNPAY DEBUG ===");
             Console.WriteLine($"Order ID: {orderId}");
@@ -377,18 +415,22 @@ namespace EV_Rental.Pages.Renter
             Console.WriteLine($"IP: {ipAddr}");
             Console.WriteLine($"Full URL: {paymentUrl}");
             Console.WriteLine("===================");
-            
+
             return paymentUrl;
         }
 
-        private async Task<string> CreateMoMoPaymentUrl(string orderId, decimal amount, string orderInfo)
+        private async Task<string> CreateMoMoPaymentUrl(
+            string orderId,
+            decimal amount,
+            string orderInfo
+        )
         {
             try
             {
                 // Remove Vietnamese characters and special chars from orderInfo for signature
                 // MoMo may have issues with UTF-8 in signature calculation
                 var cleanOrderInfo = RemoveVietnameseTones(orderInfo);
-                
+
                 var paymentUrl = await MoMoLibrary.CreatePaymentUrl(
                     endpoint: _momoSettings.PaymentUrl,
                     partnerCode: _momoSettings.PartnerCode,
@@ -427,13 +469,19 @@ namespace EV_Rental.Pages.Renter
             try
             {
                 var remoteIpAddress = HttpContext.Connection.RemoteIpAddress;
-                
+
                 if (remoteIpAddress != null)
                 {
-                    if (remoteIpAddress.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+                    if (
+                        remoteIpAddress.AddressFamily
+                        == System.Net.Sockets.AddressFamily.InterNetworkV6
+                    )
                     {
-                        remoteIpAddress = System.Net.Dns.GetHostEntry(remoteIpAddress).AddressList
-                            .FirstOrDefault(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+                        remoteIpAddress = System
+                            .Net.Dns.GetHostEntry(remoteIpAddress)
+                            .AddressList.FirstOrDefault(x =>
+                                x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork
+                            );
                     }
 
                     if (remoteIpAddress != null)
@@ -450,20 +498,27 @@ namespace EV_Rental.Pages.Renter
             return ipAddress;
         }
 
-        private async Task SendOtpEmailAsync(string toEmail, string customerName, dynamic rentalRecord)
+        private async Task SendOtpEmailAsync(
+            string toEmail,
+            string customerName,
+            dynamic rentalRecord
+        )
         {
             var subject = $"🔋 Mã OTP #{rentalRecord.Id} - Xác Nhận Thuê Xe EV Rental";
-            
+
             // Get vehicle info
             var vehicle = await _vehicleService.GetVehicleByIdAsync(rentalRecord.VehicleId);
             var vehicleName = vehicle?.Name ?? "N/A";
-            
+
             // Get station info
             var stations = await _rentalService.GetAllStationsAsync();
-            var pickupStation = stations.FirstOrDefault(s => s.Id == rentalRecord.PickupStationId)?.Name ?? "N/A";
-            var returnStation = stations.FirstOrDefault(s => s.Id == rentalRecord.ReturnStationId)?.Name ?? "N/A";
-            
-            var htmlBody = $@"
+            var pickupStation =
+                stations.FirstOrDefault(s => s.Id == rentalRecord.PickupStationId)?.Name ?? "N/A";
+            var returnStation =
+                stations.FirstOrDefault(s => s.Id == rentalRecord.ReturnStationId)?.Name ?? "N/A";
+
+            var htmlBody =
+                $@"
 <!DOCTYPE html>
 <html>
 <head>
@@ -601,8 +656,9 @@ namespace EV_Rental.Pages.Renter
 
         private string RemoveVietnameseTones(string text)
         {
-            if (string.IsNullOrEmpty(text)) return text;
-            
+            if (string.IsNullOrEmpty(text))
+                return text;
+
             var vietnameseSigns = new string[]
             {
                 "aAeEoOuUiIdDyY",
@@ -619,7 +675,7 @@ namespace EV_Rental.Pages.Renter
                 "đ",
                 "Đ",
                 "ýỳỵỷỹ",
-                "ÝỲỴỶỸ"
+                "ÝỲỴỶỸ",
             };
 
             for (int i = 1; i < vietnameseSigns.Length; i++)
@@ -634,4 +690,3 @@ namespace EV_Rental.Pages.Renter
         }
     }
 }
-

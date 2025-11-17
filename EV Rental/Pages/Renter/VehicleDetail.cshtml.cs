@@ -1,7 +1,7 @@
+using BusinessLayer.DTOs;
+using BusinessLayer.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using BusinessLayer.Interfaces;
-using BusinessLayer.DTOs;
 
 namespace EV_Rental.Pages.Renter
 {
@@ -26,19 +26,21 @@ namespace EV_Rental.Pages.Renter
             try
             {
                 Vehicle = await _vehicleService.GetVehicleByIdAsync(id);
-                
+
                 if (Vehicle == null)
                 {
                     return RedirectToPage("/Renter/Index");
                 }
-                
+
                 // Lấy tất cả reviews
                 var reviewsResult = await _reviewService.GetAllReviewsAsync();
                 if (reviewsResult.Success && reviewsResult.Data != null)
                 {
                     // Filter reviews cho vehicle này
-                    Reviews = reviewsResult.Data.Where(r => r.VehicleId == id).OrderByDescending(r => r.CreatedAt);
-                    
+                    Reviews = reviewsResult
+                        .Data.Where(r => r.VehicleId == id)
+                        .OrderByDescending(r => r.CreatedAt);
+
                     TotalReviews = Reviews.Count();
                     if (TotalReviews > 0)
                     {
@@ -51,9 +53,8 @@ namespace EV_Rental.Pages.Renter
                 // Log error nếu cần
                 Reviews = new List<RatingReviewDto>();
             }
-            
+
             return Page();
         }
     }
 }
-

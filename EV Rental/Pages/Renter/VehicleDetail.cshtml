@@ -136,18 +136,18 @@
                         @{
                             var statusBadge = Model.Vehicle?.Status switch
                             {
-                                DataAccessLayer.Enums.VehicleStatus.Available => ("status-badge available", "✓ Có sẵn ngay"),
-                                DataAccessLayer.Enums.VehicleStatus.WaitingForPickup => ("status-badge pending", "⏳ Chờ khách nhận"),
-                                DataAccessLayer.Enums.VehicleStatus.Rented => ("status-badge rented", "⊗ Đã cho thuê"),
-                                DataAccessLayer.Enums.VehicleStatus.Maintenance => ("status-badge maintenance", "🔧 Đang bảo trì"),
-                                DataAccessLayer.Enums.VehicleStatus.Charging => ("status-badge charging", "⚡ Đang sạc pin"),
+                                DataAccessLayer.Entities.VehicleStatus.Available => ("status-badge available", "✓ Có sẵn ngay"),
+                                DataAccessLayer.Entities.VehicleStatus.WaitingForPickup => ("status-badge pending", "⏳ Chờ khách nhận"),
+                                DataAccessLayer.Entities.VehicleStatus.Rented => ("status-badge rented", "⊗ Đã cho thuê"),
+                                DataAccessLayer.Entities.VehicleStatus.Maintenance => ("status-badge maintenance", "🔧 Đang bảo trì"),
+                                DataAccessLayer.Entities.VehicleStatus.Charging => ("status-badge charging", "⚡ Đang sạc pin"),
                                 _ => ("status-badge maintenance", "Trạng thái không xác định")
                             };
                         }
                         <span class="@statusBadge.Item1">@statusBadge.Item2</span>
                     </div>
 
-                    @if (Model.Vehicle?.Status == DataAccessLayer.Enums.VehicleStatus.Available)
+                    @if (Model.Vehicle?.Status == DataAccessLayer.Entities.VehicleStatus.Available)
                     {
                         <button class="btn-rent-now" onclick="window.location.href='/Renter/RentVehicle/@Model.Vehicle.Id'">Thuê Xe Ngay</button>
                     }
@@ -234,11 +234,11 @@
                             @{
                                 var statusText = Model.Vehicle?.Status switch
                                 {
-                                    DataAccessLayer.Enums.VehicleStatus.Available => "<span style=\"color: #059669;\">Có sẵn</span>",
-                                    DataAccessLayer.Enums.VehicleStatus.WaitingForPickup => "<span style=\"color: #0ea5e9;\">Chờ khách nhận</span>",
-                                    DataAccessLayer.Enums.VehicleStatus.Rented => "<span style=\"color: #dc2626;\">Đã cho thuê</span>",
-                                    DataAccessLayer.Enums.VehicleStatus.Maintenance => "<span style=\"color: #f59e0b;\">Đang bảo trì</span>",
-                                    DataAccessLayer.Enums.VehicleStatus.Charging => "<span style=\"color: #6366f1;\">Đang sạc pin</span>",
+                                    DataAccessLayer.Entities.VehicleStatus.Available => "<span style=\"color: #059669;\">Có sẵn</span>",
+                                    DataAccessLayer.Entities.VehicleStatus.WaitingForPickup => "<span style=\"color: #0ea5e9;\">Chờ khách nhận</span>",
+                                    DataAccessLayer.Entities.VehicleStatus.Rented => "<span style=\"color: #dc2626;\">Đã cho thuê</span>",
+                                    DataAccessLayer.Entities.VehicleStatus.Maintenance => "<span style=\"color: #f59e0b;\">Đang bảo trì</span>",
+                                    DataAccessLayer.Entities.VehicleStatus.Charging => "<span style=\"color: #6366f1;\">Đang sạc pin</span>",
                                     _ => "<span>Không xác định</span>"
                                 };
                             }

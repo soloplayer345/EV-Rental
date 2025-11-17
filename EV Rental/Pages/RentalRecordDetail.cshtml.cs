@@ -1,10 +1,9 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using BusinessLayer.Interfaces;
 using BusinessLayer.DTOs;
+using BusinessLayer.Interfaces;
 using BusinessLayer.Mapping;
 using EV_Rental.Helpers;
-using DataAccessLayer.Enums;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace EV_Rental.Pages
 {
@@ -24,23 +23,26 @@ namespace EV_Rental.Pages
             // Debug: Log session info
             var accountId = SessionHelper.GetAccountId(HttpContext);
             var userRole = SessionHelper.GetUserRole(HttpContext.Session);
-            
+
             Console.WriteLine($"=== RentalRecordDetail Debug ===");
             Console.WriteLine($"ID parameter: {id}");
             Console.WriteLine($"AccountId from session: {accountId}");
             Console.WriteLine($"Role from session: {userRole}");
-            
+
             // Check if user is logged in
             if (accountId == null)
             {
                 TempData["ErrorMessage"] = "Vui lòng đăng nhập để xem chi tiết đơn thuê!";
                 return RedirectToPage("/Account/Login");
             }
-            
+
             // Check admin permission
             if (userRole != "Admin")
             {
-                TempData["ErrorMessage"] = "Bạn không có quyền truy cập trang này! (Role hiện tại: " + (userRole ?? "null") + ")";
+                TempData["ErrorMessage"] =
+                    "Bạn không có quyền truy cập trang này! (Role hiện tại: "
+                    + (userRole ?? "null")
+                    + ")";
                 return RedirectToPage("/Admin/RentalRecord/Index");
             }
 
@@ -52,7 +54,7 @@ namespace EV_Rental.Pages
                     TempData["ErrorMessage"] = "Không tìm thấy đơn thuê!";
                     return RedirectToPage("/Admin/RentalRecord/Index");
                 }
-                
+
                 Console.WriteLine($"RentalRecord loaded successfully: ID={RentalRecord.Id}");
             }
             catch (Exception ex)
@@ -85,7 +87,9 @@ namespace EV_Rental.Pages
                 }
 
                 record.Status = RentalRecordStatus.Cancelled;
-                await _rentalRecordService.UpdateRentalRecordAsync(RentalRecordMapper.ToEntity(record));
+                await _rentalRecordService.UpdateRentalRecordAsync(
+                    RentalRecordMapper.ToEntity(record)
+                );
 
                 TempData["SuccessMessage"] = "Hủy đơn thuê thành công!";
             }
@@ -118,7 +122,9 @@ namespace EV_Rental.Pages
 
                 record.Status = RentalRecordStatus.Completed;
                 record.ActualEndTime = DateTime.Now;
-                await _rentalRecordService.UpdateRentalRecordAsync(RentalRecordMapper.ToEntity(record));
+                await _rentalRecordService.UpdateRentalRecordAsync(
+                    RentalRecordMapper.ToEntity(record)
+                );
 
                 TempData["SuccessMessage"] = "Đánh dấu đơn thuê hoàn thành!";
             }
@@ -131,8 +137,3 @@ namespace EV_Rental.Pages
         }
     }
 }
-
-
-
-
-

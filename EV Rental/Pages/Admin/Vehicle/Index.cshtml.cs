@@ -1,6 +1,6 @@
 using BusinessLayer.DTOs;
 using BusinessLayer.Interfaces;
-using DataAccessLayer.Enums;
+using DataAccessLayer.Entities;
 using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;

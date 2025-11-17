@@ -58,7 +58,7 @@ namespace EV_Rental.Pages.Renter
             }
 
             // Kiểm tra trạng thái
-            if (Rental.Status != DataAccessLayer.Enums.RentalRecordStatus.Completed)
+            if (Rental.Status != DataAccessLayer.Entities.RentalRecordStatus.Completed)
             {
                 TempData["ErrorMessage"] = "Chỉ có thể đánh giá sau khi hoàn thành chuyến đi";
                 return RedirectToPage("/Renter/MyTrips");

@@ -1,12 +1,13 @@
+global using DataAccessLayer.Entities;
 using BusinessLayer.Interfaces;
 using BusinessLayer.Services;
 using DataAccessLayer;
 using DataAccessLayer.Interfaces;
 using DataAccessLayer.Repositories;
-using EV_Rental.Middlewares;
-using Microsoft.EntityFrameworkCore;
 using EV_Rental.Helpers;
 using EV_Rental.Hubs;
+using EV_Rental.Middlewares;
+using Microsoft.EntityFrameworkCore;
 
 namespace EV_Rental
 {
@@ -31,17 +32,22 @@ namespace EV_Rental
             });
 
             // Add connection String with Fallback mechanism
-            var connectionString = DatabaseConnectionHelper.GetConnectionStringWithFallback(builder.Configuration);
+            var connectionString = DatabaseConnectionHelper.GetConnectionStringWithFallback(
+                builder.Configuration
+            );
             builder.Services.AddDbContext<EVRentalDBContext>(options =>
-                options.UseSqlServer(connectionString, sqlOptions =>
-                {
-                    sqlOptions.EnableRetryOnFailure(
-                        maxRetryCount: 3,
-                        maxRetryDelay: TimeSpan.FromSeconds(5),
-                        errorNumbersToAdd: null
-                    );
-                    sqlOptions.CommandTimeout(30);
-                })
+                options.UseSqlServer(
+                    connectionString,
+                    sqlOptions =>
+                    {
+                        sqlOptions.EnableRetryOnFailure(
+                            maxRetryCount: 3,
+                            maxRetryDelay: TimeSpan.FromSeconds(5),
+                            errorNumbersToAdd: null
+                        );
+                        sqlOptions.CommandTimeout(30);
+                    }
+                )
             );
 
             // Register Repositories
@@ -61,7 +67,7 @@ namespace EV_Rental
             builder.Services.AddScoped<IRentalRecordService, RentalRecordService>();
             builder.Services.AddScoped<IReviewService, ReviewService>();
             builder.Services.AddScoped<IReportService, ReportService>();
-            
+
             // Register SignalR wrapper service
             builder.Services.AddScoped<EV_Rental.Services.VehicleHubService>();
 

@@ -1,6 +1,5 @@
 using BusinessLayer.DTOs;
 using BusinessLayer.Interfaces;
-using DataAccessLayer.Enums;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace EV_Rental.Pages.Admin

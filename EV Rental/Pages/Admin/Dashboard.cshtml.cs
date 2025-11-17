@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BusinessLayer.Interfaces;
+using BusinessLayer.Services;
 using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using BusinessLayer.Interfaces;
-using BusinessLayer.Services;
-using DataAccessLayer.Enums;
 
 namespace EV_Rental.Pages.Admin
 {
@@ -14,7 +13,7 @@ namespace EV_Rental.Pages.Admin
     {
         private readonly IReportService _reportService;
         private readonly IVehicleService _vehicleService;
-        
+
         public string UserEmail { get; set; } = string.Empty;
         public int NewReportsCount { get; set; } = 0;
         public OverviewStatsDto OverviewStats { get; set; } = new();
@@ -45,13 +44,18 @@ namespace EV_Rental.Pages.Admin
             // lấy data
             OverviewStats = await _reportService.GetOverviewStatsAsync();
             RentalStats = await _reportService.GetRentalStatsAsync();
-            RecentRentals = (await _reportService.GetRecentRentalsAsync(6)) ?? new List<RentalSummaryDto>();
-            MonthlyRevenue = (await _reportService.GetMonthlyRevenueAsync(SelectedYear)) ?? new List<decimal>();
-            TopVehicles = (await _reportService.GetMostRentedVehiclesAsync(4)) ?? new List<VehicleRentalStatsDto>();
+            RecentRentals =
+                (await _reportService.GetRecentRentalsAsync(6)) ?? new List<RentalSummaryDto>();
+            MonthlyRevenue =
+                (await _reportService.GetMonthlyRevenueAsync(SelectedYear)) ?? new List<decimal>();
+            TopVehicles =
+                (await _reportService.GetMostRentedVehiclesAsync(4))
+                ?? new List<VehicleRentalStatsDto>();
             NewReportsCount = await _reportService.GetNewReportsCountAsync();
 
-            
-            var vehicles = (await _vehicleService.GetVehiclesAsync())?.ToList() ?? new List<BusinessLayer.DTOs.VehicleDto>();
+            var vehicles =
+                (await _vehicleService.GetVehiclesAsync())?.ToList()
+                ?? new List<BusinessLayer.DTOs.VehicleDto>();
             var statusDict = Enum.GetValues(typeof(VehicleStatus))
                 .Cast<VehicleStatus>()
                 .ToDictionary(status => status, status => 0);
@@ -67,4 +71,3 @@ namespace EV_Rental.Pages.Admin
         }
     }
 }
-

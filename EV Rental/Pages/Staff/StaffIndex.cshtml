@@ -102,23 +102,23 @@
                                             var badgeText = "";
                                             switch (vehicle.Status)
                                             {
-                                                case DataAccessLayer.Enums.VehicleStatus.Available:
+                                                case DataAccessLayer.Entities.VehicleStatus.Available:
                                                     badgeClass = "bg-success";
                                                     badgeText = "Sẵn sàng";
                                                     break;
-                                                case DataAccessLayer.Enums.VehicleStatus.WaitingForPickup:
+                                                case DataAccessLayer.Entities.VehicleStatus.WaitingForPickup:
                                                     badgeClass = "bg-info text-dark";
                                                     badgeText = "Chờ nhận";
                                                     break;
-                                                case DataAccessLayer.Enums.VehicleStatus.Rented:
+                                                case DataAccessLayer.Entities.VehicleStatus.Rented:
                                                     badgeClass = "bg-secondary";
                                                     badgeText = "Đã cho thuê";
                                                     break;
-                                                case DataAccessLayer.Enums.VehicleStatus.Maintenance:
+                                                case DataAccessLayer.Entities.VehicleStatus.Maintenance:
                                                     badgeClass = "bg-warning text-dark";
                                                     badgeText = "Bảo trì";
                                                     break;
-                                                case DataAccessLayer.Enums.VehicleStatus.Charging:
+                                                case DataAccessLayer.Entities.VehicleStatus.Charging:
                                                     badgeClass = "bg-primary";
                                                     badgeText = "Đang sạc";
                                                     break;

@@ -174,17 +174,17 @@
                             <td>
                                 @switch (user.Role)
                                 {
-                                    case DataAccessLayer.Enums.AccountRole.Renter:
+                                    case DataAccessLayer.Entities.AccountRole.Renter:
                                         <span class="badge badge-custom badge-info">
                                             <i class="fas fa-user me-1"></i>Renter
                                         </span>
                                         break;
-                                    case DataAccessLayer.Enums.AccountRole.Staff:
+                                    case DataAccessLayer.Entities.AccountRole.Staff:
                                         <span class="badge badge-custom badge-warning">
                                             <i class="fas fa-user-tie me-1"></i>Staff
                                         </span>
                                         break;
-                                    case DataAccessLayer.Enums.AccountRole.Admin:
+                                    case DataAccessLayer.Entities.AccountRole.Admin:
                                         <span class="badge badge-custom badge-danger">
                                             <i class="fas fa-user-shield me-1"></i>Admin
                                         </span>

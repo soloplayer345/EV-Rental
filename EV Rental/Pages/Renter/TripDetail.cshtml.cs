@@ -1,8 +1,8 @@
+using BusinessLayer.DTOs;
+using BusinessLayer.Interfaces;
+using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using BusinessLayer.Interfaces;
-using BusinessLayer.DTOs;
-using EV_Rental.Helpers;
 
 namespace EV_Rental.Pages.Renter
 {
@@ -22,13 +22,13 @@ namespace EV_Rental.Pages.Renter
             // Check renter permission
             var userRole = SessionHelper.GetUserRole(HttpContext.Session);
             var accountId = SessionHelper.GetAccountId(HttpContext);
-            
+
             if (accountId == null)
             {
                 TempData["ErrorMessage"] = "Vui lòng đăng nhập!";
                 return RedirectToPage("/Account/Login");
             }
-            
+
             if (userRole != "Renter")
             {
                 TempData["ErrorMessage"] = "Bạn không có quyền truy cập trang này!";
@@ -61,4 +61,3 @@ namespace EV_Rental.Pages.Renter
         }
     }
 }
-

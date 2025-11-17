@@ -1,7 +1,5 @@
 using BusinessLayer.DTOs;
 using BusinessLayer.Interfaces;
-using DataAccessLayer.Enums;
-using DataAccessLayer.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 

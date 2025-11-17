@@ -1,11 +1,10 @@
+using BusinessLayer.DTOs;
+using BusinessLayer.Interfaces;
+using EV_Rental.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
-using BusinessLayer.Interfaces;
-using BusinessLayer.DTOs;
-using EV_Rental.Helpers;
-using DataAccessLayer.Enums;
 
 namespace EV_Rental.Pages.Payment
 {
@@ -20,12 +19,13 @@ namespace EV_Rental.Pages.Payment
         private readonly IEmailSender _emailSender;
 
         public VNPayReturnModel(
-            IOptions<VNPaySettings> vnPaySettings, 
+            IOptions<VNPaySettings> vnPaySettings,
             IPaymentService paymentService,
             IRentalService rentalService,
             IVehicleService vehicleService,
             IAccountService accountService,
-            IEmailSender emailSender)
+            IEmailSender emailSender
+        )
         {
             _vnPaySettings = vnPaySettings.Value;
             _paymentService = paymentService;
@@ -68,105 +68,142 @@ namespace EV_Rental.Pages.Payment
             var bankName = GetBankName(vnp_BankCode);
 
             // Validate signature
-            bool checkSignature = vnpay.ValidateSignature(vnp_SecureHash, _vnPaySettings.HashSecret);
+            bool checkSignature = vnpay.ValidateSignature(
+                vnp_SecureHash,
+                _vnPaySettings.HashSecret
+            );
 
             if (checkSignature)
             {
                 if (vnp_ResponseCode == "00")
                 {
                     // Payment successful - Get pending rental ID from session
-                    var rentalIdStr = HttpContext.Session.GetString($"PendingRentalId_{vnp_OrderId}");
-                    
-                    if (!string.IsNullOrEmpty(rentalIdStr) && int.TryParse(rentalIdStr, out int rentalId))
+                    var rentalIdStr = HttpContext.Session.GetString(
+                        $"PendingRentalId_{vnp_OrderId}"
+                    );
+
+                    if (
+                        !string.IsNullOrEmpty(rentalIdStr)
+                        && int.TryParse(rentalIdStr, out int rentalId)
+                    )
                     {
                         // Confirm the pending rental
-                        var confirmResult = await _rentalService.ConfirmPendingRentalAsync(rentalId);
-                        
+                        var confirmResult = await _rentalService.ConfirmPendingRentalAsync(
+                            rentalId
+                        );
+
                         if (confirmResult.Success && confirmResult.Data != null)
                         {
                             var rental = confirmResult.Data;
-                            
+
                             // Create payment record with rental ID
                             await _paymentService.CreatePaymentForRentalAsync(
-                                rental.Id, 
-                                vnp_Amount, 
-                                "vnpay", 
+                                rental.Id,
+                                vnp_Amount,
+                                "vnpay",
                                 vnp_OrderId
                             );
-                            
+
                             // Send OTP email to renter
                             try
                             {
-                                var renterAccount = await _accountService.GetByIdAsync(rental.RenterId);
+                                var renterAccount = await _accountService.GetByIdAsync(
+                                    rental.RenterId
+                                );
                                 if (renterAccount != null)
                                 {
-                                    await SendOtpEmailAsync(renterAccount.Email, renterAccount.FullName, rental);
-                                    Console.WriteLine($"[EMAIL] OTP email sent to {renterAccount.Email}");
+                                    await SendOtpEmailAsync(
+                                        renterAccount.Email,
+                                        renterAccount.FullName,
+                                        rental
+                                    );
+                                    Console.WriteLine(
+                                        $"[EMAIL] OTP email sent to {renterAccount.Email}"
+                                    );
                                 }
                             }
                             catch (Exception ex)
                             {
-                                Console.WriteLine($"[EMAIL ERROR] Failed to send OTP email: {ex.Message}");
+                                Console.WriteLine(
+                                    $"[EMAIL ERROR] Failed to send OTP email: {ex.Message}"
+                                );
                                 // Don't fail the payment flow if email fails
                             }
-                            
+
                             // Clear session data
                             HttpContext.Session.Remove($"PendingRentalId_{vnp_OrderId}");
-                            
+
                             // Redirect to success page with rental details
-                            return RedirectToPage("/Payment/PaymentSuccess", new
-                            {
-                                transactionId = vnp_TransactionId,
-                                orderId = vnp_OrderId,
-                                paymentMethod = bankName,
-                                orderDescription = vnp_OrderInfo,
-                                amount = vnp_Amount,
-                                paymentTime = paymentTime.ToString("yyyy-MM-ddTHH:mm:ss"),
-                                rentalId = rental.Id,
-                                vehicleId = rental.VehicleId,
-                                otpCode = rental.OtpCode,
-                                startTime = rental.StartTime?.ToString("yyyy-MM-ddTHH:mm:ss"),
-                                endTime = rental.ExpectedEndTime?.ToString("yyyy-MM-ddTHH:mm:ss")
-                            });
+                            return RedirectToPage(
+                                "/Payment/PaymentSuccess",
+                                new
+                                {
+                                    transactionId = vnp_TransactionId,
+                                    orderId = vnp_OrderId,
+                                    paymentMethod = bankName,
+                                    orderDescription = vnp_OrderInfo,
+                                    amount = vnp_Amount,
+                                    paymentTime = paymentTime.ToString("yyyy-MM-ddTHH:mm:ss"),
+                                    rentalId = rental.Id,
+                                    vehicleId = rental.VehicleId,
+                                    otpCode = rental.OtpCode,
+                                    startTime = rental.StartTime?.ToString("yyyy-MM-ddTHH:mm:ss"),
+                                    endTime = rental.ExpectedEndTime?.ToString(
+                                        "yyyy-MM-ddTHH:mm:ss"
+                                    ),
+                                }
+                            );
                         }
                         else
                         {
                             // Failed to confirm rental
-                            return RedirectToPage("/Payment/PaymentFailure", new
-                            {
-                                message = "Thanh toán thành công nhưng không thể xác nhận đơn thuê: " + confirmResult.Message,
-                                transactionId = vnp_TransactionId,
-                                orderId = vnp_OrderId,
-                                paymentMethod = bankName,
-                                orderDescription = vnp_OrderInfo,
-                                amount = vnp_Amount,
-                                paymentTime = paymentTime.ToString("yyyy-MM-ddTHH:mm:ss"),
-                                responseCode = "RENTAL_CONFIRM_FAILED"
-                            });
+                            return RedirectToPage(
+                                "/Payment/PaymentFailure",
+                                new
+                                {
+                                    message = "Thanh toán thành công nhưng không thể xác nhận đơn thuê: "
+                                        + confirmResult.Message,
+                                    transactionId = vnp_TransactionId,
+                                    orderId = vnp_OrderId,
+                                    paymentMethod = bankName,
+                                    orderDescription = vnp_OrderInfo,
+                                    amount = vnp_Amount,
+                                    paymentTime = paymentTime.ToString("yyyy-MM-ddTHH:mm:ss"),
+                                    responseCode = "RENTAL_CONFIRM_FAILED",
+                                }
+                            );
                         }
                     }
-                    
+
                     // No pending rental found
-                    return RedirectToPage("/Payment/PaymentFailure", new
-                    {
-                        message = "Không tìm thấy thông tin đơn thuê chờ thanh toán",
-                        transactionId = vnp_TransactionId,
-                        orderId = vnp_OrderId,
-                        paymentMethod = bankName,
-                        orderDescription = vnp_OrderInfo,
-                        amount = vnp_Amount,
-                        paymentTime = paymentTime.ToString("yyyy-MM-ddTHH:mm:ss"),
-                        responseCode = "PENDING_RENTAL_NOT_FOUND"
-                    });
+                    return RedirectToPage(
+                        "/Payment/PaymentFailure",
+                        new
+                        {
+                            message = "Không tìm thấy thông tin đơn thuê chờ thanh toán",
+                            transactionId = vnp_TransactionId,
+                            orderId = vnp_OrderId,
+                            paymentMethod = bankName,
+                            orderDescription = vnp_OrderInfo,
+                            amount = vnp_Amount,
+                            paymentTime = paymentTime.ToString("yyyy-MM-ddTHH:mm:ss"),
+                            responseCode = "PENDING_RENTAL_NOT_FOUND",
+                        }
+                    );
                 }
                 else
                 {
                     // Payment failed - cancel pending rental and redirect to failure page
                     var message = GetVNPayResponseMessage(vnp_ResponseCode);
-                    
+
                     // Cancel the pending rental if exists
-                    var rentalIdStr = HttpContext.Session.GetString($"PendingRentalId_{vnp_OrderId}");
-                    if (!string.IsNullOrEmpty(rentalIdStr) && int.TryParse(rentalIdStr, out int rentalId))
+                    var rentalIdStr = HttpContext.Session.GetString(
+                        $"PendingRentalId_{vnp_OrderId}"
+                    );
+                    if (
+                        !string.IsNullOrEmpty(rentalIdStr)
+                        && int.TryParse(rentalIdStr, out int rentalId)
+                    )
                     {
                         try
                         {
@@ -181,37 +218,46 @@ namespace EV_Rental.Pages.Payment
                             // Log error but continue
                         }
                     }
-                    
+
                     // Clear session data
                     HttpContext.Session.Remove($"PendingRentalId_{vnp_OrderId}");
 
                     // Redirect to failure page
-                    return RedirectToPage("/Payment/PaymentFailure", new
-                    {
-                        message = message,
-                        transactionId = vnp_TransactionId,
-                        orderId = vnp_OrderId,
-                        paymentMethod = bankName,
-                        orderDescription = vnp_OrderInfo,
-                        amount = vnp_Amount,
-                        paymentTime = paymentTime.ToString("yyyy-MM-ddTHH:mm:ss"),
-                        responseCode = vnp_ResponseCode
-                    });
+                    return RedirectToPage(
+                        "/Payment/PaymentFailure",
+                        new
+                        {
+                            message = message,
+                            transactionId = vnp_TransactionId,
+                            orderId = vnp_OrderId,
+                            paymentMethod = bankName,
+                            orderDescription = vnp_OrderInfo,
+                            amount = vnp_Amount,
+                            paymentTime = paymentTime.ToString("yyyy-MM-ddTHH:mm:ss"),
+                            responseCode = vnp_ResponseCode,
+                        }
+                    );
                 }
             }
             else
             {
                 // Invalid signature - cancel pending rental and redirect to failure page
                 var message = "Chữ ký không hợp lệ. Giao dịch có thể bị giả mạo.";
-                
+
                 // Cancel the pending rental if exists
                 var rentalIdStr = HttpContext.Session.GetString($"PendingRentalId_{vnp_OrderId}");
-                if (!string.IsNullOrEmpty(rentalIdStr) && int.TryParse(rentalIdStr, out int rentalId))
+                if (
+                    !string.IsNullOrEmpty(rentalIdStr)
+                    && int.TryParse(rentalIdStr, out int rentalId)
+                )
                 {
                     try
                     {
                         var rental = await _rentalService.GetRentalByIdAsync(rentalId);
-                        if (rental != null && rental.Status == DataAccessLayer.Enums.RentalRecordStatus.Pending)
+                        if (
+                            rental != null
+                            && rental.Status == DataAccessLayer.Entities.RentalRecordStatus.Pending
+                        )
                         {
                             await _rentalService.CancelRentalAsync(rentalId, rental.RenterId);
                         }
@@ -221,22 +267,25 @@ namespace EV_Rental.Pages.Payment
                         // Log error but continue
                     }
                 }
-                
+
                 // Clear session data
                 HttpContext.Session.Remove($"PendingRentalId_{vnp_OrderId}");
-                
+
                 // Redirect to failure page
-                return RedirectToPage("/Payment/PaymentFailure", new
-                {
-                    message = message,
-                    transactionId = vnp_TransactionId,
-                    orderId = vnp_OrderId,
-                    paymentMethod = bankName,
-                    orderDescription = vnp_OrderInfo,
-                    amount = vnp_Amount,
-                    paymentTime = paymentTime.ToString("yyyy-MM-ddTHH:mm:ss"),
-                    responseCode = "INVALID_SIGNATURE"
-                });
+                return RedirectToPage(
+                    "/Payment/PaymentFailure",
+                    new
+                    {
+                        message = message,
+                        transactionId = vnp_TransactionId,
+                        orderId = vnp_OrderId,
+                        paymentMethod = bankName,
+                        orderDescription = vnp_OrderInfo,
+                        amount = vnp_Amount,
+                        paymentTime = paymentTime.ToString("yyyy-MM-ddTHH:mm:ss"),
+                        responseCode = "INVALID_SIGNATURE",
+                    }
+                );
             }
         }
 
@@ -245,18 +294,26 @@ namespace EV_Rental.Pages.Payment
             return responseCode switch
             {
                 "00" => "Giao dịch thành công",
-                "07" => "Trừ tiền thành công. Giao dịch bị nghi ngờ (liên quan tới lừa đảo, giao dịch bất thường).",
-                "09" => "Giao dịch không thành công do: Thẻ/Tài khoản của khách hàng chưa đăng ký dịch vụ InternetBanking tại ngân hàng.",
-                "10" => "Giao dịch không thành công do: Khách hàng xác thực thông tin thẻ/tài khoản không đúng quá 3 lần",
-                "11" => "Giao dịch không thành công do: Đã hết hạn chờ thanh toán. Xin quý khách vui lòng thực hiện lại giao dịch.",
+                "07" =>
+                    "Trừ tiền thành công. Giao dịch bị nghi ngờ (liên quan tới lừa đảo, giao dịch bất thường).",
+                "09" =>
+                    "Giao dịch không thành công do: Thẻ/Tài khoản của khách hàng chưa đăng ký dịch vụ InternetBanking tại ngân hàng.",
+                "10" =>
+                    "Giao dịch không thành công do: Khách hàng xác thực thông tin thẻ/tài khoản không đúng quá 3 lần",
+                "11" =>
+                    "Giao dịch không thành công do: Đã hết hạn chờ thanh toán. Xin quý khách vui lòng thực hiện lại giao dịch.",
                 "12" => "Giao dịch không thành công do: Thẻ/Tài khoản của khách hàng bị khóa.",
-                "13" => "Giao dịch không thành công do Quý khách nhập sai mật khẩu xác thực giao dịch (OTP). Xin quý khách vui lòng thực hiện lại giao dịch.",
+                "13" =>
+                    "Giao dịch không thành công do Quý khách nhập sai mật khẩu xác thực giao dịch (OTP). Xin quý khách vui lòng thực hiện lại giao dịch.",
                 "24" => "Giao dịch không thành công do: Khách hàng hủy giao dịch",
-                "51" => "Giao dịch không thành công do: Tài khoản của quý khách không đủ số dư để thực hiện giao dịch.",
-                "65" => "Giao dịch không thành công do: Tài khoản của Quý khách đã vượt quá giới hạn giao dịch trong ngày.",
+                "51" =>
+                    "Giao dịch không thành công do: Tài khoản của quý khách không đủ số dư để thực hiện giao dịch.",
+                "65" =>
+                    "Giao dịch không thành công do: Tài khoản của Quý khách đã vượt quá giới hạn giao dịch trong ngày.",
                 "75" => "Ngân hàng thanh toán đang bảo trì.",
-                "79" => "Giao dịch không thành công do: KH nhập sai mật khẩu thanh toán quá số lần quy định. Xin quý khách vui lòng thực hiện lại giao dịch",
-                _ => "Giao dịch thất bại. Mã lỗi: " + responseCode
+                "79" =>
+                    "Giao dịch không thành công do: KH nhập sai mật khẩu thanh toán quá số lần quy định. Xin quý khách vui lòng thực hiện lại giao dịch",
+                _ => "Giao dịch thất bại. Mã lỗi: " + responseCode,
             };
         }
 
@@ -278,24 +335,31 @@ namespace EV_Rental.Pages.Payment
                 "ACB" => "Ngân hàng ACB",
                 "SHB" => "Ngân hàng SHB",
                 "VNMART" => "Ví VnMart",
-                _ => bankCode
+                _ => bankCode,
             };
         }
 
-        private async Task SendOtpEmailAsync(string toEmail, string customerName, DataAccessLayer.Entities.RentalRecord rentalRecord)
+        private async Task SendOtpEmailAsync(
+            string toEmail,
+            string customerName,
+            DataAccessLayer.Entities.RentalRecord rentalRecord
+        )
         {
             var subject = $"🔋 Mã OTP #{rentalRecord.Id} - Thanh Toán Thành Công - EV Rental";
-            
+
             // Get vehicle info
             var vehicle = await _vehicleService.GetVehicleByIdAsync(rentalRecord.VehicleId);
             var vehicleName = vehicle?.Name ?? "N/A";
-            
+
             // Get station info
             var stations = await _rentalService.GetAllStationsAsync();
-            var pickupStation = stations.FirstOrDefault(s => s.Id == rentalRecord.PickupStationId)?.Name ?? "N/A";
-            var returnStation = stations.FirstOrDefault(s => s.Id == rentalRecord.ReturnStationId)?.Name ?? "N/A";
-            
-            var htmlBody = $@"
+            var pickupStation =
+                stations.FirstOrDefault(s => s.Id == rentalRecord.PickupStationId)?.Name ?? "N/A";
+            var returnStation =
+                stations.FirstOrDefault(s => s.Id == rentalRecord.ReturnStationId)?.Name ?? "N/A";
+
+            var htmlBody =
+                $@"
 <!DOCTYPE html>
 <html>
 <head>
@@ -427,4 +491,3 @@ namespace EV_Rental.Pages.Payment
         }
     }
 }
-

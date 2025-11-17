@@ -16,11 +16,11 @@
     var vehicleStatusLabels = Model.VehicleStatusDistribution
         .Select(kvp => kvp.Key switch
         {
-            DataAccessLayer.Enums.VehicleStatus.Available => "Sẵn sàng",
-            DataAccessLayer.Enums.VehicleStatus.WaitingForPickup => "Chờ nhận",
-            DataAccessLayer.Enums.VehicleStatus.Rented => "Đã cho thuê",
-            DataAccessLayer.Enums.VehicleStatus.Maintenance => "Bảo trì",
-            DataAccessLayer.Enums.VehicleStatus.Charging => "Đang sạc",
+            DataAccessLayer.Entities.VehicleStatus.Available => "Sẵn sàng",
+            DataAccessLayer.Entities.VehicleStatus.WaitingForPickup => "Chờ nhận",
+            DataAccessLayer.Entities.VehicleStatus.Rented => "Đã cho thuê",
+            DataAccessLayer.Entities.VehicleStatus.Maintenance => "Bảo trì",
+            DataAccessLayer.Entities.VehicleStatus.Charging => "Đang sạc",
             _ => kvp.Key.ToString()
         }).ToList();
 
@@ -177,10 +177,10 @@
                             {
                                 var statusClass = rental.Status switch
                                 {
-                                    DataAccessLayer.Enums.RentalRecordStatus.Completed => "badge-custom badge-active",
-                                    DataAccessLayer.Enums.RentalRecordStatus.Active => "badge-custom badge-pending",
-                                    DataAccessLayer.Enums.RentalRecordStatus.Pending => "badge-custom badge-warning",
-                                    DataAccessLayer.Enums.RentalRecordStatus.Cancelled => "badge-custom badge-inactive",
+                                    DataAccessLayer.Entities.RentalRecordStatus.Completed => "badge-custom badge-active",
+                                    DataAccessLayer.Entities.RentalRecordStatus.Active => "badge-custom badge-pending",
+                                    DataAccessLayer.Entities.RentalRecordStatus.Pending => "badge-custom badge-warning",
+                                    DataAccessLayer.Entities.RentalRecordStatus.Cancelled => "badge-custom badge-inactive",
                                     _ => "badge-custom"
                                 };
                                 <tr>
