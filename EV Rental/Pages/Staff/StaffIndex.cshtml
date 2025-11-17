@@ -1,18 +1,18 @@
 @page
 @model StaffIndexModel
 @{
-    ViewData["Title"] = "Qu?n l˝ xe di?n - Nh‚n viÍn";
+    ViewData["Title"] = "Qu?n lÔøΩ xe di?n - NhÔøΩn viÔøΩn";
 }
 
 <div class="container-fluid py-4">
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="fw-bold mb-1">Qu?n l˝ xe di?n</h1>
-            <p class="text-muted">Qu?n l˝ danh s·ch xe di?n trong h? th?ng</p>
+            <h1 class="fw-bold mb-1">Qu?n lÔøΩ xe di?n</h1>
+            <p class="text-muted">Qu?n lÔøΩ danh sÔøΩch xe di?n trong h? th?ng</p>
         </div>
         <a asp-page="/Staff/CreateVehicle" class="btn btn-success btn-lg shadow-sm">
-            <i class="bi bi-plus-circle"></i> ThÍm xe m?i
+            <i class="bi bi-plus-circle"></i> ThÔøΩm xe m?i
         </a>
     </div>
 
@@ -21,28 +21,31 @@
         <div class="card-body">
             <form method="get" class="row g-3">
                 <div class="col-md-3">
-                    <label class="form-label fw-bold">TÍn xe</label>
-                    <input type="text" name="name" placeholder="Nh?p tÍn xe..." class="form-control" />
+                    <label class="form-label fw-bold">TÔøΩn xe</label>
+                    <input type="text" name="name" placeholder="Nh?p tÔøΩn xe..." class="form-control" />
                 </div>
 
                 <div class="col-md-3">
-                    <label class="form-label fw-bold">H„ng xe</label>
-                    <input type="text" name="brand" placeholder="H„ng xe..." class="form-control" />
+                    <label class="form-label fw-bold">HÔøΩng xe</label>
+                    <input type="text" name="brand" placeholder="HÔøΩng xe..." class="form-control" />
                 </div>
 
                 <div class="col-md-3">
-                    <label class="form-label fw-bold">Tr?ng th·i</label>
+                    <label class="form-label fw-bold">Tr?ng thÔøΩi</label>
                     <select name="status" class="form-select">
-                        <option value="">-- T?t c? tr?ng th·i --</option>
-                        <option value="Available">Chua cho thuÍ</option>
-                        <option value="Rented">–„ cho thuÍ</option>
+                        <option value="">-- T?t c? tr?ng thÔøΩi --</option>
+                        <option value="Available">S?n sÔøΩng</option>
+                        <option value="WaitingForPickup">Ch? nh?n</option>
+                        <option value="Rented">ƒê√£ cho thu√™</option>
+                        <option value="Maintenance">B?o trÔøΩ</option>
+                        <option value="Charging">ƒêang s?c</option>
                     </select>
                 </div>
 
                 <div class="col-md-3">
                     <label class="form-label fw-bold">&nbsp;</label>
                     <button type="submit" class="btn btn-primary w-100">
-                        <i class="bi bi-search"></i> TÏm ki?m
+                        <i class="bi bi-search"></i> TÔøΩm ki?m
                     </button>
                 </div>
             </form>
@@ -52,13 +55,13 @@
     <!-- Vehicles Table -->
     <div class="card shadow-sm">
         <div class="card-header bg-primary text-white">
-            <h5 class="mb-0"><i class="bi bi-table"></i> Danh s·ch xe</h5>
+            <h5 class="mb-0"><i class="bi bi-table"></i> Danh sÔøΩch xe</h5>
         </div>
         <div class="card-body p-0">
             @if (Model.Vehicles == null || !Model.Vehicles.Any())
             {
                 <div class="alert alert-info m-3" role="alert">
-                    <i class="bi bi-info-circle"></i> KhÙng cÛ xe n‡o ph˘ h?p.
+                    <i class="bi bi-info-circle"></i> KhÔøΩng cÔøΩ xe nÔøΩo phÔøΩ h?p.
                 </div>
             }
             else
@@ -68,14 +71,14 @@
                         <thead class="table-light">
                             <tr>
                                 <th>?nh</th>
-                                <th>TÍn xe</th>
-                                <th>H„ng</th>
+                                <th>TÔøΩn xe</th>
+                                <th>HÔøΩng</th>
                                 <th>Bi?n s?</th>
                                 <th>Lo?i xe</th>
-                                <th>Gi·/Gi?</th>
-                                <th>Gi·/Ng‡y</th>
-                                <th>Tr?ng th·i</th>
-                                <th class="text-center" style="width: 150px;">H‡nh d?ng</th>
+                                <th>GiÔøΩ/Gi?</th>
+                                <th>GiÔøΩ/NgÔøΩy</th>
+                                <th>Tr?ng thÔøΩi</th>
+                                <th class="text-center" style="width: 150px;">HÔøΩnh d?ng</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -94,21 +97,45 @@
                                     <td>@vehicle.PricePerHour:N0 ?</td>
                                     <td>@vehicle.PricePerDay:N0 ?</td>
                                     <td>
-                                        @if (vehicle.Status == DataAccessLayer.Enums.VehicleStatus.Available)
-                                        {
-                                            <span class="badge bg-success"><i class="bi bi-check-circle"></i> S?n s‡ng</span>
+                                        @{
+                                            var badgeClass = "";
+                                            var badgeText = "";
+                                            switch (vehicle.Status)
+                                            {
+                                                case DataAccessLayer.Enums.VehicleStatus.Available:
+                                                    badgeClass = "bg-success";
+                                                    badgeText = "S·∫µn s√†ng";
+                                                    break;
+                                                case DataAccessLayer.Enums.VehicleStatus.WaitingForPickup:
+                                                    badgeClass = "bg-info text-dark";
+                                                    badgeText = "Ch·ªù nh·∫≠n";
+                                                    break;
+                                                case DataAccessLayer.Enums.VehicleStatus.Rented:
+                                                    badgeClass = "bg-secondary";
+                                                    badgeText = "ƒê√£ cho thu√™";
+                                                    break;
+                                                case DataAccessLayer.Enums.VehicleStatus.Maintenance:
+                                                    badgeClass = "bg-warning text-dark";
+                                                    badgeText = "B·∫£o tr√¨";
+                                                    break;
+                                                case DataAccessLayer.Enums.VehicleStatus.Charging:
+                                                    badgeClass = "bg-primary";
+                                                    badgeText = "ƒêang s·∫°c";
+                                                    break;
+                                                default:
+                                                    badgeClass = "bg-light text-dark";
+                                                    badgeText = vehicle.Status.ToString();
+                                                    break;
+                                            }
                                         }
-                                        else
-                                        {
-                                            <span class="badge bg-warning"><i class="bi bi-exclamation-circle"></i> –„ cho thuÍ</span>
-                                        }
+                                        <span class="badge @badgeClass"><i class="bi bi-info-circle"></i> @badgeText</span>
                                     </td>
                                     <td class="text-center">
                                         <div class="btn-group" role="group">
                                             <a href="/Staff/UpdateVehicle?id=@vehicle.Id" class="btn btn-sm btn-warning" title="S?a">
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
-                                            <button type="button" class="btn btn-sm btn-danger" onclick="deleteVehicle(@vehicle.Id)" title="XÛa">
+                                            <button type="button" class="btn btn-sm btn-danger" onclick="deleteVehicle(@vehicle.Id)" title="XÔøΩa">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </div>
@@ -144,16 +171,16 @@
 @section Scripts {
     <script>
         async function deleteVehicle(id) {
-            if (!confirm("B?n cÛ ch?c mu?n xÛa xe n‡y khÙng?")) return;
+            if (!confirm("B?n cÔøΩ ch?c mu?n xÔøΩa xe nÔøΩy khÔøΩng?")) return;
 
             try {
                 const res = await fetch(`/Staff/DeleteVehicle?id=${id}`, { method: 'POST' });
                 if (res.ok) {
-                    alert("–„ xÛa xe th‡nh cÙng!");
+                    alert("ÔøΩÔøΩ xÔøΩa xe thÔøΩnh cÔøΩng!");
                     location.reload();
                 } else {
                     const error = await res.text();
-                    alert("L?i khi xÛa xe: " + error);
+                    alert("L?i khi xÔøΩa xe: " + error);
                 }
             } catch (error) {
                 alert("L?i: " + error.message);

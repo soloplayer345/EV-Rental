@@ -51,8 +51,10 @@ namespace EV_Rental.Pages.Admin.Vehicle
                 allVehicles = allVehicles.Where(v => v.Status == vehicleStatus);
             }
 
-            // Exclude rented vehicles
-            Vehicles = allVehicles.Where(v => v.Status != VehicleStatus.Rented).ToList();
+            // Exclude vehicles đang bận (đã cho thuê hoặc đang chờ khách đến nhận)
+            Vehicles = allVehicles
+                .Where(v => v.Status != VehicleStatus.Rented && v.Status != VehicleStatus.WaitingForPickup)
+                .ToList();
 
             return Page();
         }

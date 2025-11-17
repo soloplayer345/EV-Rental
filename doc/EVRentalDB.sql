@@ -48,7 +48,7 @@ CREATE TABLE [Vehicle] (
     PlateNumber NVARCHAR(50) NOT NULL UNIQUE, -- License plate number
     Model NVARCHAR(100) NOT NULL,
     VehicleType NVARCHAR(50) NOT NULL, -- 'scooter'|'motorbike'|'car'
-    Status INT NOT NULL DEFAULT 0, -- VehicleStatus enum (0: Available, 1: Rented, 2: Maintenance, 3: Charging)
+    Status INT NOT NULL DEFAULT 0, -- VehicleStatus enum (0: Available, 1: Rented, 2: Maintenance, 3: Charging, 4: WaitingForPickup)
     PricePerHour DECIMAL(18,2) NOT NULL,
     PricePerDay DECIMAL(18,2) NOT NULL,
     Features NVARCHAR(MAX) NULL, -- JSON: {"gps":true,"insurance":true}

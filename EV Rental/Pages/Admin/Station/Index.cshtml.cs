@@ -200,10 +200,10 @@ namespace EV_Rental.Pages.Admin.Station
                     return new JsonResult(new { success = false, message = "Xe không tồn tại" });
                 }
 
-                // Check if vehicle is rentable (not currently rented)
-                if (vehicle.Status == VehicleStatus.Rented)
+                // Check if vehicle is busy (đã cho thuê hoặc đang chờ khách nhận)
+                if (vehicle.Status == VehicleStatus.Rented || vehicle.Status == VehicleStatus.WaitingForPickup)
                 {
-                    return new JsonResult(new { success = false, message = "Không thể điều chuyển xe đang được thuê" });
+                    return new JsonResult(new { success = false, message = "Không thể điều chuyển xe đang bận" });
                 }
 
                 // Update station

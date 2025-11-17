@@ -11,7 +11,7 @@ namespace DataAccessLayer.Entities
         public string? PlateNumber { get; set; } // Biển số xe
         public string? Model { get; set; }
         public string? VehicleType { get; set; } // 'scooter'|'motorbike'|'car'...
-        public VehicleStatus Status { get; set; } = VehicleStatus.Available; // 'available'|'rented'|'maintenance'|'charging'
+        public VehicleStatus Status { get; set; } = VehicleStatus.Available; // 'available'|'waitingForPickup'|'rented'|'maintenance'|'charging'
         public decimal PricePerHour { get; set; }
         public decimal PricePerDay { get; set; }
         public string? Features { get; set; } // e.g. {"gps":true,"insurance":true}
