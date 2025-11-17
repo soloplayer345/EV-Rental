@@ -1,18 +1,18 @@
 @page
 @model StaffIndexModel
 @{
-    ViewData["Title"] = "Qu?n l� xe di?n - Nh�n vi�n";
+    ViewData["Title"] = "Quản lý xe điện - Nhân viên";
 }
 
 <div class="container-fluid py-4">
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="fw-bold mb-1">Qu?n l� xe di?n</h1>
-            <p class="text-muted">Qu?n l� danh s�ch xe di?n trong h? th?ng</p>
+            <h1 class="fw-bold mb-1">Quản lý xe điện</h1>
+            <p class="text-muted">Quản lý danh sách xe điện trong hệ thống</p>
         </div>
         <a asp-page="/Staff/CreateVehicle" class="btn btn-success btn-lg shadow-sm">
-            <i class="bi bi-plus-circle"></i> Th�m xe m?i
+            <i class="bi bi-plus-circle"></i> Thêm xe mới
         </a>
     </div>
 
@@ -21,31 +21,31 @@
         <div class="card-body">
             <form method="get" class="row g-3">
                 <div class="col-md-3">
-                    <label class="form-label fw-bold">T�n xe</label>
-                    <input type="text" name="name" placeholder="Nh?p t�n xe..." class="form-control" />
+                    <label class="form-label fw-bold">Tên xe</label>
+                    <input type="text" name="name" placeholder="Nhập tên xe..." class="form-control" />
                 </div>
 
                 <div class="col-md-3">
-                    <label class="form-label fw-bold">H�ng xe</label>
-                    <input type="text" name="brand" placeholder="H�ng xe..." class="form-control" />
+                    <label class="form-label fw-bold">Hãng xe</label>
+                    <input type="text" name="brand" placeholder="Hãng xe..." class="form-control" />
                 </div>
 
                 <div class="col-md-3">
-                    <label class="form-label fw-bold">Tr?ng th�i</label>
+                    <label class="form-label fw-bold">Trạng thái</label>
                     <select name="status" class="form-select">
-                        <option value="">-- T?t c? tr?ng th�i --</option>
-                        <option value="Available">S?n s�ng</option>
-                        <option value="WaitingForPickup">Ch? nh?n</option>
+                        <option value="">-- Tất cả trạng thái --</option>
+                        <option value="Available">Sẵn sàng</option>
+                        <option value="WaitingForPickup">Chờ nhận</option>
                         <option value="Rented">Đã cho thuê</option>
-                        <option value="Maintenance">B?o tr�</option>
-                        <option value="Charging">Đang s?c</option>
+                        <option value="Maintenance">Bảo trì</option>
+                        <option value="Charging">Đang sạc</option>
                     </select>
                 </div>
 
                 <div class="col-md-3">
                     <label class="form-label fw-bold">&nbsp;</label>
                     <button type="submit" class="btn btn-primary w-100">
-                        <i class="bi bi-search"></i> T�m ki?m
+                        <i class="bi bi-search"></i> Tìm kiếm
                     </button>
                 </div>
             </form>
@@ -55,13 +55,13 @@
     <!-- Vehicles Table -->
     <div class="card shadow-sm">
         <div class="card-header bg-primary text-white">
-            <h5 class="mb-0"><i class="bi bi-table"></i> Danh s�ch xe</h5>
+            <h5 class="mb-0"><i class="bi bi-table"></i> Danh sách xe</h5>
         </div>
         <div class="card-body p-0">
             @if (Model.Vehicles == null || !Model.Vehicles.Any())
             {
                 <div class="alert alert-info m-3" role="alert">
-                    <i class="bi bi-info-circle"></i> Kh�ng c� xe n�o ph� h?p.
+                    <i class="bi bi-info-circle"></i> Không có xe nào phù hợp.
                 </div>
             }
             else
@@ -70,15 +70,15 @@
                     <table class="table table-hover table-striped mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th>?nh</th>
-                                <th>T�n xe</th>
-                                <th>H�ng</th>
-                                <th>Bi?n s?</th>
-                                <th>Lo?i xe</th>
-                                <th>Gi�/Gi?</th>
-                                <th>Gi�/Ng�y</th>
-                                <th>Tr?ng th�i</th>
-                                <th class="text-center" style="width: 150px;">H�nh d?ng</th>
+                                <th>Ảnh</th>
+                                <th>Tên xe</th>
+                                <th>Hãng</th>
+                                <th>Biển số</th>
+                                <th>Loại xe</th>
+                                <th>Giá/Giờ</th>
+                                <th>Giá/Ngày</th>
+                                <th>Trạng thái</th>
+                                <th class="text-center" style="width: 150px;">Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -94,8 +94,8 @@
                                         <span class="badge bg-secondary">@vehicle.PlateNumber</span>
                                     </td>
                                     <td>@vehicle.Model</td>
-                                    <td>@vehicle.PricePerHour:N0 ?</td>
-                                    <td>@vehicle.PricePerDay:N0 ?</td>
+                                    <td>@vehicle.PricePerHour:N0 ₫</td>
+                                    <td>@vehicle.PricePerDay:N0 ₫</td>
                                     <td>
                                         @{
                                             var badgeClass = "";
@@ -132,10 +132,10 @@
                                     </td>
                                     <td class="text-center">
                                         <div class="btn-group" role="group">
-                                            <a href="/Staff/UpdateVehicle?id=@vehicle.Id" class="btn btn-sm btn-warning" title="S?a">
+                                            <a href="/Staff/UpdateVehicle?id=@vehicle.Id" class="btn btn-sm btn-warning" title="Sửa">
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
-                                            <button type="button" class="btn btn-sm btn-danger" onclick="deleteVehicle(@vehicle.Id)" title="X�a">
+                                            <button type="button" class="btn btn-sm btn-danger" onclick="deleteVehicle(@vehicle.Id)" title="Xóa">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </div>
@@ -171,19 +171,19 @@
 @section Scripts {
     <script>
         async function deleteVehicle(id) {
-            if (!confirm("B?n c� ch?c mu?n x�a xe n�y kh�ng?")) return;
+            if (!confirm("Bạn có chắc muốn xóa xe này không?")) return;
 
             try {
                 const res = await fetch(`/Staff/DeleteVehicle?id=${id}`, { method: 'POST' });
                 if (res.ok) {
-                    alert("�� x�a xe th�nh c�ng!");
+                    alert("Đã xóa xe thành công!");
                     location.reload();
                 } else {
                     const error = await res.text();
-                    alert("L?i khi x�a xe: " + error);
+                    alert("Lỗi khi xóa xe: " + error);
                 }
             } catch (error) {
-                alert("L?i: " + error.message);
+                alert("Lỗi: " + error.message);
             }
         }
     </script>
