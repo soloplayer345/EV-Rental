@@ -94,8 +94,8 @@
                                         <span class="badge bg-secondary">@vehicle.PlateNumber</span>
                                     </td>
                                     <td>@vehicle.Model</td>
-                                    <td>@vehicle.PricePerHour:N0 ₫</td>
-                                    <td>@vehicle.PricePerDay:N0 ₫</td>
+                                    <td>@vehicle.PricePerHour.ToString("N0") ₫</td>
+                                    <td>@vehicle.PricePerDay.ToString("N0") ₫</td>
                                     <td>
                                         @{
                                             var badgeClass = "";

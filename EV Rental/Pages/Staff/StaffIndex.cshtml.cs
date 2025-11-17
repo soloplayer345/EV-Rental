@@ -30,12 +30,12 @@ namespace EV_Rental.Pages.Staff
         {
             if (Status.HasValue)
             {
-                // G?i h�m search trong service (l?c theo status)
+                // search trong service (lọc theo status)
                 Vehicles = await _vehicleService.SearchVehiclesAsync(Name ?? "", Brand ?? "", Status.Value);
             }
             else
             {
-                // N?u kh�ng ch?n status ? l?y to�n b?
+                // Nếu không chọn status sẽ lấy toàn bộ
                 Vehicles = await _vehicleService.GetVehiclesAsync();
             }
         }
