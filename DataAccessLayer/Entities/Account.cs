@@ -1,4 +1,4 @@
-﻿using DataAccessLayer.Enums;
+﻿// using DataAccessLayer.Entities;
 
 namespace DataAccessLayer.Entities
 {
@@ -12,6 +12,14 @@ namespace DataAccessLayer.Entities
         public bool IsActive { get; set; } = false;
 
         // Navigation properties
-        public virtual ICollection<RentalRecord> RentalRecords { get; set; } = new List<RentalRecord>();
+        public virtual ICollection<RentalRecord> RentalRecords { get; set; } =
+            new List<RentalRecord>();
+    }
+
+    public enum AccountRole
+    {
+        Renter,
+        Staff,
+        Admin,
     }
 }

@@ -1,4 +1,4 @@
-using DataAccessLayer.Enums;
+using DataAccessLayer.Entities;
 
 namespace BusinessLayer.DTOs
 {

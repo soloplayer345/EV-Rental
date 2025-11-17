@@ -1,6 +1,6 @@
 using BusinessLayer.DTOs;
 using DataAccessLayer.Entities;
-using DataAccessLayer.Enums;
+using DataAccessLayer.Entities;
 
 namespace BusinessLayer.Interfaces
 {

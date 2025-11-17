@@ -1,22 +1,25 @@
-﻿using DataAccessLayer.Entities;
-using DataAccessLayer.Enums;
-using DataAccessLayer.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DataAccessLayer.Entities;
+// using DataAccessLayer.Entities;
+using DataAccessLayer.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccessLayer.Repositories
 {
     public class VehicleRepo : GenericRepo<Vehicle>, IVehicleRepo
     {
-        public VehicleRepo(EVRentalDBContext context) : base(context)
-        {
-        }
+        public VehicleRepo(EVRentalDBContext context)
+            : base(context) { }
 
-        public async Task<IEnumerable<Vehicle>> SearchVehiclesAsync(string? name, string? brand, VehicleStatus? status)
+        public async Task<IEnumerable<Vehicle>> SearchVehiclesAsync(
+            string? name,
+            string? brand,
+            VehicleStatus? status
+        )
         {
             IQueryable<Vehicle> query = _dbSet.Where(x => !x.IsDeleted);
             if (!string.IsNullOrEmpty(name))
@@ -46,12 +49,12 @@ namespace DataAccessLayer.Repositories
             Vehicle? vehicle = await _dbSet
                 .Include(v => v.Station)
                 .FirstOrDefaultAsync(v => v.Id == id && !v.IsDeleted);
-            
+
             if (vehicle == null)
             {
                 throw new KeyNotFoundException($"Vehicle with ID {id} not found");
             }
-            
+
             return vehicle;
         }
     }

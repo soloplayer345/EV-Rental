@@ -1,5 +1,5 @@
-﻿using DataAccessLayer.Enums;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+// using DataAccessLayer.Entities;
 
 namespace DataAccessLayer.Entities
 {
@@ -23,7 +23,18 @@ namespace DataAccessLayer.Entities
         // Navigation properties
         [ScaffoldColumn(false)]
         public virtual Station? Station { get; set; }
+
         [ScaffoldColumn(false)]
-        public virtual ICollection<RentalRecord> RentalRecords { get; set; } = new List<RentalRecord>();
+        public virtual ICollection<RentalRecord> RentalRecords { get; set; } =
+            new List<RentalRecord>();
+    }
+
+    public enum VehicleStatus
+    {
+        Available,
+        Rented,
+        Maintenance,
+        Charging,
+        WaitingForPickup,
     }
 }

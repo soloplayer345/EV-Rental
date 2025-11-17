@@ -1,5 +1,5 @@
 using DataAccessLayer.Entities;
-using DataAccessLayer.Enums;
+// using DataAccessLayer.Entities;
 using DataAccessLayer.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,9 +7,8 @@ namespace DataAccessLayer.Repositories
 {
     public class AccountRepo : GenericRepo<Account>, IAccountRepo
     {
-        public AccountRepo(EVRentalDBContext dbContext) : base(dbContext)
-        {
-        }
+        public AccountRepo(EVRentalDBContext dbContext)
+            : base(dbContext) { }
 
         /// <summary>
         /// Tìm account theo email
@@ -19,8 +18,7 @@ namespace DataAccessLayer.Repositories
             if (string.IsNullOrWhiteSpace(email))
                 throw new ArgumentException("Email cannot be null or empty", nameof(email));
 
-            return await _dbSet
-                .FirstOrDefaultAsync(a => a.Email == email);
+            return await _dbSet.FirstOrDefaultAsync(a => a.Email == email);
         }
 
         /// <summary>
@@ -31,8 +29,7 @@ namespace DataAccessLayer.Repositories
             if (string.IsNullOrWhiteSpace(phone))
                 throw new ArgumentException("Phone cannot be null or empty", nameof(phone));
 
-            return await _dbSet
-                .FirstOrDefaultAsync(a => a.Phone == phone);
+            return await _dbSet.FirstOrDefaultAsync(a => a.Phone == phone);
         }
 
         /// <summary>
@@ -43,8 +40,7 @@ namespace DataAccessLayer.Repositories
             if (string.IsNullOrWhiteSpace(email))
                 return false;
 
-            return await _dbSet
-                .AnyAsync(a => a.Email == email);
+            return await _dbSet.AnyAsync(a => a.Email == email);
         }
 
         /// <summary>
@@ -55,8 +51,7 @@ namespace DataAccessLayer.Repositories
             if (string.IsNullOrWhiteSpace(phone))
                 return false;
 
-            return await _dbSet
-                .AnyAsync(a => a.Phone == phone);
+            return await _dbSet.AnyAsync(a => a.Phone == phone);
         }
 
         /// <summary>
@@ -100,8 +95,7 @@ namespace DataAccessLayer.Repositories
             if (id <= 0)
                 return null;
 
-            return await _dbSet
-                .FirstOrDefaultAsync(a => a.Id == id);
+            return await _dbSet.FirstOrDefaultAsync(a => a.Id == id);
         }
     }
 }

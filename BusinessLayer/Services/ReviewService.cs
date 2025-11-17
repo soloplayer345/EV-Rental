@@ -270,7 +270,7 @@ namespace BusinessLayer.Services
                 }
 
                 // Kiểm tra rental đã hoàn thành chưa
-                if (rental.Status != DataAccessLayer.Enums.RentalRecordStatus.Completed)
+                if (rental.Status != DataAccessLayer.Entities.RentalRecordStatus.Completed)
                 {
                     return new ServiceResultDto<object>
                     {

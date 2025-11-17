@@ -1,7 +1,7 @@
 using BusinessLayer.DTOs;
 using BusinessLayer.Interfaces;
 using DataAccessLayer.Entities;
-using DataAccessLayer.Enums;
+using DataAccessLayer.Entities;
 using DataAccessLayer.Interfaces;
 using Microsoft.EntityFrameworkCore;
 

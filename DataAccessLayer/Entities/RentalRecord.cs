@@ -1,4 +1,4 @@
-﻿using DataAccessLayer.Enums;
+﻿// using DataAccessLayer.Entities;
 
 namespace DataAccessLayer.Entities
 {
@@ -26,7 +26,17 @@ namespace DataAccessLayer.Entities
         public virtual Station PickupStation { get; set; }
         public virtual Station ReturnStation { get; set; }
         public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
-        public virtual ICollection<InspectionProblem> InspectionProblems { get; set; } = new List<InspectionProblem>();
+        public virtual ICollection<InspectionProblem> InspectionProblems { get; set; } =
+            new List<InspectionProblem>();
         public virtual RatingReview RatingReview { get; set; }
+    }
+
+    public enum RentalRecordStatus
+    {
+        Pending, // Đang chờ thanh toán
+        Confirmed, // Đã thanh toán, chờ nhận xe
+        Active, // Đang thuê
+        Completed, // Đã hoàn thành
+        Cancelled, // Đã hủy
     }
 }

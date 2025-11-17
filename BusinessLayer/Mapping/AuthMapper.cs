@@ -35,7 +35,7 @@ namespace BusinessLayer.Mapping
                 Email = request.Email,
                 Phone = request.Phone,
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-                Role = DataAccessLayer.Enums.AccountRole.Renter,
+                Role = DataAccessLayer.Entities.AccountRole.Renter,
                 IsActive = true,
                 CreateDate = DateTime.UtcNow,
                 UpdateDate = DateTime.UtcNow,

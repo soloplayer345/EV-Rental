@@ -1,10 +1,10 @@
+using BCrypt.Net;
 using BusinessLayer.DTOs;
 using BusinessLayer.Interfaces;
 using BusinessLayer.Mapping;
 using DataAccessLayer.Entities;
-using DataAccessLayer.Enums;
+using DataAccessLayer.Entities;
 using DataAccessLayer.Interfaces;
-using BCrypt.Net;
 
 namespace BusinessLayer.Services
 {
@@ -25,10 +25,14 @@ namespace BusinessLayer.Services
             try
             {
                 if (string.IsNullOrWhiteSpace(request.EmailOrPhone))
-                    return ServiceResultDto<AuthResponseDto>.FailureResult("Email hoặc số điện thoại không được để trống");
+                    return ServiceResultDto<AuthResponseDto>.FailureResult(
+                        "Email hoặc số điện thoại không được để trống"
+                    );
 
                 if (string.IsNullOrWhiteSpace(request.Password))
-                    return ServiceResultDto<AuthResponseDto>.FailureResult("Mật khẩu không được để trống");
+                    return ServiceResultDto<AuthResponseDto>.FailureResult(
+                        "Mật khẩu không được để trống"
+                    );
 
                 // Tìm account theo email hoặc phone
                 Account? account = null;
@@ -45,71 +49,94 @@ namespace BusinessLayer.Services
 
                 // Kiểm tra account có tồn tại không
                 if (account == null)
-                    return ServiceResultDto<AuthResponseDto>.FailureResult("Email/Số điện thoại hoặc mật khẩu không chính xác");
+                    return ServiceResultDto<AuthResponseDto>.FailureResult(
+                        "Email/Số điện thoại hoặc mật khẩu không chính xác"
+                    );
 
                 // Kiểm tra password với BCrypt
                 if (!BCrypt.Net.BCrypt.Verify(request.Password, account.PasswordHash))
-                    return ServiceResultDto<AuthResponseDto>.FailureResult("Email/Số điện thoại hoặc mật khẩu không chính xác");
+                    return ServiceResultDto<AuthResponseDto>.FailureResult(
+                        "Email/Số điện thoại hoặc mật khẩu không chính xác"
+                    );
 
                 // Kiểm tra trạng thái account
                 if (!account.IsActive)
-                    return ServiceResultDto<AuthResponseDto>.FailureResult("Tài khoản chưa được kích hoạt hoặc đã bị vô hiệu hóa");
+                    return ServiceResultDto<AuthResponseDto>.FailureResult(
+                        "Tài khoản chưa được kích hoạt hoặc đã bị vô hiệu hóa"
+                    );
 
                 var response = AuthMapper.ToAuthResponseDto(account);
-                return ServiceResultDto<AuthResponseDto>.SuccessResult(response, "Đăng nhập thành công");
+                return ServiceResultDto<AuthResponseDto>.SuccessResult(
+                    response,
+                    "Đăng nhập thành công"
+                );
             }
             catch (Exception ex)
             {
-                return ServiceResultDto<AuthResponseDto>.FailureResult("Đã có lỗi xảy ra khi đăng nhập", ex.Message);
+                return ServiceResultDto<AuthResponseDto>.FailureResult(
+                    "Đã có lỗi xảy ra khi đăng nhập",
+                    ex.Message
+                );
             }
         }
 
         /// <summary>
         /// Đăng ký tài khoản mới (tự động tạo role Renter)
         /// </summary>
-        public async Task<ServiceResultDto<AuthResponseDto>> RegisterAsync(RegisterRequestDto request)
+        public async Task<ServiceResultDto<AuthResponseDto>> RegisterAsync(
+            RegisterRequestDto request
+        )
         {
-            await _unitOfWork.BeginTransactionAsync();
-
             try
             {
                 // Validate
                 if (string.IsNullOrWhiteSpace(request.Email))
-                    return ServiceResultDto<AuthResponseDto>.FailureResult("Email không được để trống");
+                    return ServiceResultDto<AuthResponseDto>.FailureResult(
+                        "Email không được để trống"
+                    );
 
                 if (string.IsNullOrWhiteSpace(request.Phone))
-                    return ServiceResultDto<AuthResponseDto>.FailureResult("Số điện thoại không được để trống");
+                    return ServiceResultDto<AuthResponseDto>.FailureResult(
+                        "Số điện thoại không được để trống"
+                    );
 
                 if (string.IsNullOrWhiteSpace(request.Password))
-                    return ServiceResultDto<AuthResponseDto>.FailureResult("Mật khẩu không được để trống");
+                    return ServiceResultDto<AuthResponseDto>.FailureResult(
+                        "Mật khẩu không được để trống"
+                    );
 
                 if (request.Password != request.ConfirmPassword)
-                    return ServiceResultDto<AuthResponseDto>.FailureResult("Mật khẩu xác nhận không khớp");
+                    return ServiceResultDto<AuthResponseDto>.FailureResult(
+                        "Mật khẩu xác nhận không khớp"
+                    );
 
-                // Kiểm tra email đã tồn tại
+                // Kiểm tra email + phone
                 if (await _unitOfWork.AccountRepo.IsEmailExistsAsync(request.Email))
                     return ServiceResultDto<AuthResponseDto>.FailureResult("Email đã được sử dụng");
 
-                // Kiểm tra phone đã tồn tại
                 if (await _unitOfWork.AccountRepo.IsPhoneExistsAsync(request.Phone))
-                    return ServiceResultDto<AuthResponseDto>.FailureResult("Số điện thoại đã được sử dụng");
+                    return ServiceResultDto<AuthResponseDto>.FailureResult(
+                        "Số điện thoại đã được sử dụng"
+                    );
 
-                // Tạo Account từ DTO
+                // Tạo account
                 var account = AuthMapper.ToAccountEntity(request);
+
                 await _unitOfWork.AccountRepo.AddAsync(account);
-                await _unitOfWork.SaveChangesAsync(); // Save để lấy AccountId
+                await _unitOfWork.SaveChangesAsync();
 
-                // Commit transaction
-                await _unitOfWork.CommitTransactionAsync();
-
-                // Map sang response DTO
                 var response = AuthMapper.ToAuthResponseDto(account);
-                return ServiceResultDto<AuthResponseDto>.SuccessResult(response, "Đăng ký thành công");
+                return ServiceResultDto<AuthResponseDto>.SuccessResult(
+                    response,
+                    "Đăng ký thành công"
+                );
             }
             catch (Exception ex)
             {
-                await _unitOfWork.RollbackTransactionAsync();
-                return ServiceResultDto<AuthResponseDto>.FailureResult("Đã có lỗi xảy ra khi đăng ký", ex.Message);
+                return ServiceResultDto<AuthResponseDto>.FailureResult(
+                    "Đã có lỗi xảy ra khi đăng ký",
+                    ex.Message
+                );
             }
         }
 

@@ -27,7 +27,7 @@ namespace DataAccessLayer.Interfaces
         /// <summary>
         /// Lấy tất cả accounts theo role
         /// </summary>
-        Task<IEnumerable<Account>> GetAccountsByRoleAsync(Enums.AccountRole role);
+        Task<IEnumerable<Account>> GetAccountsByRoleAsync(Entities.AccountRole role);
 
         /// <summary>
         /// Lấy tất cả accounts active

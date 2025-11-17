@@ -2,7 +2,7 @@
 using BusinessLayer.Interfaces;
 using BusinessLayer.Mapping;
 using DataAccessLayer.Entities;
-using DataAccessLayer.Enums;
+using DataAccessLayer.Entities;
 using DataAccessLayer.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
