@@ -12,7 +12,7 @@
 
     <h2 class="mb-4">Danh sách xe điện</h2>
 
-    <!-- Thanh t�m ki?m -->
+    // thanh tìm kiếm
     <section class="hero bg-light py-5">
         <div class="container text-center">
             <h2 class="hero-title mb-3">🔋 Tìm Xe Điện Hoàn Hảo Của Bạn</h2>
@@ -27,8 +27,11 @@
 
                 <select name="Status" class="form-select w-25">
                     <option value="">-- Trạng thái --</option>
-                    <option value="Available" selected="@(Model.Status == VehicleStatus.Available)">Chưa cho thuê</option>
+                    <option value="Available" selected="@(Model.Status == VehicleStatus.Available)">Sẵn sàng</option>
+                    <option value="WaitingForPickup" selected="@(Model.Status == VehicleStatus.WaitingForPickup)">Chờ nhận</option>
                     <option value="Rented" selected="@(Model.Status == VehicleStatus.Rented)">Đã cho thuê</option>
+                    <option value="Maintenance" selected="@(Model.Status == VehicleStatus.Maintenance)">Bảo trì</option>
+                    <option value="Charging" selected="@(Model.Status == VehicleStatus.Charging)">Đang sạc</option>
                 </select>
 
                 <button type="submit" class="btn btn-primary">Tìm kiếm</button>
@@ -36,7 +39,7 @@
         </div>
     </section>
 
-    <!-- K?t qu? t�m ki?m -->
+    // kết quả tìm kiếm
     <section class="vehicle-results py-5">
         <div class="container">
             <h3 class="mb-4">Kết quả tìm kiếm</h3>
@@ -54,8 +57,19 @@
                                     <p class="card-text">
                                         <strong>Hãng:</strong> @vehicle.Brand <br />
                                         <strong>Trạng thái:</strong>
-                                        <span class="badge @(vehicle.Status == VehicleStatus.Available ? "bg-success" : "bg-danger")">
-                                            @vehicle.Status
+                                        @{
+                                            var statusBadge = vehicle.Status switch
+                                            {
+                                                VehicleStatus.Available => ("bg-success", "Sẵn sàng"),
+                                                VehicleStatus.WaitingForPickup => ("bg-info text-dark", "Chờ nhận"),
+                                                VehicleStatus.Rented => ("bg-danger", "Đã cho thuê"),
+                                                VehicleStatus.Maintenance => ("bg-warning text-dark", "Bảo trì"),
+                                                VehicleStatus.Charging => ("bg-primary", "Đang sạc"),
+                                                _ => ("bg-secondary", vehicle.Status.ToString())
+                                            };
+                                        }
+                                        <span class="badge @statusBadge.Item1">
+                                            @statusBadge.Item2
                                         </span>
                                     </p>
                                     <a href="/Vehicles/Details?id=@vehicle.Id" class="btn btn-outline-primary btn-sm">Chi tiết</a>

@@ -68,7 +68,8 @@
                 <select class="form-select" id="status" name="status">
                     <option value="">Tất cả</option>
                     @if (Model.FilterStatus == "Available") { <option value="Available" selected>Sẵn sàng</option> } else { <option value="Available">Sẵn sàng</option> }
-                    @if (Model.FilterStatus == "Rented") { <option value="Rented" selected>Đang cho thuê</option> } else { <option value="Rented">Đang cho thuê</option> }
+                    @if (Model.FilterStatus == "WaitingForPickup") { <option value="WaitingForPickup" selected>Chờ nhận</option> } else { <option value="WaitingForPickup">Chờ nhận</option> }
+                    @if (Model.FilterStatus == "Rented") { <option value="Rented" selected>Đã cho thuê</option> } else { <option value="Rented">Đã cho thuê</option> }
                     @if (Model.FilterStatus == "Maintenance") { <option value="Maintenance" selected>Bảo trì</option> } else { <option value="Maintenance">Bảo trì</option> }
                     @if (Model.FilterStatus == "Charging") { <option value="Charging" selected>Sạc pin</option> } else { <option value="Charging">Sạc pin</option> }
                 </select>
@@ -164,15 +165,17 @@
                                     var statusClass = vehicle.Status switch
                                     {
                                         DataAccessLayer.Enums.VehicleStatus.Available => "badge-active",
+                                        DataAccessLayer.Enums.VehicleStatus.WaitingForPickup => "badge-info text-dark",
                                         DataAccessLayer.Enums.VehicleStatus.Rented => "badge-pending",
                                         DataAccessLayer.Enums.VehicleStatus.Maintenance => "badge-warning",
-                                        DataAccessLayer.Enums.VehicleStatus.Charging => "badge-info",
+                                        DataAccessLayer.Enums.VehicleStatus.Charging => "badge-primary",
                                         _ => "badge-secondary"
                                     };
                                     var statusText = vehicle.Status switch
                                     {
                                         DataAccessLayer.Enums.VehicleStatus.Available => "Sẵn sàng",
-                                        DataAccessLayer.Enums.VehicleStatus.Rented => "Đang cho thuê",
+                                        DataAccessLayer.Enums.VehicleStatus.WaitingForPickup => "Chờ nhận",
+                                        DataAccessLayer.Enums.VehicleStatus.Rented => "Đã cho thuê",
                                         DataAccessLayer.Enums.VehicleStatus.Maintenance => "Bảo trì",
                                         DataAccessLayer.Enums.VehicleStatus.Charging => "Sạc pin",
                                         _ => vehicle.Status.ToString()

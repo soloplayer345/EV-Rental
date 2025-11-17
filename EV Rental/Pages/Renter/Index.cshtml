@@ -44,8 +44,10 @@
                     <select name="status" class="search-select">
                         <option value="">-- Tất cả trạng thái --</option>
                         <option value="Available" selected="@(Model.Status == "Available")">Xe có sẵn</option>
+                        <option value="WaitingForPickup" selected="@(Model.Status == "WaitingForPickup")">Chờ khách nhận</option>
                         <option value="Rented" selected="@(Model.Status == "Rented")">Đã cho thuê</option>
                         <option value="Maintenance" selected="@(Model.Status == "Maintenance")">Đang bảo trì</option>
+                        <option value="Charging" selected="@(Model.Status == "Charging")">Đang sạc pin</option>
                     </select>
 
                     <button type="submit" class="btn-search">
@@ -100,11 +102,17 @@
                                     case "Available":
                                         <text>Xe có sẵn</text>
                                         break;
+                                    case "WaitingForPickup":
+                                        <text>Chờ khách nhận</text>
+                                        break;
                                     case "Rented":
                                         <text>Đã cho thuê</text>
                                         break;
                                     case "Maintenance":
                                         <text>Đang bảo trì</text>
+                                        break;
+                                    case "Charging":
+                                        <text>Đang sạc pin</text>
                                         break;
                                     default:
                                         @Model.Status
@@ -163,11 +171,20 @@
                                         case DataAccessLayer.Enums.VehicleStatus.Available:
                                             <span class="status-badge status-available">✓ Có sẵn</span>
                                             break;
+                                        case DataAccessLayer.Enums.VehicleStatus.WaitingForPickup:
+                                            <span class="status-badge status-pending">⏳ Chờ nhận</span>
+                                            break;
                                         case DataAccessLayer.Enums.VehicleStatus.Rented:
                                             <span class="status-badge status-rented">⊗ Đã cho thuê</span>
                                             break;
                                         case DataAccessLayer.Enums.VehicleStatus.Maintenance:
                                             <span class="status-badge status-maintenance">⚙ Bảo trì</span>
+                                            break;
+                                        case DataAccessLayer.Enums.VehicleStatus.Charging:
+                                            <span class="status-badge status-charging">⚡ Sạc pin</span>
+                                            break;
+                                        default:
+                                            <span class="status-badge">-</span>
                                             break;
                                     }
                                 </div>
@@ -541,6 +558,7 @@
             margin: 0.75rem 0;
         }
 
+        .status-badge,
         .Status-badge {
             display: inline-block;
             padding: 0.4rem 0.8rem;
@@ -549,19 +567,34 @@
             font-weight: 600;
         }
 
+        .status-available,
         .Status-available {
             background-color: #d1fae5;
             color: #065f46;
         }
 
+        .status-pending,
+        .Status-pending {
+            background-color: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .status-rented,
         .Status-rented {
             background-color: #fee2e2;
             color: #991b1b;
         }
 
+        .status-maintenance,
         .Status-maintenance {
             background-color: #fef3c7;
             color: #92400e;
+        }
+
+        .status-charging,
+        .Status-charging {
+            background-color: #ede9fe;
+            color: #5b21b6;
         }
 
         .btn-disabled {

@@ -133,18 +133,18 @@
                     </div>
 
                     <div class="availability">
-                        @if (Model.Vehicle?.Status == DataAccessLayer.Enums.VehicleStatus.Available)
-                        {
-                            <span class="status-badge available">✓ Có sẵn ngay</span>
+                        @{
+                            var statusBadge = Model.Vehicle?.Status switch
+                            {
+                                DataAccessLayer.Enums.VehicleStatus.Available => ("status-badge available", "✓ Có sẵn ngay"),
+                                DataAccessLayer.Enums.VehicleStatus.WaitingForPickup => ("status-badge pending", "⏳ Chờ khách nhận"),
+                                DataAccessLayer.Enums.VehicleStatus.Rented => ("status-badge rented", "⊗ Đã cho thuê"),
+                                DataAccessLayer.Enums.VehicleStatus.Maintenance => ("status-badge maintenance", "🔧 Đang bảo trì"),
+                                DataAccessLayer.Enums.VehicleStatus.Charging => ("status-badge charging", "⚡ Đang sạc pin"),
+                                _ => ("status-badge maintenance", "Trạng thái không xác định")
+                            };
                         }
-                        else if (Model.Vehicle?.Status == DataAccessLayer.Enums.VehicleStatus.Rented)
-                        {
-                            <span class="status-badge rented">⚠ Đang được thuê</span>
-                        }
-                        else
-                        {
-                            <span class="status-badge maintenance">🔧 Bảo trì</span>
-                        }
+                        <span class="@statusBadge.Item1">@statusBadge.Item2</span>
                     </div>
 
                     @if (Model.Vehicle?.Status == DataAccessLayer.Enums.VehicleStatus.Available)
@@ -231,18 +231,18 @@
                     <div class="spec-row">
                         <span class="spec-name">Trạng thái</span>
                         <span class="spec-detail">
-                            @if (Model.Vehicle?.Status == DataAccessLayer.Enums.VehicleStatus.Available)
-                            {
-                                <span style="color: #059669;">Có sẵn</span>
+                            @{
+                                var statusText = Model.Vehicle?.Status switch
+                                {
+                                    DataAccessLayer.Enums.VehicleStatus.Available => "<span style=\"color: #059669;\">Có sẵn</span>",
+                                    DataAccessLayer.Enums.VehicleStatus.WaitingForPickup => "<span style=\"color: #0ea5e9;\">Chờ khách nhận</span>",
+                                    DataAccessLayer.Enums.VehicleStatus.Rented => "<span style=\"color: #dc2626;\">Đã cho thuê</span>",
+                                    DataAccessLayer.Enums.VehicleStatus.Maintenance => "<span style=\"color: #f59e0b;\">Đang bảo trì</span>",
+                                    DataAccessLayer.Enums.VehicleStatus.Charging => "<span style=\"color: #6366f1;\">Đang sạc pin</span>",
+                                    _ => "<span>Không xác định</span>"
+                                };
                             }
-                            else if (Model.Vehicle?.Status == DataAccessLayer.Enums.VehicleStatus.Rented)
-                            {
-                                <span style="color: #dc2626;">Đang được thuê</span>
-                            }
-                            else
-                            {
-                                <span style="color: #f59e0b;">Bảo trì</span>
-                            }
+                            @Html.Raw(statusText)
                         </span>
                     </div>
                     <div class="spec-row">
@@ -556,6 +556,7 @@
             align-items: center;
         }
 
+        .status-badge,
         .Status-badge {
             padding: 0.5rem 1rem;
             border-radius: 20px;
@@ -563,19 +564,34 @@
             font-size: 0.9rem;
         }
 
+        .status-badge.available,
         .Status-badge.available {
             background-color: #d1fae5;
             color: #065f46;
         }
 
+        .status-badge.pending,
+        .Status-badge.pending {
+            background-color: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .status-badge.rented,
         .Status-badge.rented {
             background-color: #fee2e2;
             color: #991b1b;
         }
 
+        .status-badge.maintenance,
         .Status-badge.maintenance {
             background-color: #fef3c7;
             color: #92400e;
+        }
+
+        .status-badge.charging,
+        .Status-badge.charging {
+            background-color: #ede9fe;
+            color: #5b21b6;
         }
 
         .btn-rent-now {

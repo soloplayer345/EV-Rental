@@ -31,7 +31,7 @@ namespace EV_Rental.Pages.Renter
         public async Task<IActionResult> OnPostPayAsync([FromBody] decimal amount)
         {
             var success = await _checkinService.ConfirmPaymentAsync(RentalRecordId, amount);
-            return new JsonResult(new { success, message = success ? "Thanh to�n th�nh c�ng!" : "Thanh to�n th?t b?i!" });
+            return new JsonResult(new { success, message = success ? "Thanh toán thành công!" : "Thanh toán thất bại!" });
         }
     }
 }

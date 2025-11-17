@@ -205,8 +205,8 @@ namespace BusinessLayer.Services
                 var rentalRepo = _unitOfWork.GetRepository<RentalRecord>();
                 await rentalRepo.AddAsync(rentalRecord);
 
-                // Update vehicle status to Rented
-                vehicle.Status = VehicleStatus.Rented;
+                // Update vehicle status to WaitingForPickup until OTP verification
+                vehicle.Status = VehicleStatus.WaitingForPickup;
                 await _vehicleService.UpdateVehicleAsync(vehicle);
 
                 await _unitOfWork.SaveChangesAsync();
@@ -241,11 +241,11 @@ namespace BusinessLayer.Services
                 rental.UpdateDate = DateTime.Now;
                 await rentalRepo.Update(rental);
 
-                // Update vehicle status to Rented
+                // Update vehicle status to WaitingForPickup until OTP verification
                 var vehicle = await _vehicleService.GetVehicleByIdAsync(rental.VehicleId);
                 if (vehicle != null)
                 {
-                    vehicle.Status = VehicleStatus.Rented;
+                    vehicle.Status = VehicleStatus.WaitingForPickup;
                     await _vehicleService.UpdateVehicleAsync(vehicle);
                 }
 
@@ -391,11 +391,26 @@ namespace BusinessLayer.Services
 
                 var rentalRepo = _unitOfWork.GetRepository<RentalRecord>();
 
+                var vehicle = await _vehicleService.GetVehicleByIdAsync(rental.VehicleId);
+                if (vehicle == null)
+                {
+                    return ServiceResultDto<RentalRecord>.FailureResult("Không tìm thấy thông tin xe tương ứng với đơn thuê.");
+                }
+
+                if (vehicle.Status != VehicleStatus.WaitingForPickup)
+                {
+                    return ServiceResultDto<RentalRecord>.FailureResult("Xe không ở trạng thái chờ nhận để bàn giao cho khách.");
+                }
+
                 // Cập nhật trạng thái từ Confirmed → Active
                 rental.Status = RentalRecordStatus.Active;
                 rental.StartTime = DateTime.Now; 
                 rental.UpdateDate = DateTime.Now;
                 await rentalRepo.Update(rental);
+
+                // Sau khi khách đã nhận xe, cập nhật trạng thái xe sang Rented (đang được thuê)
+                vehicle.Status = VehicleStatus.Rented;
+                await _vehicleService.UpdateVehicleAsync(vehicle);
 
                 await _unitOfWork.SaveChangesAsync();
 

@@ -11,6 +11,7 @@ namespace DataAccessLayer.Enums
         Available,
         Rented,
         Maintenance,
-        Charging
+        Charging,
+        WaitingForPickup
     }
 }

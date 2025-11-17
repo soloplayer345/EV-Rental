@@ -54,7 +54,7 @@ GO
 
 -- =============================================
 -- Sample Data: Vehicle (Electric Vehicles)
--- VehicleStatus: 0 = Available, 1 = Rented, 2 = Maintenance, 3 = Charging
+-- VehicleStatus: 0 = Available, 1 = Rented, 2 = Maintenance, 3 = Charging, 4 = WaitingForPickup
 -- =============================================
 INSERT INTO [Vehicle] (StationId, Name, Brand, PlateNumber, Model, VehicleType, Status, PricePerHour, PricePerDay, Features, ImageUrl, MaxDistance, SeatCapacity, BatteryCapacity, CreatedAt)
 VALUES 
