@@ -44,19 +44,21 @@ namespace EV_Rental.Pages.Admin.Station
                 // Lọc theo tìm kiếm
                 if (!string.IsNullOrEmpty(search))
                 {
-                    Stations = Stations.Where(s =>
-                        s.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                        s.Address.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                        s.State.Contains(search, StringComparison.OrdinalIgnoreCase)
-                    ).ToList();
+                    Stations = Stations
+                        .Where(s =>
+                            s.Name.Contains(search, StringComparison.OrdinalIgnoreCase)
+                            || s.Address.Contains(search, StringComparison.OrdinalIgnoreCase)
+                            || s.State.Contains(search, StringComparison.OrdinalIgnoreCase)
+                        )
+                        .ToList();
                 }
 
                 // Lọc theo tỉnh/thành phố
                 if (!string.IsNullOrEmpty(state))
                 {
-                    Stations = Stations.Where(s =>
-                        s.State.Equals(state, StringComparison.OrdinalIgnoreCase)
-                    ).ToList();
+                    Stations = Stations
+                        .Where(s => s.State.Equals(state, StringComparison.OrdinalIgnoreCase))
+                        .ToList();
                 }
 
                 // Sắp xếp theo ngày tạo (mới nhất trước)
@@ -108,7 +110,7 @@ namespace EV_Rental.Pages.Admin.Station
                     name = v.Name,
                     plateNumber = v.PlateNumber,
                     vehicleType = v.VehicleType,
-                    status = v.Status.ToString()
+                    status = v.Status.ToString(),
                 });
                 return new JsonResult(result);
             }
@@ -118,7 +120,10 @@ namespace EV_Rental.Pages.Admin.Station
             }
         }
 
-        public async Task<IActionResult> OnGetAvailableVehiclesAsync(int excludeStationId, int? sourceStationId = null)
+        public async Task<IActionResult> OnGetAvailableVehiclesAsync(
+            int excludeStationId,
+            int? sourceStationId = null
+        )
         {
             if (!SessionHelper.IsAdmin(HttpContext.Session))
             {
@@ -128,11 +133,13 @@ namespace EV_Rental.Pages.Admin.Station
             try
             {
                 var allVehicles = await _vehicleService.GetAllVehiclesAsync();
-                
+
                 // Filter: exclude current station, only Available/Maintenance status
-                var filtered = allVehicles.Where(v => 
-                    v.StationId != excludeStationId &&
-                    (v.Status == VehicleStatus.Available || v.Status == VehicleStatus.Maintenance)
+                var filtered = allVehicles.Where(v =>
+                    v.StationId != excludeStationId
+                    && (
+                        v.Status == VehicleStatus.Available || v.Status == VehicleStatus.Maintenance
+                    )
                 );
 
                 // Optional: filter by source station
@@ -149,7 +156,7 @@ namespace EV_Rental.Pages.Admin.Station
                     vehicleType = v.VehicleType,
                     status = v.Status.ToString(),
                     stationId = v.StationId,
-                    stationName = v.Station?.Name ?? "N/A"
+                    stationName = v.Station?.Name ?? "N/A",
                 });
 
                 return new JsonResult(result);
@@ -174,7 +181,7 @@ namespace EV_Rental.Pages.Admin.Station
                 {
                     id = s.Id,
                     name = s.Name,
-                    vehicleCount = s.Vehicles?.Count ?? 0
+                    vehicleCount = s.Vehicles?.Count ?? 0,
                 });
                 return new JsonResult(result);
             }
@@ -184,7 +191,9 @@ namespace EV_Rental.Pages.Admin.Station
             }
         }
 
-        public async Task<IActionResult> OnPostMoveVehicleAsync([FromBody] MoveVehicleRequest request)
+        public async Task<IActionResult> OnPostMoveVehicleAsync(
+            [FromBody] MoveVehicleRequest request
+        )
         {
             if (!SessionHelper.IsAdmin(HttpContext.Session))
             {
@@ -200,20 +209,30 @@ namespace EV_Rental.Pages.Admin.Station
                 }
 
                 // Check if vehicle is busy (đã cho thuê hoặc đang chờ khách nhận)
-                if (vehicle.Status == VehicleStatus.Rented || vehicle.Status == VehicleStatus.WaitingForPickup)
+                if (
+                    vehicle.Status == VehicleStatus.Rented
+                    || vehicle.Status == VehicleStatus.WaitingForPickup
+                )
                 {
-                    return new JsonResult(new { success = false, message = "Không thể điều chuyển xe đang bận" });
+                    return new JsonResult(
+                        new { success = false, message = "Không thể điều chuyển xe đang bận" }
+                    );
                 }
 
                 // Update station
                 vehicle.StationId = request.TargetStationId;
                 await _vehicleService.UpdateVehicleAsync(vehicle);
 
-                return new JsonResult(new { success = true, message = "Điều chuyển xe thành công" });
+                return new JsonResult(
+                    new { success = true, message = "Điều chuyển xe thành công" }
+                );
             }
             catch (Exception ex)
             {
-                return new JsonResult(new { success = false, message = ex.Message }) { StatusCode = 500 };
+                return new JsonResult(new { success = false, message = ex.Message })
+                {
+                    StatusCode = 500,
+                };
             }
         }
 
@@ -224,4 +243,3 @@ namespace EV_Rental.Pages.Admin.Station
         }
     }
 }
-

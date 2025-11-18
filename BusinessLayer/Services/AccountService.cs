@@ -2,7 +2,6 @@ using BusinessLayer.DTOs;
 using BusinessLayer.Interfaces;
 using BusinessLayer.Mapping;
 using DataAccessLayer.Entities;
-using DataAccessLayer.Entities;
 using DataAccessLayer.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -52,7 +51,9 @@ namespace BusinessLayer.Services
         {
             var accountRepo = _unitOfWork.AccountRepo;
             var accounts = await accountRepo.GetAllAsync();
-            var account = accounts.FirstOrDefault(a => a.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+            var account = accounts.FirstOrDefault(a =>
+                a.Email.Equals(email, StringComparison.OrdinalIgnoreCase)
+            );
             return AccountMapper.ToDto(account);
         }
 
@@ -60,7 +61,7 @@ namespace BusinessLayer.Services
         public async Task<AccountDto> AddAccountAsync(dynamic accountData)
         {
             var accountRepo = _unitOfWork.AccountRepo;
-            
+
             // Convert dynamic to Account entity
             var account = new Account
             {
@@ -69,9 +70,9 @@ namespace BusinessLayer.Services
                 Phone = accountData.Phone,
                 PasswordHash = accountData.PasswordHash,
                 Role = accountData.Role,
-                IsActive = accountData.IsActive
+                IsActive = accountData.IsActive,
             };
-            
+
             // Check if email already exists
             if (await accountRepo.IsEmailExistsAsync(account.Email))
             {
@@ -97,7 +98,7 @@ namespace BusinessLayer.Services
         public async Task UpdateAccountAsync(Account account)
         {
             var accountRepo = _unitOfWork.AccountRepo;
-            
+
             // Get existing account
             var existingAccount = await accountRepo.GetByIdAsync(account.Id);
             if (existingAccount == null)
@@ -106,13 +107,19 @@ namespace BusinessLayer.Services
             }
 
             // Check if email is changed and already exists
-            if (existingAccount.Email != account.Email && await accountRepo.IsEmailExistsAsync(account.Email))
+            if (
+                existingAccount.Email != account.Email
+                && await accountRepo.IsEmailExistsAsync(account.Email)
+            )
             {
                 throw new InvalidOperationException("Email đã tồn tại");
             }
 
             // Check if phone is changed and already exists
-            if (existingAccount.Phone != account.Phone && await accountRepo.IsPhoneExistsAsync(account.Phone))
+            if (
+                existingAccount.Phone != account.Phone
+                && await accountRepo.IsPhoneExistsAsync(account.Phone)
+            )
             {
                 throw new InvalidOperationException("Số điện thoại đã tồn tại");
             }
@@ -127,7 +134,7 @@ namespace BusinessLayer.Services
         {
             var accountRepo = _unitOfWork.AccountRepo;
             var account = await accountRepo.GetByIdAsync(accountId);
-            
+
             if (account == null)
             {
                 throw new KeyNotFoundException("Không tìm thấy tài khoản");
@@ -145,7 +152,7 @@ namespace BusinessLayer.Services
         {
             var accountRepo = _unitOfWork.AccountRepo;
             var account = await accountRepo.GetByIdAsync(accountId);
-            
+
             if (account == null)
             {
                 throw new KeyNotFoundException("Không tìm thấy tài khoản");
@@ -170,7 +177,7 @@ namespace BusinessLayer.Services
                 TotalUsers = allAccounts.Count,
                 ActiveUsers = allAccounts.Count(a => a.IsActive),
                 InactiveUsers = allAccounts.Count(a => !a.IsActive),
-                NewUsersThisMonth = allAccounts.Count(a => a.CreateDate >= firstDayOfMonth)
+                NewUsersThisMonth = allAccounts.Count(a => a.CreateDate >= firstDayOfMonth),
             };
         }
 
@@ -178,7 +185,8 @@ namespace BusinessLayer.Services
         public async Task<IEnumerable<AccountDto>> SearchAccountsAsync(
             string? searchTerm = null,
             AccountRole? roleFilter = null,
-            bool? statusFilter = null)
+            bool? statusFilter = null
+        )
         {
             var accountRepo = _unitOfWork.AccountRepo;
             var accounts = (await accountRepo.GetAllAsync())
@@ -189,9 +197,9 @@ namespace BusinessLayer.Services
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 accounts = accounts.Where(a =>
-                    a.FullName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    a.Email.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    a.Phone.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                    a.FullName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                    || a.Email.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                    || a.Phone.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
                 );
             }
 
