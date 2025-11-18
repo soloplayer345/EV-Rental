@@ -1,5 +1,7 @@
 using BusinessLayer.DTOs;
 using DataAccessLayer.Entities;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace BusinessLayer.Mapping
 {
@@ -14,7 +16,33 @@ namespace BusinessLayer.Mapping
                 Id = station.Id,
                 Name = station.Name,
                 Address = station.Address,
-                State = station.State
+                State = station.State,
+                Vehicles = station.Vehicles?.Select(v => ToVehicleDtoWithoutStation(v)).ToList() ?? new List<VehicleDto>()
+            };
+        }
+        
+        private static VehicleDto ToVehicleDtoWithoutStation(Vehicle vehicle)
+        {
+            if (vehicle == null) return null;
+
+            return new VehicleDto
+            {
+                Id = vehicle.Id,
+                StationId = vehicle.StationId,
+                Name = vehicle.Name,
+                Brand = vehicle.Brand,
+                PlateNumber = vehicle.PlateNumber,
+                Model = vehicle.Model,
+                VehicleType = vehicle.VehicleType,
+                Status = vehicle.Status,
+                PricePerHour = vehicle.PricePerHour,
+                PricePerDay = vehicle.PricePerDay,
+                Features = vehicle.Features,
+                ImageUrl = vehicle.ImageUrl,
+                MaxDistance = vehicle.MaxDistance,
+                BatteryCapacity = vehicle.BatteryCapacity,
+                seartCapacity = vehicle.seartCapacity,
+                Station = null // Don't map station to avoid circular reference
             };
         }
 

@@ -30,7 +30,8 @@ namespace BusinessLayer.Mapping
                 ImageUrl = vehicle.ImageUrl,
                 MaxDistance = vehicle.MaxDistance,
                 BatteryCapacity = vehicle.BatteryCapacity,
-                seartCapacity = vehicle.seartCapacity
+                seartCapacity = vehicle.seartCapacity,
+                Station = vehicle.Station != null ? vehicle.Station.ToDto() : null
             };
             return response;
         }
