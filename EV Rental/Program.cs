@@ -69,6 +69,10 @@ namespace EV_Rental
             builder.Services.AddScoped<IReportService, ReportService>();
             builder.Services.AddScoped<AccountService>();
 
+            //AI register
+            builder.Services.AddScoped<CarAiAssistantService>();
+
+
             // Register SignalR wrapper service
             builder.Services.AddScoped<EV_Rental.Services.VehicleHubService>();
 

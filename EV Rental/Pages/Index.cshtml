@@ -12,7 +12,7 @@
 
     <h2 class="mb-4">Danh sách xe điện</h2>
 
-    // thanh tìm kiếm
+ 
     <section class="hero bg-light py-5">
         <div class="container text-center">
             <h2 class="hero-title mb-3">🔋 Tìm Xe Điện Hoàn Hảo Của Bạn</h2>
@@ -85,6 +85,60 @@
             }
         </div>
     </section>
+
+    <!-- CHATBOT AI -->
+    <section class="py-5 bg-light border-top">
+        <div class="container">
+            <h3 class="mb-3 text-center">🤖 Tư vấn chọn xe bằng AI</h3>
+
+            <div id="chatContainer" class="border rounded p-3 mb-3" style="height: 400px; overflow-y: auto; background: #f8f9fa;">
+                @if (Model.AiRecommendedVehicles.Any())
+                {
+                    foreach (var item in Model.AiRecommendedVehicles)
+                    {
+                        if (item.Id == null)
+                        {
+                            // This is the summary text
+                            <div class="mb-2 p-2 rounded text-start bg-light border">
+                                <em>@item.Reason</em>
+                            </div>
+                        }
+                        else
+                        {
+                            // This is a car recommendation
+                            var car = Model.Vehicles.FirstOrDefault(v => v.Id == item.Id);
+                            if (car == null) continue;
+
+                            <div class="mb-2 p-2 rounded text-start bg-light border">
+                                <strong>@item.Name</strong><br />
+                                <img src="@car.ImageUrl" class="img-fluid mb-1" style="max-height:120px;" />
+                                <em>@item.Reason</em>
+                            </div>
+                        }
+                    }
+                }
+            </div>
+
+
+
+            <form method="post" asp-page-handler="Chat" class="d-flex gap-2">
+                <input asp-for="UserQuery" class="form-control" placeholder="VD: đi Vũng Tàu 4 người, cần xe tiết kiệm..." />
+                <button class="btn btn-primary" type="submit">Gửi</button>
+            </form>
+        </div>
+    </section>
+
+    @section Scripts {
+        <script>
+            // scroll to bottom after page loads
+            window.addEventListener("load", () => {
+                const chatContainer = document.getElementById("chatContainer");
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            });
+        </script>
+    }
+
+
 
 </div>
 
