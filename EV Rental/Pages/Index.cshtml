@@ -1,0 +1,144 @@
+@page
+@using DataAccessLayer.Entities
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome to EV Rental</h1>
+    <p>Hệ thống cho thuê xe điện</p>
+
+
+    <h2 class="mb-4">Danh sách xe điện</h2>
+
+ 
+    <section class="hero bg-light py-5">
+        <div class="container text-center">
+            <h2 class="hero-title mb-3">🔋 Tìm Xe Điện Hoàn Hảo Của Bạn</h2>
+            <p class="hero-subtitle mb-4">Chọn, thuê và lái xe điện từ các trạm gần bạn</p>
+
+            <form method="get" class="search-form d-flex justify-content-center gap-3">
+                <input type="text" name="Name" value="@Model.Name" placeholder="Nhập tên xe"
+                       class="form-control w-25" />
+
+                <input type="text" name="Brand" value="@Model.Brand" placeholder="Nhập hãng xe"
+                       class="form-control w-25" />
+
+                <select name="Status" class="form-select w-25">
+                    <option value="">-- Trạng thái --</option>
+                    <option value="Available" selected="@(Model.Status == VehicleStatus.Available)">Sẵn sàng</option>
+                    <option value="WaitingForPickup" selected="@(Model.Status == VehicleStatus.WaitingForPickup)">Chờ nhận</option>
+                    <option value="Rented" selected="@(Model.Status == VehicleStatus.Rented)">Đã cho thuê</option>
+                    <option value="Maintenance" selected="@(Model.Status == VehicleStatus.Maintenance)">Bảo trì</option>
+                    <option value="Charging" selected="@(Model.Status == VehicleStatus.Charging)">Đang sạc</option>
+                </select>
+
+                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+            </form>
+        </div>
+    </section>
+
+    // kết quả tìm kiếm
+    <section class="vehicle-results py-5">
+        <div class="container">
+            <h3 class="mb-4">Kết quả tìm kiếm</h3>
+
+            @if (Model.Vehicles != null && Model.Vehicles.Any())
+            {
+                <div class="row">
+                    @foreach (var vehicle in Model.Vehicles)
+                    {
+                        <div class="col-md-4 mb-4">
+                            <div class="card shadow-sm">
+                                <img src="@vehicle.ImageUrl" class="card-img-top" alt="@vehicle.Name" />
+                                <div class="card-body">
+                                    <h5 class="card-title">@vehicle.Name</h5>
+                                    <p class="card-text">
+                                        <strong>Hãng:</strong> @vehicle.Brand <br />
+                                        <strong>Trạng thái:</strong>
+                                        @{
+                                            var statusBadge = vehicle.Status switch
+                                            {
+                                                VehicleStatus.Available => ("bg-success", "Sẵn sàng"),
+                                                VehicleStatus.WaitingForPickup => ("bg-info text-dark", "Chờ nhận"),
+                                                VehicleStatus.Rented => ("bg-danger", "Đã cho thuê"),
+                                                VehicleStatus.Maintenance => ("bg-warning text-dark", "Bảo trì"),
+                                                VehicleStatus.Charging => ("bg-primary", "Đang sạc"),
+                                                _ => ("bg-secondary", vehicle.Status.ToString())
+                                            };
+                                        }
+                                        <span class="badge @statusBadge.Item1">
+                                            @statusBadge.Item2
+                                        </span>
+                                    </p>
+                                    <a href="/Vehicles/Details?id=@vehicle.Id" class="btn btn-outline-primary btn-sm">Chi tiết</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning">Không tìm thấy xe phù hợp.</div>
+            }
+        </div>
+    </section>
+
+    <!-- CHATBOT AI -->
+    <section class="py-5 bg-light border-top">
+        <div class="container">
+            <h3 class="mb-3 text-center">🤖 Tư vấn chọn xe bằng AI</h3>
+
+            <div id="chatContainer" class="border rounded p-3 mb-3" style="height: 400px; overflow-y: auto; background: #f8f9fa;">
+                @if (Model.AiRecommendedVehicles.Any())
+                {
+                    foreach (var item in Model.AiRecommendedVehicles)
+                    {
+                        if (item.Id == null)
+                        {
+                            // This is the summary text
+                            <div class="mb-2 p-2 rounded text-start bg-light border">
+                                <em>@item.Reason</em>
+                            </div>
+                        }
+                        else
+                        {
+                            // This is a car recommendation
+                            var car = Model.Vehicles.FirstOrDefault(v => v.Id == item.Id);
+                            if (car == null) continue;
+
+                            <div class="mb-2 p-2 rounded text-start bg-light border">
+                                <strong>@item.Name</strong><br />
+                                <img src="@car.ImageUrl" class="img-fluid mb-1" style="max-height:120px;" />
+                                <em>@item.Reason</em>
+                            </div>
+                        }
+                    }
+                }
+            </div>
+
+
+
+            <form method="post" asp-page-handler="Chat" class="d-flex gap-2">
+                <input asp-for="UserQuery" class="form-control" placeholder="VD: đi Vũng Tàu 4 người, cần xe tiết kiệm..." />
+                <button class="btn btn-primary" type="submit">Gửi</button>
+            </form>
+        </div>
+    </section>
+
+    @section Scripts {
+        <script>
+            // scroll to bottom after page loads
+            window.addEventListener("load", () => {
+                const chatContainer = document.getElementById("chatContainer");
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            });
+        </script>
+    }
+
+
+
+</div>
+

@@ -1,0 +1,322 @@
+@page "{id:int}"
+@model EV_Rental.Pages.Renter.TripDetailModel
+@{
+    ViewData["Title"] = "Chi tiết Chuyến Đi";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<!-- Page Header -->
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1><i class="fas fa-route me-2"></i>Chi tiết Chuyến Đi #@Model.RentalRecord.Id</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Renter/Index">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="/Renter/MyTrips">Chuyến của tôi</a></li>
+                <li class="breadcrumb-item active">Chi tiết</li>
+            </ol>
+        </nav>
+    </div>
+    <div>
+        <a href="/Renter/MyTrips" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Quay lại
+        </a>
+    </div>
+</div>
+
+<!-- Alerts -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row">
+    <!-- Main Content -->
+    <div class="col-lg-8">
+        <!-- Rental Status -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Trạng Thái</h5>
+                @{
+                    var statusClass = Model.RentalRecord.Status switch
+                    {
+                        DataAccessLayer.Entities.RentalRecordStatus.Pending => "bg-warning",
+                        DataAccessLayer.Entities.RentalRecordStatus.Confirmed => "bg-info",
+                        DataAccessLayer.Entities.RentalRecordStatus.Active => "bg-primary",
+                        DataAccessLayer.Entities.RentalRecordStatus.Completed => "bg-success",
+                        DataAccessLayer.Entities.RentalRecordStatus.Cancelled => "bg-danger",
+                        _ => "bg-secondary"
+                    };
+                    var statusText = Model.RentalRecord.Status switch
+                    {
+                        DataAccessLayer.Entities.RentalRecordStatus.Pending => "Chờ thanh toán",
+                        DataAccessLayer.Entities.RentalRecordStatus.Confirmed => "Đã thanh toán",
+                        DataAccessLayer.Entities.RentalRecordStatus.Active => "Đang thuê",
+                        DataAccessLayer.Entities.RentalRecordStatus.Completed => "Hoàn thành",
+                        DataAccessLayer.Entities.RentalRecordStatus.Cancelled => "Đã hủy",
+                        _ => Model.RentalRecord.Status.ToString()
+                    };
+                }
+                <span class="badge @statusClass fs-6">@statusText</span>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Mã Đơn</label>
+                        <p class="fs-5">
+                            <strong>#@Model.RentalRecord.Id</strong>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Mã OTP</label>
+                        <p class="fs-5">
+                            <code class="bg-light p-2 rounded">@Model.RentalRecord.OtpCode</code>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Thời Gian Nhận Xe</label>
+                        <p class="fs-5">
+                            <i class="fas fa-calendar-check text-success me-2"></i>
+                            <strong>@Model.RentalRecord.StartTime?.ToString("dd/MM/yyyy HH:mm")</strong>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Thời Gian Trả Xe (Dự kiến)</label>
+                        <p class="fs-5">
+                            <i class="fas fa-calendar-times text-warning me-2"></i>
+                            <strong>@Model.RentalRecord.ExpectedEndTime?.ToString("dd/MM/yyyy HH:mm")</strong>
+                        </p>
+                    </div>
+                </div>
+
+                @if (Model.RentalRecord.ActualEndTime.HasValue)
+                {
+                    <div class="alert alert-info">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>Đã trả xe:</strong> @Model.RentalRecord.ActualEndTime.Value.ToString("dd/MM/yyyy HH:mm")
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Vehicle Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-car me-2"></i>Thông tin Xe Thuê</h5>
+            </div>
+            <div class="card-body">
+                @if (!string.IsNullOrEmpty(Model.RentalRecord.Vehicle?.ImageUrl))
+                {
+                    <div class="text-center mb-3">
+                        <img src="@Model.RentalRecord.Vehicle.ImageUrl" alt="@Model.RentalRecord.Vehicle.Name" 
+                             class="img-fluid rounded" style="max-height: 300px;">
+                    </div>
+                }
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Tên Xe</label>
+                        <p class="fs-5"><strong>@Model.RentalRecord.Vehicle?.Name</strong></p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Biển Số</label>
+                        <p class="fs-5"><strong>@Model.RentalRecord.Vehicle?.PlateNumber</strong></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Loại Xe</label>
+                        <p><strong>@Model.RentalRecord.Vehicle?.VehicleType</strong></p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Dòng Xe</label>
+                        <p><strong>@Model.RentalRecord.Vehicle?.Brand @Model.RentalRecord.Vehicle?.Model</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Station Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>Địa Điểm</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="border-start border-success border-4 ps-3 mb-3">
+                            <label class="form-label text-muted">Trạm Nhận Xe</label>
+                            <p class="mb-1"><strong>@Model.RentalRecord.PickupStation?.Name</strong></p>
+                            <p class="text-muted mb-0">
+                                <i class="fas fa-map-marker-alt me-1"></i>
+                                @Model.RentalRecord.PickupStation?.Address
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="border-start border-danger border-4 ps-3 mb-3">
+                            <label class="form-label text-muted">Trạm Trả Xe</label>
+                            @if (Model.RentalRecord.ReturnStation != null)
+                            {
+                                <p class="mb-1"><strong>@Model.RentalRecord.ReturnStation.Name</strong></p>
+                                <p class="text-muted mb-0">
+                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                    @Model.RentalRecord.ReturnStation.Address
+                                </p>
+                            }
+                            else
+                            {
+                                <p class="text-muted">Chưa trả xe</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inspection Problems -->
+        @if (Model.RentalRecord.InspectionProblems.Any())
+        {
+            <div class="card mb-4 border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Vấn Đề Phát Hiện</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        @foreach (var problem in Model.RentalRecord.InspectionProblems)
+                        {
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1 text-danger">@problem.IncidentType</h6>
+                                    <span class="badge bg-danger">Phí phạt: ₫@problem.PenaltyAmount.ToString("N0")</span>
+                                </div>
+                                <p class="mb-1">@problem.Description</p>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    @problem.CreateDate.ToString("dd/MM/yyyy HH:mm")
+                                </small>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Price Summary -->
+        <div class="card mb-4 border-primary">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Chi Tiết Thanh Toán</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Giá Thuê:</span>
+                    <strong>₫@Model.RentalRecord.BasePrice.ToString("N0")</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Phí Cọc:</span>
+                    <strong>₫@Model.RentalRecord.DepositFee.ToString("N0")</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Phí Giữ Chỗ:</span>
+                    <strong>₫@Model.RentalRecord.ReservationFee.ToString("N0")</strong>
+                </div>
+                @if (Model.RentalRecord.ExtraFees > 0)
+                {
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Phí Phát Sinh:</span>
+                        <strong class="text-danger">₫@Model.RentalRecord.ExtraFees.ToString("N0")</strong>
+                    </div>
+                }
+                @if (Model.RentalRecord.Discount > 0)
+                {
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Giảm Giá:</span>
+                        <strong class="text-success">-₫@Model.RentalRecord.Discount.ToString("N0")</strong>
+                    </div>
+                }
+                <hr>
+                <div class="d-flex justify-content-between fs-4">
+                    <span><strong>Tổng Cộng:</strong></span>
+                    <strong class="text-primary">₫@Model.RentalRecord.TotalPrice.ToString("N0")</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payments -->
+        @if (Model.RentalRecord.Payments.Any())
+        {
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-credit-card me-2"></i>Lịch Sử Thanh Toán</h5>
+                </div>
+                <div class="card-body">
+                    @foreach (var payment in Model.RentalRecord.Payments)
+                    {
+                        <div class="mb-3 pb-3 border-bottom">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong class="fs-5">₫@payment.Amount.ToString("N0")</strong>
+                                    <br>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>
+                                        @payment.PaidAt?.ToString("dd/MM/yyyy HH:mm")
+                                    </small>
+                                </div>
+                                <span class="badge bg-success">@payment.Method</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        <!-- Help -->
+        <div class="card border-info">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-question-circle me-2"></i>Cần Trợ Giúp?</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-3">Nếu bạn có thắc mắc về chuyến đi này, vui lòng liên hệ:</p>
+                <div class="d-grid gap-2">
+                    <a href="tel:1900xxxx" class="btn btn-outline-info">
+                        <i class="fas fa-phone me-2"></i>Hotline: 1900 xxxx
+                    </a>
+                    <a href="mailto:support@evrental.com" class="btn btn-outline-info">
+                        <i class="fas fa-envelope me-2"></i>Email Hỗ Trợ
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto dismiss alerts after 5 seconds
+        document.querySelectorAll('.alert').forEach(alert => {
+            setTimeout(() => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 5000);
+        });
+    </script>
+}
+

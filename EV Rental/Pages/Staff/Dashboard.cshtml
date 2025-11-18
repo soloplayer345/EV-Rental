@@ -1,0 +1,184 @@
+@page
+@model EV_Rental.Pages.Staff.DashboardModel
+@{
+    ViewData["Title"] = "Dashboard Nhân viên";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold mb-1">Dashboard Nhân viên</h1>
+            <p class="text-muted">Chào mừng <strong>@Model.UserEmail</strong></p>
+        </div>
+    </div>
+
+    <!-- Quick Stats Row -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm border-0">
+                <div class="card-body">
+                    <div class="display-4 text-success mb-2">
+                        <i class="bi bi-car-front"></i>
+                    </div>
+                    <h6 class="card-title text-muted">Tổng Xe</h6>
+                    <h2 class="fw-bold">25</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm border-0">
+                <div class="card-body">
+                    <div class="display-4 text-warning mb-2">
+                        <i class="bi bi-hourglass-split"></i>
+                    </div>
+                    <h6 class="card-title text-muted">Đang Cho Thuê</h6>
+                    <h2 class="fw-bold">8</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm border-0">
+                <div class="card-body">
+                    <div class="display-4 text-info mb-2">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                    <h6 class="card-title text-muted">Sẵn Sàng</h6>
+                    <h2 class="fw-bold">17</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm border-0">
+                <div class="card-body">
+                    <div class="display-4 text-danger mb-2">
+                        <i class="bi bi-wrench"></i>
+                    </div>
+                    <h6 class="card-title text-muted">Bảo Trì</h6>
+                    <h2 class="fw-bold">0</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Actions Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-success text-white">
+                    <i class="bi bi-key"></i> Xác Minh OTP & Nhận Xe
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Khách hàng đến trạm</h5>
+                    <p class="card-text text-muted">
+                        Khách hàng sẽ cung cấp mã OTP. Nhân viên xác minh mã OTP và cho phép khách hàng nhận xe.
+                    </p>
+                    <a asp-page="/Staff/PickupVehicle" class="btn btn-success w-100">
+                        <i class="bi bi-arrow-right-circle"></i> Xác Minh OTP
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-warning text-dark">
+                    <i class="bi bi-clipboard-check"></i> Kiểm Tra & Trả Xe
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Kiểm tra tình trạng xe</h5>
+                    <p class="card-text text-muted">
+                        Kiểm tra tình trạng phương tiện khi khách hàng trả xe. Ghi nhận các sự cố nếu có.
+                    </p>
+                    <a asp-page="/Staff/CheckIn/Index" class="btn btn-warning w-100">
+                        <i class="bi bi-arrow-right-circle"></i> Kiểm Tra Xe
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Management Sections -->
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-list-ul"></i> Quản Lý Xe Điện
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Danh sách xe</h5>
+                    <p class="card-text text-muted">
+                        Xem danh sách tất cả xe điện, cập nhật thông tin xe, thêm hoặc xóa xe.
+                    </p>
+                    <ul class="list-unstyled mb-3">
+                        <li class="py-1"><i class="bi bi-check-circle text-success"></i> Xem danh sách</li>
+                        <li class="py-1"><i class="bi bi-check-circle text-success"></i> Thêm xe mới</li>
+                        <li class="py-1"><i class="bi bi-check-circle text-success"></i> Cập nhật thông tin</li>
+                    </ul>
+                    <a asp-page="/Staff/StaffIndex" class="btn btn-primary w-100">
+                        <i class="bi bi-arrow-right-circle"></i> Quản Lý Xe
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-receipt"></i> Hóa Đơn Cho Thuê
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Danh sách giao dịch</h5>
+                    <p class="card-text text-muted">
+                        Xem lịch sử các giao dịch cho thuê, trạng thái thanh toán và chi tiết khách hàng.
+                    </p>
+                    <ul class="list-unstyled mb-3">
+                        <li class="py-1"><i class="bi bi-check-circle text-success"></i> Xem hóa đơn</li>
+                        <li class="py-1"><i class="bi bi-check-circle text-success"></i> Thống kê doanh thu</li>
+                        <li class="py-1"><i class="bi bi-check-circle text-success"></i> Lịch sử giao dịch</li>
+                    </ul>
+                    <a href="#" class="btn btn-info w-100">
+                        <i class="bi bi-arrow-right-circle"></i> Xem Hóa Đơn
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border-radius: 0.5rem;
+    }
+
+    .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1) !important;
+    }
+
+    .card-header {
+        border-bottom: 2px solid rgba(0,0,0,0.1);
+        font-weight: 600;
+        padding: 1rem;
+    }
+
+    .display-4 {
+        opacity: 0.8;
+    }
+
+    .list-unstyled li {
+        font-size: 0.95rem;
+        color: #555;
+    }
+
+    .btn {
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+</style>
+

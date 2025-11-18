@@ -1,0 +1,247 @@
+@page
+@model EV_Rental.Pages.Admin.Vehicle.BulkAssignModel
+@{
+    ViewData["Title"] = "Phân phối Xe hàng loạt";
+    Layout = "~/Pages/Shared/_AdminLayout.cshtml";
+}
+
+<!-- Page Header -->
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1><i class="fas fa-exchange-alt me-2"></i>Phân phối Xe hàng loạt</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Admin/Dashboard">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="/Admin/Vehicle/Index">Quản lý Xe</a></li>
+                <li class="breadcrumb-item active">Phân phối hàng loạt</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- Alerts -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row">
+    <!-- Filter & Selection -->
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Lọc và Chọn Xe</h5>
+            </div>
+            <div class="card-body">
+                <form method="get" class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label for="currentStation" class="form-label">Trạm hiện tại</label>
+                        <select class="form-select" id="currentStation" name="currentStation">
+                            <option value="">Tất cả trạm</option>
+                            @foreach (var station in Model.Stations)
+                            {
+                                <option value="@station.Id" selected="@(Model.CurrentStationFilter == station.Id)">
+                                    @station.Name (@station.Vehicles.Count xe)
+                                </option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="status" class="form-label">Trạng thái</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="">Tất cả</option>
+                            <option value="Available" selected="@(Model.StatusFilter == "Available")">Sẵn sàng</option>
+                            <option value="WaitingForPickup" selected="@(Model.StatusFilter == "WaitingForPickup")">Chờ nhận</option>
+                            <option value="Maintenance" selected="@(Model.StatusFilter == "Maintenance")">Bảo trì</option>
+                            <option value="Charging" selected="@(Model.StatusFilter == "Charging")">Sạc pin</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-admin-primary w-100">
+                            <i class="fas fa-search me-1"></i>Lọc
+                        </button>
+                    </div>
+                </form>
+
+                <form method="post" id="bulkAssignForm">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">
+                                        <input type="checkbox" id="selectAll" class="form-check-input">
+                                    </th>
+                                    <th>Tên xe</th>
+                                    <th>Biển số</th>
+                                    <th>Trạm hiện tại</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var vehicle in Model.Vehicles)
+                                {
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" name="selectedVehicles" value="@vehicle.Id" 
+                                                   class="form-check-input vehicle-checkbox">
+                                        </td>
+                                        <td><strong>@vehicle.Name</strong></td>
+                                        <td>@vehicle.PlateNumber</td>
+                                        <td>
+                                            <span class="badge bg-info">@vehicle.Station?.Name</span>
+                                        </td>
+                                        <td>
+                                            @switch (vehicle.Status)
+                                            {
+                                                case DataAccessLayer.Entities.VehicleStatus.Available:
+                                                    <span class="badge bg-success">Sẵn sàng</span>
+                                                    break;
+                                                case DataAccessLayer.Entities.VehicleStatus.WaitingForPickup:
+                                                    <span class="badge bg-info text-dark">Chờ nhận</span>
+                                                    break;
+                                                case DataAccessLayer.Entities.VehicleStatus.Maintenance:
+                                                    <span class="badge bg-warning">Bảo trì</span>
+                                                    break;
+                                                case DataAccessLayer.Entities.VehicleStatus.Charging:
+                                                    <span class="badge bg-primary">Sạc pin</span>
+                                                    break;
+                                                case DataAccessLayer.Entities.VehicleStatus.Rented:
+                                                    <span class="badge bg-secondary">Đã cho thuê</span>
+                                                    break;
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @if (!Model.Vehicles.Any())
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Không tìm thấy xe nào</p>
+                        </div>
+                    }
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assignment Panel -->
+    <div class="col-md-4">
+        <div class="card sticky-top" style="top: 100px;">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>Phân phối</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Đã chọn: <strong id="selectedCount">0</strong> xe
+                </div>
+
+                <form method="post" asp-page-handler="Assign">
+                    <input type="hidden" id="vehicleIdsInput" name="vehicleIds" value="">
+                    
+                    <div class="mb-3">
+                        <label for="targetStation" class="form-label">Trạm đích</label>
+                        <select class="form-select" id="targetStation" name="targetStationId" required>
+                            <option value="">-- Chọn trạm --</option>
+                            @foreach (var station in Model.Stations)
+                            {
+                                <option value="@station.Id">
+                                    @station.Name (@station.Vehicles.Count xe)
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Cập nhật trạng thái xe</label>
+                        <select class="form-select" name="newStatus">
+                            <option value="">Giữ nguyên</option>
+                            <option value="Available">Sẵn sàng</option>
+                            <option value="WaitingForPickup">Chờ nhận</option>
+                            <option value="Maintenance">Bảo trì</option>
+                            <option value="Charging">Sạc pin</option>
+                        </select>
+                        <small class="text-muted">Tùy chọn: Thay đổi trạng thái sau khi phân phối</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100" id="assignBtn" disabled>
+                        <i class="fas fa-check me-2"></i>Xác nhận Phân phối
+                    </button>
+                </form>
+
+                <hr>
+
+                <div class="mt-3">
+                    <h6 class="mb-2">Tóm tắt trạm</h6>
+                    @foreach (var station in Model.Stations.OrderByDescending(s => s.Vehicles.Count).Take(5))
+                    {
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small">@station.Name</span>
+                            <span class="badge bg-secondary">@station.Vehicles.Count xe</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const vehicleCheckboxes = document.querySelectorAll('.vehicle-checkbox');
+    const selectedCountSpan = document.getElementById('selectedCount');
+    const assignBtn = document.getElementById('assignBtn');
+    const vehicleIdsInput = document.getElementById('vehicleIdsInput');
+
+    function updateSelectedCount() {
+        const checkedBoxes = document.querySelectorAll('.vehicle-checkbox:checked');
+        const count = checkedBoxes.length;
+        selectedCountSpan.textContent = count;
+        assignBtn.disabled = count === 0;
+
+        // Update hidden input with selected IDs
+        const ids = Array.from(checkedBoxes).map(cb => cb.value).join(',');
+        vehicleIdsInput.value = ids;
+    }
+
+    selectAllCheckbox.addEventListener('change', function() {
+        vehicleCheckboxes.forEach(cb => {
+            cb.checked = this.checked;
+        });
+        updateSelectedCount();
+    });
+
+    vehicleCheckboxes.forEach(cb => {
+        cb.addEventListener('change', updateSelectedCount);
+    });
+
+    // Form submission confirmation
+    document.querySelector('form[asp-page-handler="Assign"]').addEventListener('submit', function(e) {
+        const count = document.querySelectorAll('.vehicle-checkbox:checked').length;
+        const stationName = document.getElementById('targetStation').selectedOptions[0].text;
+        
+        if (!confirm(`Bạn có chắc chắn muốn phân phối ${count} xe đến ${stationName}?`)) {
+            e.preventDefault();
+        }
+    });
+</script>
+}
+

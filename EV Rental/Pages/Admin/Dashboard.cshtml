@@ -1,0 +1,319 @@
+@page
+@model EV_Rental.Pages.Admin.DashboardModel
+@using System.Text.Json
+@using System.Linq
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Pages/Shared/_AdminLayout.cshtml";
+
+    var monthlyRevenue = (Model.MonthlyRevenue != null && Model.MonthlyRevenue.Any())
+        ? Model.MonthlyRevenue
+        : Enumerable.Repeat(0m, 12).ToList();
+    var revenueLabels = Enumerable.Range(1, monthlyRevenue.Count).Select(i => $"Tháng {i}").ToList();
+    var revenueDataJson = JsonSerializer.Serialize(monthlyRevenue);
+    var revenueLabelsJson = JsonSerializer.Serialize(revenueLabels);
+
+    var vehicleStatusLabels = Model.VehicleStatusDistribution
+        .Select(kvp => kvp.Key switch
+        {
+            DataAccessLayer.Entities.VehicleStatus.Available => "Sẵn sàng",
+            DataAccessLayer.Entities.VehicleStatus.WaitingForPickup => "Chờ nhận",
+            DataAccessLayer.Entities.VehicleStatus.Rented => "Đã cho thuê",
+            DataAccessLayer.Entities.VehicleStatus.Maintenance => "Bảo trì",
+            DataAccessLayer.Entities.VehicleStatus.Charging => "Đang sạc",
+            _ => kvp.Key.ToString()
+        }).ToList();
+
+    var vehicleStatusData = Model.VehicleStatusDistribution.Select(kvp => kvp.Value).ToList();
+    var vehicleStatusLabelsJson = JsonSerializer.Serialize(vehicleStatusLabels);
+    var vehicleStatusDataJson = JsonSerializer.Serialize(vehicleStatusData);
+
+    string GetTrendClass(double value) => value >= 0 ? "stat-change positive" : "stat-change negative";
+    string FormatPercentage(double value) => $"{Math.Abs(value):0.#}%";
+}
+
+<!-- Page Header -->
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1><i class="fas fa-tachometer-alt me-2"></i>Dashboard</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active">Trang chủ</li>
+            </ol>
+        </nav>
+    </div>
+    <div>
+        <button class="btn btn-admin-primary">
+            <i class="fas fa-download me-2"></i>Xuất báo cáo
+        </button>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-card-icon primary me-3">
+                    <i class="fas fa-receipt"></i>
+                </div>
+                <div class="stat-card-body flex-grow-1">
+                    <h6>Tổng đơn thuê</h6>
+                    <h3>@(Model.OverviewStats?.TotalRentals ?? 0)</h3>
+                    <small class="text-muted">
+                        <span class="@GetTrendClass(Model.OverviewStats?.RentalGrowth ?? 0)">
+                            <i class="fas @(Model.OverviewStats?.RentalGrowth >= 0 ? "fa-arrow-up" : "fa-arrow-down")"></i>
+                            @FormatPercentage(Model.OverviewStats?.RentalGrowth ?? 0)
+                        </span>
+                        so với 30 ngày trước
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-card-icon success me-3">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-card-body flex-grow-1">
+                    <h6>Tổng doanh thu</h6>
+                    <h3>₫@((Model.OverviewStats?.TotalRevenue ?? 0).ToString("N0"))</h3>
+                    <small class="text-muted">
+                        <span class="@GetTrendClass(Model.OverviewStats?.RevenueGrowth ?? 0)">
+                            <i class="fas @(Model.OverviewStats?.RevenueGrowth >= 0 ? "fa-arrow-up" : "fa-arrow-down")"></i>
+                            @FormatPercentage(Model.OverviewStats?.RevenueGrowth ?? 0)
+                        </span>
+                        so với 30 ngày trước
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-card-icon info me-3">
+                    <i class="fas fa-car-side"></i>
+                </div>
+                <div class="stat-card-body flex-grow-1">
+                    <h6>Tổng số xe</h6>
+                    <h3>@(Model.OverviewStats?.TotalVehicles ?? 0)</h3>
+                    <small class="text-muted">@((Model.OverviewStats?.AvailableVehicles ?? 0)) xe sẵn sàng cho thuê</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-card-icon warning me-3">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div class="stat-card-body flex-grow-1">
+                    <h6>Báo cáo mới</h6>
+                    <h3>@Model.NewReportsCount</h3>
+                    <small class="text-muted">Cần xử lý</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <div class="col-xl-8 mb-4">
+        <div class="chart-card">
+            <div class="chart-card-header">
+                <h5><i class="fas fa-chart-area me-2"></i>Doanh thu theo tháng (@Model.SelectedYear)</h5>
+            </div>
+            <div class="chart-card-body">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 mb-4">
+        <div class="chart-card">
+            <div class="chart-card-header">
+                <h5><i class="fas fa-chart-pie me-2"></i>Trạng thái xe</h5>
+            </div>
+            <div class="chart-card-body">
+                <canvas id="vehicleStatusChart"></canvas>
+                <div class="text-center text-muted small mt-3">
+                    Tổng số xe: @(Model.VehicleStatusDistribution?.Values.Sum() ?? 0)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activities -->
+<div class="row">
+    <div class="col-xl-8 mb-4">
+        <div class="chart-card">
+            <div class="chart-card-header">
+                <h5><i class="fas fa-history me-2"></i>Hoạt động gần đây</h5>
+                <a href="#" class="btn btn-sm btn-outline-primary">Xem tất cả</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Thời gian</th>
+                            <th>Người dùng</th>
+                            <th>Hoạt động</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.RecentRentals != null && Model.RecentRentals.Any())
+                        {
+                            foreach (var rental in Model.RecentRentals)
+                            {
+                                var statusClass = rental.Status switch
+                                {
+                                    DataAccessLayer.Entities.RentalRecordStatus.Completed => "badge-custom badge-active",
+                                    DataAccessLayer.Entities.RentalRecordStatus.Active => "badge-custom badge-pending",
+                                    DataAccessLayer.Entities.RentalRecordStatus.Pending => "badge-custom badge-warning",
+                                    DataAccessLayer.Entities.RentalRecordStatus.Cancelled => "badge-custom badge-inactive",
+                                    _ => "badge-custom"
+                                };
+                                <tr>
+                                    <td><small>@(rental.StartTime?.ToString("HH:mm dd/MM") ?? "-")</small></td>
+                                    <td>@(string.IsNullOrWhiteSpace(rental.RenterName) ? "Khách lạ" : rental.RenterName)</td>
+                                    <td>@($"Thuê xe {rental.VehicleName}")</td>
+                                    <td><span class="badge @statusClass">@rental.Status</span></td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">Chưa có hoạt động nào gần đây.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 mb-4">
+        <div class="chart-card">
+            <div class="chart-card-header">
+                <h5><i class="fas fa-star me-2"></i>Xe được thuê nhiều nhất</h5>
+            </div>
+            <div class="p-3">
+                @if (Model.TopVehicles != null && Model.TopVehicles.Any())
+                {
+                    foreach (var vehicle in Model.TopVehicles)
+                    {
+                        <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                            <div class="flex-shrink-0">
+                                <div class="bg-gradient-primary text-white rounded p-2">
+                                    <i class="fas fa-car fa-lg"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-0">@vehicle.VehicleName</h6>
+                                <small class="text-muted">@vehicle.RentalCount lượt thuê</small>
+                            </div>
+                            <div class="text-end">
+                                <div class="badge bg-success">Doanh thu ₫@vehicle.TotalRevenue.ToString("N0")</div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-center text-muted my-3">Chưa có dữ liệu xe được thuê.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    const revenueData = @Html.Raw(revenueDataJson);
+    const revenueLabels = @Html.Raw(revenueLabelsJson);
+    const revenueChart = new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+            labels: revenueLabels,
+            datasets: [{
+                label: 'Doanh thu (Triệu VNĐ)',
+                data: revenueData,
+                backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                borderColor: 'rgba(78, 115, 223, 1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value + 'M';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Vehicle Status Chart
+    const vehicleStatusCtx = document.getElementById('vehicleStatusChart').getContext('2d');
+    const vehicleStatusLabels = @Html.Raw(vehicleStatusLabelsJson);
+    const vehicleStatusData = @Html.Raw(vehicleStatusDataJson);
+    const vehicleStatusChart = new Chart(vehicleStatusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: vehicleStatusLabels,
+            datasets: [{
+                data: vehicleStatusData,
+                backgroundColor: [
+                    'rgba(28, 200, 138, 0.8)',
+                    'rgba(78, 115, 223, 0.8)',
+                    'rgba(246, 194, 62, 0.8)',
+                    'rgba(231, 74, 59, 0.8)',
+                    'rgba(94, 114, 228, 0.8)'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        usePointStyle: true
+                    }
+                }
+            }
+        }
+    });
+</script>
+}
+
+
