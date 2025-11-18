@@ -21,7 +21,7 @@ namespace DataAccessLayer.Repositories
             VehicleStatus? status
         )
         {
-            IQueryable<Vehicle> query = _dbSet.Where(x => !x.IsDeleted);
+            IQueryable<Vehicle> query = _dbSet.Include(v => v.Station).Where(x => !x.IsDeleted);
             if (!string.IsNullOrEmpty(name))
             {
                 query = query.Where(v => v.Name.Contains(name));

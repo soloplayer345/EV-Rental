@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using DataAccessLayer.Entities;
 using DataAccessLayer.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -237,5 +238,6 @@ namespace DataAccessLayer.Repositories
 
             return result;
         }
+
     }
 }

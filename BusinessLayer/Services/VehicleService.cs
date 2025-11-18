@@ -33,21 +33,23 @@ namespace BusinessLayer.Services
 
         public async Task<IEnumerable<VehicleDto>> GetVehiclesAsync()
         {
-            var vehicles = await _vehicleRepo.GetAllAsync();
+            var query = _vehicleRepo.GetAllQueryable("Station");
+            var vehicles = await query.ToListAsync();
             return vehicles.Select(VehicleMapper.ToVehicleDto);
         }
 
         public async Task<IEnumerable<VehicleDto>> GetAllVehiclesAsync()
         {
-            var vehicles = await _vehicleRepo.GetAllAsync();
+            var query = _vehicleRepo.GetAllQueryable("Station");
+            var vehicles = await query.ToListAsync();
             return vehicles.Select(VehicleMapper.ToVehicleDto);
         }
 
         public async Task<IEnumerable<VehicleDto>> GetVehiclesByStationIdAsync(int stationId)
         {
-            var allVehicles = await _vehicleRepo.GetAllAsync();
-            var filtered = allVehicles.Where(v => v.StationId == stationId);
-            return filtered.Select(VehicleMapper.ToVehicleDto);
+            var query = _vehicleRepo.GetAllQueryable("Station").Where(v => v.StationId == stationId);
+            var vehicles = await query.ToListAsync();
+            return vehicles.Select(VehicleMapper.ToVehicleDto);
         }
 
         public async Task<VehicleDto?> GetVehicleByIdAsync(int id)

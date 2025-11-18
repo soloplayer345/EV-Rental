@@ -86,10 +86,6 @@ namespace EV_Rental
             // Bind MoMo settings
             builder.Services.Configure<MoMoSettings>(builder.Configuration.GetSection("MoMo"));
 
-
-
-
-
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -111,7 +107,6 @@ namespace EV_Rental
 
             app.MapRazorPages();
             app.MapHub<VehicleHub>("/vehicleHub"); // Map SignalR Hub
-
 
             app.Run();
         }
